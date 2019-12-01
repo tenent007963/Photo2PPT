@@ -1,0 +1,16 @@
+{
+  "name": "InstantPhoto",
+  "description": "Phone Snap, PC get.",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "main": "index.js",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "ip": "^1.1.5",
+    "opn": "^6.0.0",
+    "pptxgenjs": "^2.6.0",
+    "socket.io": "^2.3.0"
+  }
+}
