@@ -62,13 +62,13 @@ io.sockets.on("connection", function(socket) {
     });
   })
   
-  // Register "leave" events, sent by the client
+  // Register "leave" events, sent by phone side
   socket.on("leave", function(room) {
 	// leave the current room  
 	socket.leave(room);
   });
   
-  // Register "switchroom" events, sent by development version of pc side
+  // Register "switchroom" events, sent by pc side
   socket.on("switchroom", function(newroom) {
 	// leave the current room (stored in session)
 	socket.leave(socket.room);
