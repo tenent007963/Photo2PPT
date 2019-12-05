@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>InstantPhoto - Server - Local</title>
+    <title>InstantPhoto - Server (Development) - Local</title>
     <script src="/socket.io/socket.io.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.js"></script>
     <!-- Bundle: Easiest to use, supports all browsers -->
@@ -21,7 +21,7 @@
 	<button type="button" id="savepptx" onclick="savepptx()" style="float: right;position: relative; width: 100px; height: 25px;" disabled>Save PPTX</button>
 	<form style="float: right;position: relative">
 	<input type="file" id="e-warranty" style="display:none !important;" disabled="disabled" />
-	<input type="text" name="GSPN" id="GSPNint" placeholder="S/O number:" disabled="disabled"/>   
+	<input type="text" name="GSPN" id="GSPNint" placeholder="S/O number:" onkeypress="return formenter(event)" disabled="disabled"/>   
 	</form>
 	<span id="ewanstat" style="float: right;position: relative;color: green;display:none">&#10004; E-Warranty Attached &#10004; </span>
 	<h3>Waiting input on client side...</h3>
@@ -204,5 +204,15 @@
 	   } else {
 	    alert("PPTXGenJS not enabled!")
 	   }});
+	   
+	   
+  function formenter(e){
+  e=e||window.event;
+  var key = e.keyCode;
+  if(key==13) //Enter
+  {
+     return false; //return true to submit, false to do nothing
+  }
+}
     </script>
 </html>

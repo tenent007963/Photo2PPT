@@ -36,7 +36,7 @@
           // Send an image event to the socket
           var image = event.target.result
           output.src = image;
-          socket.emit("image", image);
+          socket.emit("image", image, room);
         };
 
         // Read file

@@ -15,26 +15,29 @@ var server=http.createServer(function(req,res){
         res.end();
     }
     switch(pathname){
-        case '/pc':
+        case '/server-beta':
             doc = fs.readFile(__dirname + '/server-minified.html', fsCallback);
         break;
 		case '/server-dev':
             doc = fs.readFile(__dirname + '/server-dev.html', fsCallback);
         break;
-		case '/server':
+		case '/pc':
             doc = fs.readFile(__dirname + '/server-source.html', fsCallback);
         break;
-		case '/phone':
-            doc = fs.readFile(__dirname + '/client.html', fsCallback);
+		case '/clienjt-beta':
+            doc = fs.readFile(__dirname + '/client-minified.html', fsCallback);
         break;
 		case '/client-dev':
             doc = fs.readFile(__dirname + '/client-dev.html', fsCallback);
         break;
-		case '/client':
+		case '/phone':
             doc = fs.readFile(__dirname + '/client-source.html', fsCallback);
         break;
 		case '/sync':
             doc = fs.readFile(__dirname + '/sync.html', fsCallback);
+        break;
+		case '/favicon':
+            doc = fs.readFile(__dirname + '/favicon.ico', fsCallback);
         break;
         default:
             doc = fs.readFile(__dirname + '/index.html', fsCallback);
@@ -49,16 +52,16 @@ console.log("InstantPhoto had started!");
 var io = require('socket.io').listen(server);
 
 // Register "connection" events to the WebSocket
-io.sockets.on("connection", function(socket) {
+io.on("connection", function(socket) {
   // Register "join" events, requested by a connected client
   socket.on("join", function (room) {
     // join channel provided by client
-	socket.room = room;
     socket.join(room);
+	socket.room = room;
 	// Register "image" events, sent by the client
 	socket.on("image", function(msg , rrr) {
      // Broadcast the "image" event to all other clients in the room
-     socket.to(rrr).emit("image", msg, rrr);
+     socket.broadcast.to(rrr).emit("image", msg, rrr);
     });
   })
   
@@ -87,4 +90,4 @@ console.log("Server IP:",ip);
 
 var opn = require('opn');
 // specify the app to open in 
-opn('http://localhost', {app: 'chrome'});
+opn('http://localhost/pc', {app: 'chrome'});
