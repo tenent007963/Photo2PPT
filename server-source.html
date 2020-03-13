@@ -5,7 +5,6 @@
     <title>InstantPhoto - Server - Local</title>
     <script src="/socket.io/socket.io.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.js"></script>
-    <!-- Bundle: Easiest to use, supports all browsers -->
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@2.5.0/dist/pptxgen.bundle.js"></script>
   </head>
   <body>
@@ -13,9 +12,13 @@
   <button type="button" onclick="checkRoomInitialize();" id="init-button" style="width: 250px; height: 30px; position: relative;" >Click here to start!</button>
   </div>
   
-    <!-- Image output -->
+    <!-- Container -->
 	<div class="container" id="main" style="display:none;">
+	<div class="btn-container" id="btn-container" style="display:none">
+	<button type="button" id="clrtmb" onclick="rmtmb()" style="float: right;position: relative; width: 150px; height: 25px;">Clear Thumbnail</button>
 	<button type="button" id="changeroom" onclick="joinroom()" style="float: right;position: relative; width: 110px; height: 25px;">Change Room</button>
+	</div>
+	<button type="button" id="moreopt" onclick="moreopt()" style="float: right;position: relative; width: 110px; height: 25px;">More Options</button>
 	<button type="button" id="saveimage" onclick="saveimage()" style="float: right;position: relative; width: 130px; height: 25px;">Save Image : <span id="wannasavemou">Yes</span></button>
 	<button type="button" id="togglepptx" onclick="togglepptx()" style="float: right;position: relative; width: 130px; height: 25px;">Create PPTX : <span id="pptxgenjsstatus">Off</span></button>
 	<button type="button" id="savepptx" onclick="savepptx()" style="float: right;position: relative; width: 100px; height: 25px;" disabled>Save PPTX</button>
@@ -27,7 +30,13 @@
 	<h3>Waiting input on client side...</h3>
 	<h4>Current room: <span id="roomindicator"></span></h4>
     <br />
+	<!-- Image output -->
 	<img style="max-width:640px; max-height:480px;" src="" id="download"/>
+	
+	<!-- Preview sidebar -->
+	<div id="rightbar" style="position:relative; width:240px; height: 720px;float:right">
+	
+	</div>
 </div>
 </body>
 
@@ -51,10 +60,12 @@
 	  const imgdown = document.getElementById("wannasavemou");
 	  const nsi = document.getElementById("nosaveimage");
 	  const ewanatt = document.getElementById("ewanstat");
+	  const btncoint = document.getElementById("btn-container");
 	
 	  //Initialize elements status
 	  let pptxenabled = false;
 	  let saveimg = true;
+	  let optenb = false;
 
 	  //Enable PPTXGenJS...or not?
 	  function togglepptx() {
@@ -83,6 +94,7 @@
 	      var loggo = ["receiving data from", woroom];
 		  console.log(loggo);
 	      output.src = image;
+		  triggerthumbnail(image);
 	      //Download Image Automatically if want
 		  if (saveimg == true) { 
 	          download(image, filename(), "application/octet-stream;base64");
@@ -148,15 +160,14 @@
 
 	  function checkRoomInitialize() {
 	      if (rn == 0) {
-	          console.log(rn);
+	          var isHiddenOrNot = document.getElementById("init");
+			  isHiddenOrNot.style.display = "none";
+			  var showTheContent = document.getElementById("main");
+	          showTheContent.style.display = "block";
+	          document.getElementById("roomindicator").innerHTML = room;
 	      } else {
 	          location.reload();
 	      };
-	      var isHiddenOrNot = document.getElementById("init");
-	      isHiddenOrNot.style.display = "none";
-	      var showTheContent = document.getElementById("main");
-	      showTheContent.style.display = "block";
-	      document.getElementById("roomindicator").innerHTML = room;
 	  }
 
 	  function savepptx() {
@@ -171,6 +182,7 @@
 		  fileInput.value = "";
 		  fileInput.disabled = true;
 		  ewanatt.style.display = "none";
+		  rmtmb();
 	  } else {
 	   alert("No GSPN Service Order number!");
 	    }}
@@ -180,12 +192,12 @@
 		   case true:
 		     saveimg = false;
 		     imgdown.innerHTML = "No";
-			 nsi.style.display = "none";
+			 nsi.style.display = "block";
 			 break;
 		   case false:
              saveimg = true;
 		     imgdown.innerHTML = "Yes";
-			 nsi.style.display = "block";
+			 nsi.style.display = "none";
              break;
           }}	
 		
@@ -199,11 +211,55 @@
 		  var ewanss = reader.result;
 		  window.slide = pptx.addNewSlide();
 		  slide.addImage({data: ewanss, x: 0.5, y: 0.3, w: 8.5, h: 5.5 });
+		  triggerthumbnail(ewanss);
 		}
 		ewanatt.style.display = "block";
 	   } else {
 	    alert("PPTXGenJS not enabled!")
 	   }});
+	   
+	   
+	//generate thumbnail for current received image and show at sidebar
+	//ref https://codepen.io/zoutepopcorn/pen/QvLxMp?editors=1010
+	//https://www.w3schools.com/jsref/met_document_createelement.asp
+
+function triggerthumbnail(image){
+	resizeImageToSpecificWidth(200, image, function(dat) {
+		var tmbnail = document.createElement("img");
+		tmbnail.src = dat;
+		tmbnail.setAttribute('id', 'tmbtnb');
+		var tmbdiv = document.getElementById("rightbar");
+		tmbdiv.appendChild(tmbnail);
+		});
+}
+
+function resizeImageToSpecificWidth(max, imgur, cb) {
+  var data;
+      var img = new Image();
+      img.onload = function() {
+        if (img.width > max) {
+          var oc = document.createElement('canvas'), octx = oc.getContext('2d');
+          oc.width = img.width;
+          oc.height = img.height;
+          octx.drawImage(img, 0, 0);
+          if( img.width > img.height) {
+            oc.height = (img.height / img.width) * max;
+            oc.width = max;
+          } else {
+            oc.width = (img.width / img.height) * max;
+            oc.height = max;
+          }
+          octx.drawImage(oc, 0, 0, oc.width, oc.height);          
+          octx.drawImage(img, 0, 0, oc.width, oc.height);
+          data = oc.toDataURL();
+        } else {
+          data = oc.toDataURL();
+        }
+        cb(data);
+      };
+      img.src = imgur;
+  }
+	
 	   
   function formenter(e){
   e=e||window.event;
@@ -213,5 +269,27 @@
      return false; //return true to submit, false to do nothing
   }
 }
+
+function rmtmb() {
+    // Removes an element from the document
+    var element = document.getElementById('rightbar');
+    element.innerHTML = '';
+}
+
+function moreopt() {
+	switch(optenb) {
+		   case true:
+		     optenb = false;
+			 btncoint.style.display = "none";
+			 break;
+		   case false:
+             optenb = true;
+			 btncoint.style.display = "block";
+             break;
+			 }
+	}
+   
+
+  window.onload = checkRoomInitialize();
     </script>
 </html>

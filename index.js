@@ -81,13 +81,13 @@ io.on("connection", function(socket) {
   });
   
 
-
+/*
 var os = require( 'os' );
 var networkInterfaces = os.networkInterfaces( );
 var arr = networkInterfaces['Ethernet']
 var ip = arr[1].address;
 console.log("Server IP:",ip);
-
+*/
 var opn = require('opn');
 // specify the app to open in 
 opn('http://localhost/pc', {app: 'chrome'});
