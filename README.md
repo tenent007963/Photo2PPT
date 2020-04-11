@@ -1,5 +1,5 @@
 # **InstaPhoto**
-Phone snap, PC get :D
+Aim to let users easily send freshly taken photos to computer.
 
 
 # Features:
