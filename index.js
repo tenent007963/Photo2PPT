@@ -17,7 +17,7 @@ var server=http.createServer(function(req,res){
         res.end();
     }
     switch(pathname){
-        case '/server-beta':
+        case '/pc-min':
             doc = fs.readFile(__dirname + '/static/server-min.html', fsCallback);
         break;
 		case '/server-dev':
@@ -26,7 +26,7 @@ var server=http.createServer(function(req,res){
 		case '/pc':
             doc = fs.readFile(__dirname + '/static/server-source.html', fsCallback);
         break;
-		case '/clienjt-beta':
+		case '/phone-min':
             doc = fs.readFile(__dirname + '/static/client-min.html', fsCallback);
         break;
 		case '/client-dev':
