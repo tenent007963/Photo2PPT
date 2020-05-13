@@ -1,27 +1,27 @@
 # **InstaPhoto**
-Aim to let users easily send freshly taken photos to computer.
+Aim to let users send freshly taken photos to computer easily.
 
 
 # Features:
-- Take photos from Phone-side and instantly shows up on PC-side
-- Intergrated PPTXGenJS function (Create / Attaching photos from Clipboard & Phone-side / Save with specific file name)
-- Changing between rooms on both sides
-
-# How to:
-
-Simply download this git and write `npm install` in console
-This project is currently in development and have multiple serious bugs. 
-Please only use the main function at room "test" and room "room1" on both PC-side and Phone-side
+- Take photos from Client-side and instantly shows up on Server-side
+- Intergrated PPTXGenJS function
+- Easily paste clipboard photo using Ctrl+V
+- Thubnail preview for newly added photos 
+- Multiple workspace for multiuser scenario
 
 
-*This project is originally for specific file attachments.*
+# How to use:
+
+Simply clone this repo and run `npm install` in console
+To start run `npm start` in console
+
+For Heroku:
+Just clone this repo and its now ready to go. 
+
+
+*This project is originally for doing specific file attachments.*
 
 # To-Do:
- 1. Fix leaving "rooms" for PC-side
- 2. Fix same photo was received multiple times on PC-side
- 3. Improve UI design for both side
- 4. Adding more features / plugins
+ 1. Improve UI design for both side
+ 2. Adding more features / plugins
  
-
-
-Feel free to download and test it, commit code changes to a branch first for better code review.

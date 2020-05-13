@@ -18,31 +18,31 @@ var server=http.createServer(function(req,res){
     }
     switch(pathname){
         case '/server-beta':
-            doc = fs.readFile(__dirname + '/server-minified.html', fsCallback);
+            doc = fs.readFile(__dirname + '/static/server-min.html', fsCallback);
         break;
 		case '/server-dev':
-            doc = fs.readFile(__dirname + '/server-dev.html', fsCallback);
+            doc = fs.readFile(__dirname + '/static/server-dev.html', fsCallback);
         break;
 		case '/pc':
-            doc = fs.readFile(__dirname + '/server-source.html', fsCallback);
+            doc = fs.readFile(__dirname + '/static/server-source.html', fsCallback);
         break;
 		case '/clienjt-beta':
-            doc = fs.readFile(__dirname + '/client-minified.html', fsCallback);
+            doc = fs.readFile(__dirname + '/static/client-min.html', fsCallback);
         break;
 		case '/client-dev':
-            doc = fs.readFile(__dirname + '/client-dev.html', fsCallback);
+            doc = fs.readFile(__dirname + '/static/client-dev.html', fsCallback);
         break;
 		case '/phone':
-            doc = fs.readFile(__dirname + '/client-source.html', fsCallback);
+            doc = fs.readFile(__dirname + '/static/client-source.html', fsCallback);
         break;
 		case '/sync':
-            doc = fs.readFile(__dirname + '/sync.html', fsCallback);
+            doc = fs.readFile(__dirname + '/static/sync.html', fsCallback);
         break;
 		case '/favicon':
             doc = fs.readFile(__dirname + '/favicon.ico', fsCallback);
         break;
         default:
-            doc = fs.readFile(__dirname + '/index.html', fsCallback);
+            doc = fs.readFile(__dirname + '/static/index.html', fsCallback);
         break;
     }
 	
@@ -58,14 +58,9 @@ io.on("connection", function(socket) {
   // Register "join" events, requested by a connected client
   socket.on("join", function (room) {
     // join channel provided by client
-    socket.join(room);
 	socket.room = room;
-	// Register "image" events, sent by the client
-	socket.on("image", function(msg , rrr) {
-     // Broadcast the "image" event to all other clients in the room
-     socket.broadcast.to(rrr).emit("image", msg, rrr);
-    });
-  })
+    socket.join(room);
+  });
   
   // Register "leave" events, sent by phone side
   socket.on("leave", function(room) {
@@ -73,14 +68,24 @@ io.on("connection", function(socket) {
 	socket.leave(room);
   });
   
+  // Register "image" events, sent by the client
+	socket.on("image", function(data , room) {
+     // Broadcast the "image" event to all other clients in the room
+     socket.broadcast.to(room).emit("image", data, room);
+	 //console.log(`Broadcasting data to ${room}`);
+    });
+  
+  
+/* not working due to client side value not passed to server  
   // Register "switchroom" events, sent by pc side
   socket.on("switchroom", function(newroom) {
 	// leave the current room (stored in session)
 	socket.leave(socket.room);
 	// join new room, received as function parameter
 	socket.join(newroom);
-	});
+	}); */
   });
+  
   
 
 /*

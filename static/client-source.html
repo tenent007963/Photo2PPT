@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.5,maximum-scale=3,user-scalable=no"/>
+    <title>InstantPhoto - Client(Stable Release)</title>
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body>
+  <button type="button" id="refresh" onclick="window.location.reload();" style="float: left" >Refresh page</button>
+  
+    <!-- File input -->
+	<div class="center" style="width: 50%; padding-top: 20%;" >
+	<button type="button" id="plusroom" onclick="plusroom()" style="float:right;position: relative; width: 140px; height: 25px;">Change Room +</button>
+	<button type="button" id="minusroom" onclick="minusroom()" style="float:right;position: relative; width: 140px; height: 25px;" disabled>Change Room -</button>
+	<h4>Current room: <span id="roomindicator"></span></h4>
+	<form id="holder" name="upload">
+	<span>Take photo directly please use this:</span>
+	<input id="input1" type="file" name="fresh" accept="image/*" capture="camera" autofocus>
+	<br /><br />
+	<span>Upload photo from gallery please use this:</span>
+	<input id="input2" type="file" name="gallery" accept="image/*">
+	</form>
+	
+    <!-- Client Code -->
+    <script type="text/javascript">
+
+      // Get WebSocket
+      var socket = io();
+
+      // Get DOM elements
+      var src1 = document.getElementById("input1");
+	  var src2 = document.getElementById("input2");
+
+      // Join a channel
+      let room = "test";
+	  let rm = "0";
+      socket.emit("join", room);
+	  document.getElementById("roomindicator").innerHTML = room;
+
+      // Listen to Source1 input events
+      src1.addEventListener("change", function (event) {
+
+        // Prepeare file reader
+        var file = event.target.files[0];
+        var fileReader = new FileReader();
+
+        fileReader.onloadend = function (event) {
+          // Send an image event to the socket
+          var image = event.target.result;
+          socket.emit("image", image , room);
+		  console.log(`Sending data stream to ${room}`);
+        };
+
+        // Read file
+        fileReader.readAsDataURL(file);
+      })
+	  
+	  // Listen to Source2 input events
+      src2.addEventListener("change", function (event) {
+
+        // Prepeare file reader
+        var file = event.target.files[0];
+        var fileReader = new FileReader();
+
+        fileReader.onloadend = function (event) {
+          // Send an image event to the socket
+          var image = event.target.result;
+          socket.emit("image", image , room);
+        };
+
+        // Read file
+        fileReader.readAsDataURL(file);
+      })
+	  
+	function plusroom() {
+	 rm++ ;
+	 joinroom(rm);
+    }	
+	
+	function minusroom() {
+	 rm-- ;
+	 joinroom(rm)
+    }	
+
+	function joinroom(rm) {
+	 let oldroom = room;
+
+	 if (rm >= 6) {
+	   if (rm = 6) {	 
+	     document.getElementById("plusroom").disabled = true;
+		} else { 
+	     rm-- ;
+	     alert("Uh-oh!Invalid Room selected.");
+	   } }
+	 
+	 if (rm >= 1 , rm < 6 ) {
+	 document.getElementById("plusroom").disabled = false;
+	 document.getElementById("minusroom").disabled = false;
+	 }
+	 
+	 if (rm <= 1) {
+	  if (rm = 1 ) {
+	   document.getElementById("minusroom").disabled = true;
+	  } else { 
+	   rm++ ;
+	   alert("Hey! Its not absolute zero!");
+	 }  }
+	
+	switch (rm) {
+	  case 1:
+       room = "room1";
+	   socket.emit("leave", oldroom);
+	   socket.emit("join", room);
+	   break;
+	  case 2: 
+	   room = "room2";
+	   socket.emit("leave", oldroom);
+	   socket.emit("join", room);
+	   break;
+	  case 3:
+	   room = "room3";
+	   socket.emit("leave", oldroom);
+	   socket.emit("join", room);
+	   break;
+	  case 4: 
+	   room = "room4";
+	   socket.emit("leave", oldroom);
+	   socket.emit("join", room);
+	   break;
+	  case 5: 
+	   room = "room5";
+	   socket.emit("leave", oldroom);
+	   socket.emit("join", room);
+	   break;
+	  case 6: 
+	   room = "room6";
+	   socket.emit("leave", oldroom);
+	   socket.emit("join", room);
+	   break; 
+	  default:
+	   room = "test";
+		break;
+		}
+		
+	 document.getElementById("roomindicator").innerHTML = room;
+	 
+    }
+    </script>
+	</div>
+  </body>
+</html>
