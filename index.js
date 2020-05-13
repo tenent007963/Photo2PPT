@@ -5,6 +5,8 @@ var path = require("path");
 var url=require('url');
 var PptxGenJS = require("pptxgenjs");
 
+const PORT = process.env.PORT || 3000;
+
 var server=http.createServer(function(req,res){
     var pathname=url.parse(req.url).pathname;
 	var fsCallback = function(error, data) {
@@ -44,7 +46,7 @@ var server=http.createServer(function(req,res){
         break;
     }
 	
-}).listen(80);
+}).listen(PORT);
 
 console.log("InstantPhoto had started!");
 
@@ -88,6 +90,6 @@ var arr = networkInterfaces['Ethernet']
 var ip = arr[1].address;
 console.log("Server IP:",ip);
 */
-var opn = require('opn');
+//var opn = require('opn');
 // specify the app to open in 
-opn('http://localhost/pc', {app: 'chrome'});
+//opn('http://localhost/pc', {app: 'chrome'});
