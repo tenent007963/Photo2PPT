@@ -39,7 +39,7 @@ var server=http.createServer(function(req,res){
             doc = fs.readFile(__dirname + '/static/sync.html', fsCallback);
         break;
 		case '/favicon':
-            doc = fs.readFile(__dirname + '/favicon.ico', fsCallback);
+            doc = fs.readFile(__dirname + '/static/favicon.ico', fsCallback);
         break;
         default:
             doc = fs.readFile(__dirname + '/static/index.html', fsCallback);
