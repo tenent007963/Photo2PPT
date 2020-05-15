@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>InstantPhoto - Server (Development)</title>
+    <title>InstantPhoto - Server</title>
     <link rel="icon" href="./favicon">
     <script src="/socket.io/socket.io.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.js"></script>
@@ -196,7 +196,7 @@
 	   alert("No GSPN Service Order number!");
 	    }}
 
-	  function saveimage() {
+	function saveimage() {
          switch(saveimg) {
 		   case true:
 		     saveimg = false;
@@ -210,22 +210,35 @@
              break;
           }}	
 		
-	   window.addEventListener('paste', function(e) {
-	   if (pptxenabled == true) {
-	    fileInput.files = e.clipboardData.files;
-		var file = document.querySelector('input[type=file]').files[0];
-		var reader =  new FileReader();
-		reader.readAsDataURL(file);
-		reader.onloadend = function () {
-		  var ewanss = reader.result;
-		  window.slide = pptx.addNewSlide();
-		  slide.addImage({data: ewanss, x: 0.5, y: 0.3, w: 8.5, h: 5.5 });
-		  triggerthumbnail(ewanss);
+	window.addEventListener('paste', function(e) {
+	    if (pptxenabled == true) {
+			clipboardData = e.clipboardData;
+			pastedData = clipboardData.getData('Text');
+			if (pastedData) {
+				setTimeout(function(){ 
+					if (gpint.value === pastedData) { 
+						return;
+					} else {
+						gpint.value = pastedData;
+						return; 
+					}},100);
+			} else {
+				fileInput.files = clipboardData.files;
+				var file = document.querySelector('input[type=file]').files[0];
+				var reader =  new FileReader();
+				reader.readAsDataURL(file);
+				reader.onloadend = function () {
+					var ewanss = reader.result;
+					window.slide = pptx.addNewSlide();
+					slide.addImage({data: ewanss, x: 0.5, y: 0.3, w: 8.5, h: 5.5 });
+					triggerthumbnail(ewanss);
+				}
+				ewanatt.style.display = "block";
+			}
+		} else {
+			alert("PPTXGenJS not enabled!")
 		}
-		ewanatt.style.display = "block";
-	   } else {
-	    alert("PPTXGenJS not enabled!")
-	   }});
+	});
 	   
 	   
 	//generate thumbnail for current received image and show at sidebar
