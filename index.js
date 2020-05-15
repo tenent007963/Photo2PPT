@@ -75,20 +75,13 @@ io.on("connection", function(socket) {
 	 //console.log(`Broadcasting data to ${room}`);
     });
   
-  
-/* not working due to client side value not passed to server  
-  // Register "switchroom" events, sent by pc side
-  socket.on("switchroom", function(newroom) {
-	// leave the current room (stored in session)
-	socket.leave(socket.room);
-	// join new room, received as function parameter
-	socket.join(newroom);
-	}); */
   });
   
   
 
+
 /*
+//required only if running on local machine
 var os = require( 'os' );
 var networkInterfaces = os.networkInterfaces( );
 var arr = networkInterfaces['Ethernet']
