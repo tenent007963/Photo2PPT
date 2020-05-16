@@ -3,9 +3,10 @@
   <head>
     <meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.5,maximum-scale=3,user-scalable=no"/>
-    <title>InstantPhoto - Client(Development)</title>
+    <title>InstantPhoto - Client</title>
     <link rel="icon" href="./favicon">
     <script src="/socket.io/socket.io.js"></script>
+	<script src="jsxcompressor"></script>
   </head>
   <body>
   <button type="button" id="refresh" onclick="window.location.reload();" style="float: left" >Refresh page</button>
@@ -39,40 +40,29 @@
       socket.emit("join", room);
 	  document.getElementById("roomindicator").innerHTML = room;
 
-      // Listen to Source1 input events
-      src1.addEventListener("change", function (event) {
+		// Listen to Source1 and Source2 input events
+		[src1,src2].forEach(function(sauce){ 
+			sauce.addEventListener("change", function (event) {
 
-        // Prepeare file reader
-        var file = event.target.files[0];
-        var fileReader = new FileReader();
-
-        fileReader.onloadend = function (event) {
-          // Send an image event to the socket
-          var image = event.target.result;
-          socket.emit("image", image , room);
-		  console.log(`Sending data stream to ${room}`);
-        };
-
-        // Read file
-        fileReader.readAsDataURL(file);
-      })
-	  
-	  // Listen to Source2 input events
-      src2.addEventListener("change", function (event) {
-
-        // Prepeare file reader
-        var file = event.target.files[0];
-        var fileReader = new FileReader();
-
-        fileReader.onloadend = function (event) {
-          // Send an image event to the socket
-          var image = event.target.result;
-          socket.emit("image", image , room);
-        };
-
-        // Read file
-        fileReader.readAsDataURL(file);
-      })
+				// Prepeare file reader
+				var file = event.target.files[0];
+				var fileReader = new FileReader();
+		
+				// Determine input type 
+				if (file instanceof Blob) {
+					// Read file
+					fileReader.readAsDataURL(file);
+				}
+				fileReader.onloadend = function (event) {
+				// Send an image event to the socket
+				var image = event.target.result;
+				// Add line for compressing image data here
+		  
+				socket.emit("image", image , room);
+				console.log(`Sending data stream to ${room}`);
+				};
+			});
+		});
 	  
 	function plusroom() {
 	 rm++ ;
@@ -92,7 +82,7 @@
 	     document.getElementById("plusroom").disabled = true;
 		} else { 
 	     rm-- ;
-	     alert("Uh-oh!Invalid Room selected.");
+	     alert("Invalid Room selected.");
 	   } }
 	 
 	 if (rm >= 1 , rm < 6 ) {
@@ -105,7 +95,7 @@
 	   document.getElementById("minusroom").disabled = true;
 	  } else { 
 	   rm++ ;
-	   alert("Hey! Its not absolute zero!");
+	   alert("You had reached the end!");
 	 }  }
 	
 	switch (rm) {
@@ -147,6 +137,14 @@
 	 document.getElementById("roomindicator").innerHTML = room;
 	 
     }
+	
+	// Checking on socket connection
+	socket.on('disconnect', function(){
+      // solution 1: refresh page
+	  window.location.reload();
+	  // solution 2: reconnect socket
+	  //socket.connect();
+	});
     </script>
 	</div>
   </body>

@@ -140,10 +140,10 @@
 	
 	// Checking on socket connection
 	socket.on('disconnect', function(){
-      //refresh page
+      // solution 1: refresh page
 	  window.location.reload();
-	  //reconnect socket
-	  //socket
+	  // solution 2: reconnect socket
+	  //socket.connect();
 	});
     </script>
 	</div>

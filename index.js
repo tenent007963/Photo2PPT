@@ -72,8 +72,13 @@ io.on("connection", function(socket) {
 	socket.on("image", function(data , room) {
      // Broadcast the "image" event to all other clients in the room
      socket.broadcast.to(room).emit("image", data, room);
-	 //console.log(`Broadcasting data to ${room}`);
+	 console.log(`Broadcasting data to ${room}`);
     });
+
+  // Handle and broadcast "status" events
+    socket.on("status",function(data,room) {
+	   socket.broadcast.to(room).emit("status",data);
+	});
   
   });
 
