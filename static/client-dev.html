@@ -6,16 +6,16 @@
     <title>InstantPhoto - Client(Development)</title>
     <link rel="icon" href="./favicon">
     <script src="/socket.io/socket.io.js"></script>
-	<script src="jsxcompressor"></script>
   </head>
   <body>
   <button type="button" id="refresh" onclick="window.location.reload();" style="float: left" >Refresh page</button>
   
     <!-- File input -->
-	<div class="center" style="width: 50%; padding-top: 20%;" >
+	<div class="center" style="width: 50%; padding-top: 16%;" >
 	<button type="button" id="plusroom" onclick="plusroom()" style="float:right;position: relative; width: 140px; height: 25px;">Change Room +</button>
 	<button type="button" id="minusroom" onclick="minusroom()" style="float:right;position: relative; width: 140px; height: 25px;" disabled>Change Room -</button>
 	<h4>Current room: <span id="roomindicator"></span></h4>
+	<h4 id="status">Now adding photo number 1</h4>
 	<form id="holder" name="upload">
 	<span>Take photo directly please use this:</span>
 	<input id="input1" type="file" name="fresh" accept="image/*" capture="camera" autofocus>
@@ -24,15 +24,18 @@
 	<input id="input2" type="file" name="gallery" accept="image/*">
 	</form>
 	
+	</div>	
     <!-- Client Code -->
     <script type="text/javascript">
-
+	  
       // Get WebSocket
       var socket = io();
 
       // Get DOM elements
       var src1 = document.getElementById("input1");
 	  var src2 = document.getElementById("input2");
+	  var status = document.getElementById("status");
+	  var fileform = document.getElementById("holder");
 
       // Join a channel
       let room = "test";
@@ -138,6 +141,11 @@
 	 
     }
 	
+	socket.on("status",function(data){
+		status.textContent = data;
+		fileform.reset();
+	}
+	
 	// Checking on socket connection
 	socket.on('disconnect', function(){
       // solution 1: refresh page
@@ -146,6 +154,5 @@
 	  //socket.connect();
 	});
     </script>
-	</div>
   </body>
 </html>

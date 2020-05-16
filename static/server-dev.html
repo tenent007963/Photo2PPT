@@ -65,9 +65,10 @@
 	  const btncoint = document.getElementById("btn-container");
 	
 	  //Initialize elements status
-	  let pptxenabled = false;
-	  let saveimg = true;
-	  let optenb = false;
+	  var pptxenabled = false;
+	  var saveimg = true;
+	  var optenb = false;
+	  var photocount = 0;
 
 	  //Enable PPTXGenJS...or not?
 	  function togglepptx() {
@@ -251,6 +252,8 @@ function triggerthumbnail(image){
 		tmbnail.setAttribute('id', 'tmbtnb');
 		var tmbdiv = document.getElementById("rightbar");
 		tmbdiv.appendChild(tmbnail);
+		photocount++
+		socket.emit("status",`Now adding photo number ${photocount+1}`,room);
 		});
 }
 
