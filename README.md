@@ -28,4 +28,4 @@ Just clone this repo and its now ready to go.
 	b. datastream encrypting
  3. Add support for pasting local image files
  4. Fix continuous connection issue (socket.io)
- 
+ 5. Clean client side input upon upload complete to prevent double upload

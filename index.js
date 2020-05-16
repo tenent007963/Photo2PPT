@@ -76,9 +76,6 @@ io.on("connection", function(socket) {
     });
   
   });
-  
-  
-
 
 /*
 //required only if running on local machine

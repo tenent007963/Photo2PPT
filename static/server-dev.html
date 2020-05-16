@@ -93,8 +93,9 @@
 	  socket.emit("join", room);
 
 	  socket.on("image", function(image, woroom) {
-	      var loggo = ["receiving data from", woroom];
-		  console.log(loggo);
+		  console.log(`receiving data from ${woroom}`);
+		  // Add line for decompressing image data here
+		  
 	      output.src = image;
 		  triggerthumbnail(image);
 	      //Download Image Automatically if want
