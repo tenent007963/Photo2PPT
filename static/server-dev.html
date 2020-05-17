@@ -195,7 +195,7 @@
 		  _fileInput.disabled = true;
 		  _ewanatt.style.display = "none";
 		  photocount = 0;
-		  socket.emit("status",`Now adding photo number ${photocount+1}`,room)
+		  socket.emit("status",`Now adding photo ${photocount+1}`,room)
 		  rmtmb();
 	  } else {
 	   alert("No GSPN Service Order number!");
@@ -256,7 +256,7 @@ function triggerthumbnail(image){
 		var tmbdiv = document.getElementById("rightbar");
 		tmbdiv.appendChild(tmbnail);
 		photocount++
-		socket.emit("status",`Now adding photo number ${photocount+1}`,room);
+		socket.emit("status",`Now adding photo ${photocount+1}`,room);
 		});
 }
 
