@@ -6,25 +6,52 @@
     <title>InstantPhoto - Client(Development)</title>
     <link rel="icon" href="./favicon">
     <script src="/socket.io/socket.io.js"></script>
+	<style>
+	html {
+		height: 100%;
+		margin: 0;
+		}
+	
+	body {
+		background: linear-gradient(to bottom, #66ccff 0%, #6699ff 100%),no-repeat;
+		height:100%;
+		width:50%;
+		text-align:center;
+		margin:0;
+	}
+	.center{
+		padding-top: 40%;
+		}
+		
+	button {
+		position: relative; 
+		width: 140px; 
+		height: 25px;
+		}
+		
+	</style>
   </head>
+  
   <body>
   <button type="button" id="refresh" onclick="window.location.reload();" style="float: left" >Refresh page</button>
   
     <!-- File input -->
-	<div class="center" style="width: 50%; padding-top: 16%;" >
-	<button type="button" id="plusroom" onclick="plusroom()" style="float:right;position: relative; width: 140px; height: 25px;">Change Room +</button>
-	<button type="button" id="minusroom" onclick="minusroom()" style="float:right;position: relative; width: 140px; height: 25px;" disabled>Change Room -</button>
-	<h4>Current room: <span id="roomindicator"></span></h4>
-	<h4 id="status">Now adding photo number 1</h4>
+	<div class="center">
+	<button type="button" class="button" id="plusroom" onclick="plusroom()">Change Room +</button>
+	<button type="button" class="button" id="minusroom" onclick="minusroom()" disabled>Change Room -</button>
+	<br />
+	<h4 style="text-align:left">Current room: <span id="roomindicator"></span></h4>
+	<h4 id="status" style="text-align:left;">Now adding photo number 1</h4>
 	<form id="holder" name="upload">
-	<span>Take photo directly please use this:</span>
+	<span>Take photo directly:</span>
 	<input id="input1" type="file" name="fresh" accept="image/*" capture="camera" autofocus>
 	<br /><br />
-	<span>Upload photo from gallery please use this:</span>
+	<span>Upload photo from gallery:</span>
 	<input id="input2" type="file" name="gallery" accept="image/*">
 	</form>
 	
 	</div>	
+	</body>
     <!-- Client Code -->
     <script type="text/javascript">
 	  
@@ -32,10 +59,10 @@
       var socket = io();
 
       // Get DOM elements
-      var src1 = document.getElementById("input1");
-	  var src2 = document.getElementById("input2");
-	  var status = document.getElementById("status");
-	  var fileform = document.getElementById("holder");
+      var _src1 = document.getElementById("input1");
+	  var _src2 = document.getElementById("input2");
+	  var _status = document.getElementById("status");
+	  var _fileform = document.getElementById("holder");
 
       // Join a channel
       let room = "test";
@@ -44,7 +71,7 @@
 	  document.getElementById("roomindicator").innerHTML = room;
 
 		// Listen to Source1 and Source2 input events
-		[src1,src2].forEach(function(sauce){ 
+		[_src1,_src2].forEach(function(sauce){ 
 			sauce.addEventListener("change", function (event) {
 
 				// Prepeare file reader
@@ -142,9 +169,9 @@
     }
 	
 	socket.on("status",function(data){
-		status.textContent = data;
-		fileform.reset();
-	}
+		_status.textContent = data;
+		_fileform.reset();
+	});
 	
 	// Checking on socket connection
 	socket.on('disconnect', function(){
@@ -154,5 +181,4 @@
 	  //socket.connect();
 	});
     </script>
-  </body>
 </html>

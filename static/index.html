@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>InstantPhoto - Select Mode</title>
-	<meta name="viewport" content="width=device-width,initial-scale=1.5,maximum-scale=3,user-scalable=no"/>
+	<meta name="viewport" content="width=device-width,initial-scale=0.8,maximum-scale=3,user-scalable=no"/>
 	<meta name="description" content="InstaPhoto - Instant send freshly taken photos from your phone to your computer."/>
     <link rel="icon" href="./favicon">
 	<style>
@@ -155,7 +155,7 @@ body {
 .instagram {
 	text-align: center;
 	border-radius: 50px;
-  padding: 26px;
+  padding: 20px;
   color: white;
   background: #BD3381;
   transition: all 0.2s ease-out 0s;
@@ -171,10 +171,10 @@ body {
   bottom: auto;
   margin: auto;
   z-index: -1;
-  background: radial-gradient(90px circle at top center, rgba(238,88,63,.8) 30%, rgba(255,255,255,0));
+  background: radial-gradient(70px circle at top center, rgba(238,88,63,.8) 30%, rgba(255,255,255,0));
   transition: all 0s ease-out 0s;
 	transform: translatex(-140px);
-	animation: 18s linear 0s infinite move;
+	animation: 10s linear 0s infinite move;
 }
 
 @keyframes move {
@@ -207,8 +207,8 @@ body {
 	<div class="header">
 		<a href="//servercd.xyz" class="logo">InstaPhoto</a>
 		<div class="header-right">
-			<a class="active" onclick="home()">Home</a>
-			<a onclick="more()">More</a>
+			<a class="active" onclick="home()" id="home">Home</a>
+			<a onclick="more()" id="more">More</a>
 			<a href="https://bit.ly/3dPTuGh" target="_blank">Github</a>
 		</div>
 	</div>
@@ -229,17 +229,23 @@ body {
     
   </body>
   <script>
-	var container = document.getElementById("container");
-	var container1 = document.getElementById("container1");
+	var _container = document.getElementById("container");
+	var _container1 = document.getElementById("container1");
+	var _home = document.getElementById("home");
+	var _more = document.getElementById("more");
 	
 	function home() {
-		container.style.display = "block";
-		container1.style.display = "none";	
+		_container.style.display = "block";
+		_container1.style.display = "none";
+		_home.classList.add('active')
+		_more.classList.remove('active')
 	}
 	
 	function more() {
-		container.style.display = "none";
-		container1.style.display = "block";	
+		_container.style.display = "none";
+		_container1.style.display = "block";
+		_home.classList.remove('active')
+		_more.classList.add('active')
 	}
 	</script>
 </html>

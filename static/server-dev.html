@@ -20,7 +20,7 @@
 	<button type="button" id="clrtmb" onclick="rmtmb()" style="float: right;position: relative; width: 150px; height: 25px;">Clear Thumbnail</button>
 	<button type="button" id="changeroom" onclick="joinroom()" style="float: right;position: relative; width: 110px; height: 25px;">Change Room</button>
 	</div>
-	<button type="button" id="moreopt" onclick="moreopt()" style="float: right;position: relative; width: 110px; height: 25px;">More Options</button>
+	<button type="button" id="moreopt" onclick="moreopt()" style="float: right;position: relative; width: 110px; height: 25px;">Expand</button>
 	<button type="button" id="saveimage" onclick="saveimage()" style="float: right;position: relative; width: 130px; height: 25px;">Save Image : <span id="wannasavemou">Yes</span></button>
 	<button type="button" id="togglepptx" onclick="togglepptx()" style="float: right;position: relative; width: 130px; height: 25px;">Create PPTX : <span id="pptxgenjsstatus">Off</span></button>
 	<button type="button" id="savepptx" onclick="savepptx()" style="float: right;position: relative; width: 100px; height: 25px;" disabled>Save PPTX</button>
@@ -53,16 +53,17 @@
     <script type="text/javascript">
 	
 	  //Define all document elements
-	  const svppt = document.getElementById("savepptx");
-	  const gpint = document.getElementById("GSPNint");
-	  const pptstat = document.getElementById("pptxgenjsstatus");
-	  const togppt = document.getElementById("togglepptx");
-	  const pptxne = document.getElementById("pptxnotenabled");
-	  const fileInput = document.getElementById("e-warranty");
-	  const imgdown = document.getElementById("wannasavemou");
-	  const nsi = document.getElementById("nosaveimage");
-	  const ewanatt = document.getElementById("ewanstat");
-	  const btncoint = document.getElementById("btn-container");
+	  const _svppt = document.getElementById("savepptx");
+	  const _gpint = document.getElementById("GSPNint");
+	  const _pptstat = document.getElementById("pptxgenjsstatus");
+	  const _togppt = document.getElementById("togglepptx");
+	  const _pptxne = document.getElementById("pptxnotenabled");
+	  const _fileInput = document.getElementById("e-warranty");
+	  const _imgdown = document.getElementById("wannasavemou");
+	  const _nsi = document.getElementById("nosaveimage");
+	  const _ewanatt = document.getElementById("ewanstat");
+	  const _btncoint = document.getElementById("btn-container");
+	  const _moreopt = document.getElementById("moreopt");
 	
 	  //Initialize elements status
 	  var pptxenabled = false;
@@ -74,12 +75,12 @@
 	  function togglepptx() {
 	      window.pptx = new PptxGenJS();
 	      pptxenabled = true;
-	      svppt.disabled = false;
-	      gpint.disabled = false;
-		  fileInput.disabled = false;
-	      pptxne.style.display = "none";
-	      pptstat.innerHTML = "On";
-	      togppt.disabled = true;
+	      _svppt.disabled = false;
+	      _gpint.disabled = false;
+		  _fileInput.disabled = false;
+	      _pptxne.style.display = "none";
+	      _pptstat.innerHTML = "On";
+	      _togppt.disabled = true;
 	  }
 
 	  // Get WebSocket
@@ -103,19 +104,19 @@
 		  if (saveimg == true) { 
 	          download(image, filename(), "application/octet-stream;base64");
 		  } else {
-		      nsi.style.display = "block"
+		      _nsi.style.display = "block"
 			  }
 	      if (pptxenabled == true) {
 		      window.slide = pptx.addNewSlide();
 	          slide.addImage({ data: image, x: 0, y: 0, w: 9.5, h: 5.5});
 	      } else {
-	          pptxne.style.display = "block";
+	          _pptxne.style.display = "block";
 	      }
 	  });
 
 	  //Grab Filename from input field
 	  function filename() {
-	      let GSPNsonumber = gpint.value;
+	      let GSPNsonumber = _gpint.value;
 	      return GSPNsonumber;
 	  }
 
@@ -182,17 +183,19 @@
 	  }
 
 	  function savepptx() {
-	    if (gpint && gpint.value) {
+	    if (_gpint && _gpint.value) {
 	      pptx.save(filename());
-	      pptstat.innerHTML = "Off";
+	      _pptstat.innerHTML = "Off";
 	      pptxenabled = false;
-	      svppt.disabled = true;
-		  gpint.value = "";
-	      gpint.disabled = true;
-	      togppt.disabled = false;
-		  fileInput.value = "";
-		  fileInput.disabled = true;
-		  ewanatt.style.display = "none";
+	      _svppt.disabled = true;
+		  _gpint.value = "";
+	      _gpint.disabled = true;
+	      _togppt.disabled = false;
+		  _fileInput.value = "";
+		  _fileInput.disabled = true;
+		  _ewanatt.style.display = "none";
+		  photocount = 0;
+		  socket.emit("status",`Now adding photo number ${photocount+1}`,room)
 		  rmtmb();
 	  } else {
 	   alert("No GSPN Service Order number!");
@@ -202,13 +205,13 @@
          switch(saveimg) {
 		   case true:
 		     saveimg = false;
-		     imgdown.innerHTML = "No";
-			 nsi.style.display = "block";
+		     _imgdown.innerHTML = "No";
+			 _nsi.style.display = "block";
 			 break;
 		   case false:
              saveimg = true;
-		     imgdown.innerHTML = "Yes";
-			 nsi.style.display = "none";
+		     _imgdown.innerHTML = "Yes";
+			 _nsi.style.display = "none";
              break;
           }}	
 		
@@ -218,14 +221,14 @@
 			pastedData = clipboardData.getData('Text');
 			if (pastedData) {
 				setTimeout(function(){ 
-					if (gpint.value === pastedData) { 
+					if (_gpint.value === pastedData) { 
 						return;
 					} else {
-						gpint.value = pastedData;
+						_gpint.value = pastedData;
 						return; 
 					}},100);
 			} else {
-				fileInput.files = clipboardData.files;
+				_fileInput.files = clipboardData.files;
 				var file = document.querySelector('input[type=file]').files[0];
 				var reader =  new FileReader();
 				reader.readAsDataURL(file);
@@ -235,7 +238,7 @@
 					slide.addImage({data: ewanss, x: 0.5, y: 0.3, w: 8.5, h: 5.5 });
 					triggerthumbnail(ewanss);
 				}
-				ewanatt.style.display = "block";
+				_ewanatt.style.display = "block";
 			}
 		} else {
 			alert("PPTXGenJS not enabled!")
@@ -304,11 +307,13 @@ function moreopt() {
 	switch(optenb) {
 		   case true:
 		     optenb = false;
-			 btncoint.style.display = "none";
+			 _btncoint.style.display = "none";
+			 _moreopt.textContent = "Expand";
 			 break;
 		   case false:
              optenb = true;
-			 btncoint.style.display = "block";
+			 _btncoint.style.display = "block";
+			 _moreopt.textContent = "Collapse";
              break;
 			 }
 	}
