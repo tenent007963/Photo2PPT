@@ -22,9 +22,7 @@ Just clone this repo and its now ready to go.
 *This project is originally for doing specific file attachments.*
 
 # To-Do:
- 1. Improve UI design for both side
- 2. Adding more features / plugins
+ 1. Adding more features / plugins
 	a. datastream compressing
 	b. datastream encrypting
- 3. Add support for pasting local image files
- 4. Enable status for both sides
+ 2. Add support for pasting local image files

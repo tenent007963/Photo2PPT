@@ -2,26 +2,35 @@
 <html>
   <head>
     <meta charset="utf-8">
-	<meta name="viewport" content="width=device-width,initial-scale=1.5,maximum-scale=3,user-scalable=no"/>
+	<meta name="viewport" content="initial-scale=1.5,maximum-scale=3,user-scalable=no"/>
     <title>InstantPhoto - Client(Development)</title>
     <link rel="icon" href="./favicon">
     <script src="/socket.io/socket.io.js"></script>
 	<style>
+	html, body, body div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, figure, footer, header, hgroup, menu, nav, section, time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+	font-size: 100%;
+    vertical-align: baseline;
+	}
+	
 	html {
 		height: 100%;
 		margin: 0;
+		width: 90%;
 		}
 	
 	body {
 		background: #9796f0;  /* fallback for old browsers */
 		background: -webkit-linear-gradient(to right, #fbc7d4, #9796f0);  /* Chrome 10-25, Safari 5.1-6 */
-		background: linear-gradient(to right, #fbc7d4, #9796f0); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+		background: linear-gradient(to bottom, #fbc7d4, #9796f0); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 		margin:0;
 	}
 	.center{
-		padding-top: 20%;
+		padding-top: 35%;
 		height:100%;
-		width:50%;
 		text-align:center;
 		margin:0;
 		}
@@ -31,18 +40,17 @@
 		width: 140px; 
 		height: 25px;
 		}
-		
-	h4 {
-		text-align:left;
-		}
-		
-	html, body, body div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, figure, footer, header, hgroup, menu, nav, section, time, mark, audio, video {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    outline: 0;
-	font-size: 100%;
-    vertical-align: baseline;
+	
+	form {
+	    display: inline-block;
+	}
+	
+	form {
+	max-width: 200px;
+	}
+	
+	input {
+	width: 100%;
 	}
 	</style>
   </head>

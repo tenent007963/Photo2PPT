@@ -2,36 +2,91 @@
 <html>
   <head>
     <meta charset="utf-8">
-	<meta name="viewport" content="width=device-width,initial-scale=1.5,maximum-scale=3,user-scalable=no"/>
+	<meta name="viewport" content="initial-scale=1.5,maximum-scale=3,user-scalable=no"/>
     <title>InstantPhoto - Client</title>
     <link rel="icon" href="./favicon">
     <script src="/socket.io/socket.io.js"></script>
+	<style>
+	html, body, body div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, figure, footer, header, hgroup, menu, nav, section, time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+	font-size: 100%;
+    vertical-align: baseline;
+	}
+	
+	html {
+		height: 100%;
+		margin: 0;
+		width: 90%;
+		}
+	
+	body {
+		background: #9796f0;  /* fallback for old browsers */
+		background: -webkit-linear-gradient(to right, #fbc7d4, #9796f0);  /* Chrome 10-25, Safari 5.1-6 */
+		background: linear-gradient(to bottom, #fbc7d4, #9796f0); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+		margin:0;
+	}
+	.center{
+		padding-top: 35%;
+		height:100%;
+		text-align:center;
+		margin:0;
+		}
+		
+	button {
+		position: relative; 
+		width: 140px; 
+		height: 25px;
+		}
+	
+	form {
+	    display: inline-block;
+	}
+	
+	form {
+	max-width: 200px;
+	}
+	
+	input {
+	width: 100%;
+	}
+	</style>
   </head>
+  
   <body>
   <button type="button" id="refresh" onclick="window.location.reload();" style="float: left" >Refresh page</button>
   
     <!-- File input -->
-	<div class="center" style="width: 50%; padding-top: 20%;" >
-	<button type="button" id="plusroom" onclick="plusroom()" style="float:right;position: relative; width: 140px; height: 25px;">Change Room +</button>
-	<button type="button" id="minusroom" onclick="minusroom()" style="float:right;position: relative; width: 140px; height: 25px;" disabled>Change Room -</button>
-	<h4>Current room: <span id="roomindicator"></span></h4>
+	<div class="center">
+	<button type="button" class="button" id="plusroom" onclick="plusroom()">Change Room +</button>
+	<button type="button" class="button" id="minusroom" onclick="minusroom()" disabled>Change Room -</button>
+	<br />
+	<h4 id="croom">Current room: <span id="roomindicator"></span></h4>
+	<h4 id="status">Now adding photo 1</h4>
+	<br />
 	<form id="holder" name="upload">
-	<span>Take photo directly please use this:</span>
+	<span>Take photo directly:</span>
 	<input id="input1" type="file" name="fresh" accept="image/*" capture="camera" autofocus>
 	<br /><br />
-	<span>Upload photo from gallery please use this:</span>
+	<span>Upload photo from gallery:</span>
 	<input id="input2" type="file" name="gallery" accept="image/*">
-	</form>
+	</form> 
 	
+	</div>	
+	</body>
     <!-- Client Code -->
     <script type="text/javascript">
-
+	  
       // Get WebSocket
       var socket = io();
 
       // Get DOM elements
-      var src1 = document.getElementById("input1");
-	  var src2 = document.getElementById("input2");
+      var _src1 = document.getElementById("input1");
+	  var _src2 = document.getElementById("input2");
+	  var _status = document.getElementById("status");
+	  var _fileform = document.getElementById("holder");
 
       // Join a channel
       let room = "test";
@@ -40,7 +95,7 @@
 	  document.getElementById("roomindicator").innerHTML = room;
 
 		// Listen to Source1 and Source2 input events
-		[src1,src2].forEach(function(sauce){ 
+		[_src1,_src2].forEach(function(sauce){ 
 			sauce.addEventListener("change", function (event) {
 
 				// Prepeare file reader
@@ -137,6 +192,11 @@
 	 
     }
 	
+	socket.on("status",function(data){
+		_status.textContent = data;
+		_fileform.reset();
+	});
+	
 	// Checking on socket connection
 	socket.on('disconnect', function(){
       // solution 1: refresh page
@@ -145,6 +205,4 @@
 	  //socket.connect();
 	});
     </script>
-	</div>
-  </body>
 </html>

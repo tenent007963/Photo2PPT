@@ -6,37 +6,157 @@
     <link rel="icon" href="./favicon">
     <script src="/socket.io/socket.io.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.js"></script>
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap" rel="stylesheet">
     <!-- Bundle: Easiest to use, supports all browsers -->
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@2.5.0/dist/pptxgen.bundle.js"></script>
+	<style>
+	@keyframes rainbow { 
+    0%{background-position:0% 50%}
+    50%{background-position:100% 25%}
+    100%{background-position:0% 50%}
+	}
+	
+	html, body, body div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, figure, footer, header, hgroup, menu, nav, section, time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+	font-size: 100%;
+    vertical-align: baseline;
+	}
+	
+	html {
+		height: 100%;
+	}
+	
+	body {
+		background: #2BC0E4;  /* fallback for old browsers */
+		background: -webkit-linear-gradient(to right, #2BC0E4, #EAECC6);  /* Chrome 10-25, Safari 5.1-6 */
+		background: linear-gradient(to right, #2BC0E4, #EAECC6); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+		margin:0;
+	}
+	
+	header h1 {
+		margin:0 2px;
+		font-family: 'Roboto', sans-serif;
+		position: fixed;
+		background-image: repeating-linear-gradient(45deg, violet, indigo, blue, green, yellow, orange, red, violet);
+		text-align: left;
+		background-size: 800% 800%;
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		font-size: 35px;
+		animation: rainbow 20s ease infinite
+	}
+	
+	h1 {
+		font-size: x-large;
+	}
+	
+	.init {
+		z-index: 99;
+		height: 100%
+		width: 100%;
+		margin:0; 
+		padding:0; 
+		top: 50%;
+		align-content: center;
+		text: center;
+	}
+	
+	.container {
+		width: 100%;
+		height: 100%;
+	}
+	
+	#topbar {
+		width: 99%;
+		overflow: hidden;
+		padding: 10px 5px;
+		background-color: #45b3a9; 
+		display:flex;
+		flex-direction: row-reverse;
+		justify-content: flex-start;
+		align-content: flex-start;
+		}
+	
+	button {
+		min-width: 120px;
+		min-height: 35px;
+		margin: 0 3px;
+		position: relative;
+		border: 3px solid white;
+		justify-content: center;
+		align-items: center;
+		background: transparent;
+		cursor: pointer;
+		transition: .3s;
+		color: white;
+	}
+	button:hover {
+		box-shadow: 0px 0px 15px 5px #fff;
+	}
+	
+	.preview {
+		position:relative; 
+		width:240px; 
+		height: 720px;
+		float:right;
+	}
+	
+	.savepptx {
+		font-size:1.5rem;
+		border:2px solid black;
+		border-radius:100px;
+		width:40px;
+		height:40px;
+		padding:5px;
+		margin: 10% auto;
+		transition: .5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+	}
+	
+	#header {
+		width: 90%;
+		margin:0 8px;
+	}
+	</style>
   </head>
   <body>
-  <div class="container" id="init" style="margin:0 auto; padding:auto; top: 50%;align-content: center;text: center; width:100%;height:90%;">
-  <button type="button" onclick="checkRoomInitialize();" id="init-button" style="width: 250px; height: 30px; position: relative;" >Click here to start!</button>
+  <header>
+  <h1>InstantPhoto<h1>
+  </header>
+  <div class="init" id="init">
+  <button type="button" onclick="checkRoomInitialize();" id="init-button">Click here to start!</button>
   </div>
   
     <!-- Container -->
-	<div class="container" id="main" style="display:none;">
-	<div class="btn-container" id="btn-container" style="display:none">
-	<button type="button" id="clrtmb" onclick="rmtmb()" style="float: right;position: relative; width: 150px; height: 25px;">Clear Thumbnail</button>
-	<button type="button" id="changeroom" onclick="joinroom()" style="float: right;position: relative; width: 110px; height: 25px;">Change Room</button>
+	<div class="container" id="main">
+		<div class="topbar" id="topbar">
+			<div class="btn-container" id="btn-container" style="display:none">
+				<button type="button" id="clrtmb" onclick="rmtmb()">Clear Thumbnail</button>
+				<button type="button" id="changeroom" onclick="joinroom()">Change Room</button>
+			</div>
+		<button type="button" id="moreopt" onclick="moreopt()">Expand</button>
+		<button type="button" id="saveimage" onclick="saveimage()">Save Image : <span id="wannasavemou">Yes</span></button>
+		<button type="button" id="togglepptx" onclick="togglepptx()">Create PPTX : <span id="pptxgenjsstatus">Off</span></button>
+		<button type="button" id="savepptx" onclick="savepptx()" disabled>Save PPTX</button>
+		<form style="float: right;position: relative">
+		<input type="file" id="e-warranty" style="display:none !important;" disabled="disabled" />
+		<input type="text" name="GSPN" id="GSPNint" placeholder="S/O number:" onkeypress="return formenter(event)" disabled="disabled"/>   
+		</form>
+		<span id="ewanstat" style="position: relative;color: green;display:none">&#10004; E-Warranty Attached &#10004; </span>
 	</div>
-	<button type="button" id="moreopt" onclick="moreopt()" style="float: right;position: relative; width: 110px; height: 25px;">Expand</button>
-	<button type="button" id="saveimage" onclick="saveimage()" style="float: right;position: relative; width: 130px; height: 25px;">Save Image : <span id="wannasavemou">Yes</span></button>
-	<button type="button" id="togglepptx" onclick="togglepptx()" style="float: right;position: relative; width: 130px; height: 25px;">Create PPTX : <span id="pptxgenjsstatus">Off</span></button>
-	<button type="button" id="savepptx" onclick="savepptx()" style="float: right;position: relative; width: 100px; height: 25px;" disabled>Save PPTX</button>
-	<form style="float: right;position: relative">
-	<input type="file" id="e-warranty" style="display:none !important;" disabled="disabled" />
-	<input type="text" name="GSPN" id="GSPNint" placeholder="S/O number:" onkeypress="return formenter(event)" disabled="disabled"/>   
-	</form>
-	<span id="ewanstat" style="float: right;position: relative;color: green;display:none">&#10004; E-Warranty Attached &#10004; </span>
-	<h3>Waiting input on client side...</h3>
-	<h4>Current room: <span id="roomindicator"></span></h4>
-    <br />
+	<div class="header" id="header"> 
+		<h1>Waiting input on client side...</h1>
+		<br />
+		<h3>Current room: <span id="roomindicator"></span></h3>
+		<br />
+	</div>
 	<!-- Image output -->
 	<img style="max-width:640px; max-height:480px;" src="" id="download"/>
 	
 	<!-- Preview sidebar -->
-	<div id="rightbar" style="position:relative; width:240px; height: 720px;float:right">
+	<div class="preview" id="rightbar">
 	
 	</div>
 </div>
