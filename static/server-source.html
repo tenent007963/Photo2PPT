@@ -438,6 +438,13 @@ function moreopt() {
 			 }
 	}
    
+   // Checking on socket connection
+	socket.on('disconnect', function(){
+      // solution 1: refresh page
+	  // window.location.reload();
+	  // solution 2: reconnect socket
+	  socket.connect();
+	});
 
   window.onload = checkRoomInitialize();
     </script>
