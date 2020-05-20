@@ -108,16 +108,52 @@
 					fileReader.readAsDataURL(file);
 				}
 				fileReader.onloadend = function (event) {
-				// Send an image event to the socket
-				var image = event.target.result;
-				// Add line for compressing image data here
-		  
-				socket.emit("image", image , room);
-				console.log(`Sending data stream to ${room}`);
+					// Send an image event to the socket
+					var image = event.target.result;
+					// Add line for compressing image data here
+				
+					// Check for connection status
+					if (socket.connected) {
+						test(image);
+					} else {
+						// reconnect
+						socket.connect();
+						if (socket.connected) {
+							test(image);
+						} else { 
+							alert("Connection lost! Will now refresh page.");
+							window.location.reload();
+						}
+					}
+				
 				};
+				
+				
 			});
 		});
-	  
+	    
+	function emitPhoto(image) {
+		var isSuccess = false;
+		socket.emit("image", image , room, (isSuccess) => {var complete = isSuccess} );
+		console.log(`Sending data stream to ${room}`);
+		
+		setTimeout((complete) => {if (!complete) {
+			emitPhoto(image);
+			} else {
+			console.log(`Data sent!`);
+			}},5000)
+	}
+	
+	
+	async function test(image) {
+		let sendPhoto = (image) => {socket.emit("image", image , room, (isSuccess) )};
+		let isSuccess = await sendPhoto;
+		let checkSuccess = (isSuccess) => { if (!isSuccess) { test(image) } else { console.log('Image sent!'); }; };
+		
+		sendPhoto(image);
+		checkSuccess(isSuccess);
+	}
+	
 	function plusroom() {
 	 rm++ ;
 	 joinroom(rm);
