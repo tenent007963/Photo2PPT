@@ -26,4 +26,3 @@ Just clone this repo and its now ready to go.
 	a. datastream compressing
 	b. datastream encrypting
  2. Add support for pasting local image files
- 3. Let client able to resend image if connection drop
