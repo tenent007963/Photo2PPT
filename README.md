@@ -26,3 +26,4 @@ Just clone this repo and its now ready to go.
 	a. datastream compressing
 	b. datastream encrypting
  2. Add support for pasting local image files
+ 3. active update status for client side
