@@ -114,12 +114,12 @@
 				
 					// Check for connection status
 					if (socket.connected) {
-						test(image);
+						emitPhoto(image);
 					} else {
 						// reconnect
 						socket.connect();
 						if (socket.connected) {
-							test(image);
+							emitPhoto(image);
 						} else { 
 							alert("Connection lost! Will now refresh page.");
 							window.location.reload();
@@ -130,28 +130,12 @@
 				
 				
 			});
-		});
-	    
+		});	
+	
 	function emitPhoto(image) {
-		var isSuccess = false;
-		socket.emit("image", image , room, (isSuccess) => {var complete = isSuccess} );
-		console.log(`Sending data stream to ${room}`);
-		
-		setTimeout((complete) => {if (!complete) {
-			emitPhoto(image);
-			} else {
-			console.log(`Data sent!`);
-			}},5000)
-	}
-	
-	
-	async function test(image) {
-		let sendPhoto = (image) => {socket.emit("image", image , room, (isSuccess) )};
-		let isSuccess = await sendPhoto;
-		let checkSuccess = (isSuccess) => { if (!isSuccess) { test(image) } else { console.log('Image sent!'); }; };
-		
-		sendPhoto(image);
-		checkSuccess(isSuccess);
+		socket.emit("recvimage", image, room, (isSuccess) => {
+			if (isSuccess) { console.log('Image sent!'); } else { test(image);};
+			});
 	}
 	
 	function plusroom() {
@@ -237,7 +221,7 @@
 	socket.on('disconnect', function(){
       // solution 1: refresh page
 	  window.location.reload();
-	  // solution 2: reconnect socket
+	  // solution 2: reconnect socket - used when emitting photo
 	  //socket.connect();
 	});
     </script>
