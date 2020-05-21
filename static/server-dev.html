@@ -214,28 +214,6 @@
 	  var rn = "0";
 	  socket.emit("join", room);
 
-	  // old "image" socket - with room param
-	  socket.on("image", function(image, woroom) {
-		  console.log(`receiving data from ${woroom}`);
-		  // Add line for decompressing image data here
-		  
-	      output.src = image;
-		  triggerthumbnail(image);
-	      //Download Image Automatically if want
-		  if (saveimg == true) { 
-	          download(image, filename(), "application/octet-stream;base64");
-		  } else {
-		      _nsi.style.display = "block"
-			  }
-	      if (pptxenabled == true) {
-		      window.slide = pptx.addNewSlide();
-	          slide.addImage({ data: image, x: 0, y: 0, w: 9.5, h: 5.5});
-	      } else {
-	          _pptxne.style.display = "block";
-	      }
-	  });
-	  
-	  
 	  // new "transimage" - w/o room param 
 	  socket.on("transimage", function(image) {
 		  // Add line for decompressing image data here

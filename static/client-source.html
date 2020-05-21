@@ -108,16 +108,36 @@
 					fileReader.readAsDataURL(file);
 				}
 				fileReader.onloadend = function (event) {
-				// Send an image event to the socket
-				var image = event.target.result;
-				// Add line for compressing image data here
-		  
-				socket.emit("image", image , room);
-				console.log(`Sending data stream to ${room}`);
+					// Send an image event to the socket
+					var image = event.target.result;
+					// Add line for compressing image data here
+				
+					// Check for connection status
+					if (socket.connected) {
+						emitPhoto(image);
+					} else {
+						// reconnect
+						socket.connect();
+						if (socket.connected) {
+							emitPhoto(image);
+						} else { 
+							alert("Connection lost! Will now refresh page.");
+							window.location.reload();
+						}
+					}
+				
 				};
+				
+				
 			});
-		});
-	  
+		});	
+	
+	function emitPhoto(image) {
+		socket.emit("recvimage", image, room, (isSuccess) => {
+			if (isSuccess) { console.log('Image sent!'); } else { test(image);};
+			});
+	}
+	
 	function plusroom() {
 	 rm++ ;
 	 joinroom(rm);
@@ -201,7 +221,7 @@
 	socket.on('disconnect', function(){
       // solution 1: refresh page
 	  window.location.reload();
-	  // solution 2: reconnect socket
+	  // solution 2: reconnect socket - used when emitting photo
 	  //socket.connect();
 	});
     </script>
