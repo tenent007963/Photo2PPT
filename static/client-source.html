@@ -64,7 +64,7 @@
 	<button type="button" class="button" id="minusroom" onclick="minusroom()" disabled>Change Room -</button>
 	<br />
 	<h4 id="croom">Current room: <span id="roomindicator"></span></h4>
-	<h4 id="status">Now adding photo 1</h4>
+	<h4 id="status">Getting Status...</h4>
 	<br />
 	<form id="holder" name="upload">
 	<span>Take photo directly:</span>
@@ -220,9 +220,14 @@
 	// Checking on socket connection
 	socket.on('disconnect', function(){
       // solution 1: refresh page
-	  window.location.reload();
+	  //window.location.reload();
 	  // solution 2: reconnect socket - used when emitting photo
-	  //socket.connect();
+	  socket.connect();
 	});
+	
+	window.onoload = function () {
+		socket.emit("status","check",room);
+		}
+	
     </script>
 </html>

@@ -213,7 +213,7 @@
 	  var room = "test";
 	  var rn = "0";
 	  socket.emit("join", room);
- 
+
 	  // new "transimage" - w/o room param 
 	  socket.on("transimage", function(image) {
 		  // Add line for decompressing image data here
@@ -334,40 +334,8 @@
 			 _nsi.style.display = "none";
              break;
           }}	
-		
-	window.addEventListener('paste', function(e) {
-	    if (pptxenabled == true) {
-			clipboardData = e.clipboardData;
-			pastedData = clipboardData.getData('Text');
-			if (pastedData) {
-				setTimeout(function(){ 
-					if (_gpint.value === pastedData) { 
-						return;
-					} else {
-						_gpint.value = pastedData;
-						return; 
-					}},100);
-			} else {
-				_fileInput.files = clipboardData.files;
-				var file = document.querySelector('input[type=file]').files[0];
-				var reader =  new FileReader();
-				reader.readAsDataURL(file);
-				reader.onloadend = function () {
-					var ewanss = reader.result;
-					window.slide = pptx.addNewSlide();
-					slide.addImage({data: ewanss, x: 0.5, y: 0.3, w: 8.5, h: 5.5 });
-					triggerthumbnail(ewanss);
-				}
-				_ewanatt.style.display = "block";
-			}
-		} else {
-			alert("PPTXGenJS not enabled!")
-		}
-	});
 	   
-	   
-	//generate thumbnail for current received image and show at sidebar
-
+//generate thumbnail for current received image and show at sidebar
 function triggerthumbnail(image){
 	if (pptxenabled) {
 		resizeImageToSpecificWidth(200, image, function(dat) {
@@ -442,7 +410,53 @@ function moreopt() {
 			 }
 	}
    
+   	window.addEventListener('paste', function(e) {
+	    if (pptxenabled) {
+			clipboardData = e.clipboardData;
+			pastedData = clipboardData.getData('Text');
+			if (pastedData) {
+				setTimeout(function(){ 
+					if (_gpint.value === pastedData) { 
+						return;
+					} else {
+						_gpint.value = pastedData;
+						return; 
+					}},100);
+			} else {
+				_fileInput.files = clipboardData.files;
+				var file = document.querySelector('input[type=file]').files[0];
+				var reader =  new FileReader();
+				reader.readAsDataURL(file);
+				reader.onloadend = function () {
+					var ewanss = reader.result;
+					window.slide = pptx.addNewSlide();
+					slide.addImage({data: ewanss, x: 0.5, y: 0.3, w: 8.5, h: 5.5 });
+					triggerthumbnail(ewanss);
+				}
+				_ewanatt.style.display = "block";
+			}
+		} else {
+			alert("PPTXGenJS not enabled!")
+		}
+	});
+	   
+	// Return server image status to client upon call
+	socket.on("status",(data) => {
+		if (pptxenabled) {
+			socket.emit("status",`Now adding photo ${photocount+1}`,room);
+			} else {
+			socket.emit("status",`PptxGenJS not enabled!`,room);
+			}
+	});
 
   window.onload = checkRoomInitialize();
+  
+  // Checking on socket connection
+	socket.on('disconnect', function(){
+      // solution 1: refresh page
+	  window.location.reload();
+	  // solution 2: reconnect socket - used when emitting photo
+	  //socket.connect();
+	});
     </script>
 </html>
