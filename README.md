@@ -27,4 +27,4 @@ Just clone this repo and its now ready to go.
 	b. multiroom through generate / scan qr
  2. Add support for pasting local image files
  3. "Status" socket able to check if server side is online and return appropriate info
- 4. Make connection between server - client more stable / redundant
+ 4. Auto reconnect for both server & client
