@@ -12,7 +12,7 @@ Aim to let users send freshly taken photos to computer easily.
 
 # How to use:
 
-Simply clone this repo and run `npm install` in console
+Simply clone this repo and run `npm install` in console.
 To start run `npm start` in console
 
 For Heroku:
@@ -23,8 +23,8 @@ Just clone this repo and its now ready to go.
 
 # To-Do:
  1. Adding more features / plugins
-	a. datastream compressing
-	b. datastream encrypting
+	a. datastream encrypting
+	b. multiroom through generate / scan qr
  2. Add support for pasting local image files
- 3. active update status for client side
- 4. Add connection check on server side
+ 3. "Status" socket able to check if server side is online and return appropriate info
+ 4. Make connection between server - client more stable / redundant
