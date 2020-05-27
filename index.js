@@ -68,11 +68,12 @@ io.on("connection", function(socket) {
 	socket.leave(room);
   });
   
-  // Register "recvimage" events, a newer fucntion sent by the client
+  // Register "recvimage" events, a newer function sent by the client
 	socket.on("recvimage", (data , room, callback) => {
 	// Broadcast the "transimage" event to all server side in the room
     socket.broadcast.to(room).emit("transimage", data);
 	// Return success msg
+     console.log(`Broadcasting image to ${room}`);
     callback({isSuccess: true});
     });
 
