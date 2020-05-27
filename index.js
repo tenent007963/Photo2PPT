@@ -50,11 +50,43 @@ var server=http.createServer(function(req,res){
 
 console.log("InstantPhoto had started!");
 
-// Initialize Socket.io 
+// Initialize Socket.io and its variables
 var io = require('socket.io').listen(server);
+var serverIsOnline = new Object;
 
 // Register "connection" events to the WebSocket
 io.on("connection", function(socket) {
+	
+	// Register "server" events sent by server ONLY
+    socket.on("server", function (data,room) {
+		// check for sent data
+		if (data === "isOnline") {
+			serverIsOnline.room = true;
+			// check if connection is dropped
+			if (!socket.connected) {
+				serverIsOnline.room = false;
+				return false;
+			}
+		} else {
+			return false;
+		}
+  });
+  
+  // Register "client" events sent by client ONLY
+    socket.on("client", function (data,room) {
+		console.log(`Received request from client side.`);
+		// check for sent data
+		if (data === "check") {
+			console.log(`Determined request type.`);
+			if (serverIsOnline.room) {
+				console.log(`Parse request to server side`);
+				socket.broadcast.to(room).emit("status",data);
+			} else {
+				socket.broadcast.to(room).emit("status",`Server side offline!`);
+			}
+		}
+  });
+	
   // Register "join" events, requested by a connected client
   socket.on("join", function (room) {
     // join channel provided by client
@@ -79,7 +111,8 @@ io.on("connection", function(socket) {
 
   // Handle and broadcast "status" events
     socket.on("status",function(data,room) {
-	   socket.broadcast.to(room).emit("status",data);
+		console.log(`Parsing status..`)
+	    socket.broadcast.to(room).emit("status",data);
 	});
   
   });

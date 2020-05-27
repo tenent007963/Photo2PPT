@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>InstantPhoto - Server (Development)</title>
+    <title>InstantPhoto - Server</title>
     <link rel="icon" href="./favicon">
     <script src="/socket.io/socket.io.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.js"></script>
@@ -171,12 +171,14 @@
 </footer>
 <!-- Client Code -->
     <script type="text/javascript">
+	  //Debug section
+	  var isDebug = true;	
 	
 	  //Define all document elements
 	  const _svppt = document.getElementById("savepptx");
 	  const _gpint = document.getElementById("GSPNint");
 	  const _pptstat = document.getElementById("pptxgenjsstatus");
-	  const _togppt = document.getElementById("togglepptx");
+	  const _togppt = document.getElementById("togglepptx"); //no longer in use
 	  const _pptxne = document.getElementById("pptxnotenabled");
 	  const _fileInput = document.getElementById("e-warranty");
 	  const _imgdown = document.getElementById("wannasavemou");
@@ -193,14 +195,28 @@
 
 	  //Enable PPTXGenJS...or not?
 	  function togglepptx() {
-	      window.pptx = new PptxGenJS();
+		if (pptxenabled) {
+	      _pptstat.innerHTML = "Off";
+	      pptxenabled = false;
+	      _svppt.disabled = true;
+		  _gpint.value = "";
+	      _gpint.disabled = true;
+		  _fileInput.value = "";
+		  _fileInput.disabled = true;
+		  _ewanatt.style.display = "none";
+		  photocount = 0;
+		  rmtmb();
+		  socket.emit("status",`PptxGenJS not enabled!`,room);
+	    } else {
+		  window.pptx = new PptxGenJS();
 	      pptxenabled = true;
 	      _svppt.disabled = false;
 	      _gpint.disabled = false;
 		  _fileInput.disabled = false;
 	      _pptxne.style.display = "none";
 	      _pptstat.innerHTML = "On";
-	      _togppt.disabled = true;
+		  socket.emit("status",`Now adding photo ${photocount+1}`,room);
+		}
 	  }
 
 	  // Get WebSocket
@@ -238,6 +254,15 @@
 	  function filename() {
 	      let GSPNsonumber = _gpint.value;
 	      return GSPNsonumber;
+	  }
+	  
+	  //Generate random hash
+	  function randomHash() {
+		var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+		var stringLength = 10;
+		function pickRandom() {	return possible[Math.floor(Math.random() * possible.length)]; }
+		var randomString = Array.apply(null, Array(stringLength)).map(pickRandom).join('');
+		return randomString;
 	  }
 
 	  //Joining Different Room
@@ -292,16 +317,24 @@
 
 	  function checkRoomInitialize() {
 	      if (rn == 0) {
+			  // checking all variables and setup room
 	          var isHiddenOrNot = document.getElementById("init");
 			  isHiddenOrNot.style.display = "none";
 			  var showTheContent = document.getElementById("main");
 	          showTheContent.style.display = "block";
 	          document.getElementById("roomindicator").innerHTML = room;
+			  //check isDebug environment
+			  if (isDebug) {
+				window.document.title = "InstantPhoto - Server(Development)";
+			  }
+			  // tell host that server in room is online
+			  socket.emit("server","isOnline",room);
 	      } else {
 	          location.reload();
 	      };
 	  }
-
+		
+	  //Save PPTX as file and reset all to default
 	  function savepptx() {
 	    if (_gpint && _gpint.value) {
 	      pptx.save(filename());
@@ -310,17 +343,17 @@
 	      _svppt.disabled = true;
 		  _gpint.value = "";
 	      _gpint.disabled = true;
-	      _togppt.disabled = false;
 		  _fileInput.value = "";
 		  _fileInput.disabled = true;
 		  _ewanatt.style.display = "none";
 		  photocount = 0;
-		  socket.emit("status",`Now adding photo ${photocount+1}`,room)
+		  socket.emit("status",`File saved. Please re-enable PPTXGenJS.`,room)
 		  rmtmb();
 	  } else {
 	   alert("No GSPN Service Order number!");
 	    }}
 
+	//Toggle SaveImage On/Off
 	function saveimage() {
          switch(saveimg) {
 		   case true:
@@ -432,31 +465,52 @@ function moreopt() {
 					window.slide = pptx.addNewSlide();
 					slide.addImage({data: ewanss, x: 0.5, y: 0.3, w: 8.5, h: 5.5 });
 					triggerthumbnail(ewanss);
+					if (saveimg == true) { 
+						download(ewanss, randomHash(), "application/octet-stream;base64");
+					}
 				}
 				_ewanatt.style.display = "block";
+				 
 			}
 		} else {
 			alert("PPTXGenJS not enabled!")
 		}
 	});
-	   
-	// Return server image status to client upon call
+  
+  // Below are all socket functions / connections
+ 
+  // Upon socket disconnection
+	socket.on('disconnect', function(){
+      // Save file with random hash and proceed page reload
+	  pptx.save(randomHash());
+	  window.location.reload();
+	});
+	
+  	// Return server image status to client upon call
 	socket.on("status",(data) => {
+	  console.log(`Received parsed request from host`)
+      if (data == "check") {
 		if (pptxenabled) {
+			console.log(`Sending status..`)
 			socket.emit("status",`Now adding photo ${photocount+1}`,room);
 			} else {
+			console.log(`Sending status..`)
 			socket.emit("status",`PptxGenJS not enabled!`,room);
 			}
+      } else {
+		console.log(`Request dropped!`)
+		return false; 
+	  }
 	});
-
-  window.onload = checkRoomInitialize();
-  
-  // Checking on socket connection
-	socket.on('disconnect', function(){
-      // solution 1: refresh page
-	  window.location.reload();
-	  // solution 2: reconnect socket - used when emitting photo
-	  //socket.connect();
-	});
+	
+	window.onload = checkRoomInitialize();
+	
+	
+	//Default debug Code, do not modify
+	function _consoleLog(stringData) {
+		if(isDebug) {
+			console.log(stringData);
+			} 
+		}
     </script>
 </html>

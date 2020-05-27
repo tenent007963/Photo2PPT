@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 	<meta name="viewport" content="initial-scale=1.5,maximum-scale=3,user-scalable=no"/>
-    <title>InstantPhoto - Client(Development)</title>
+    <title>InstantPhoto - Client</title>
     <link rel="icon" href="./favicon">
     <script src="/socket.io/socket.io.js"></script>
 	<style>
@@ -78,6 +78,8 @@
 	</body>
     <!-- Client Code -->
     <script type="text/javascript">
+	//Debug section
+	var isDebug = true;	
 	  
       // Get WebSocket
       var socket = io();
@@ -212,7 +214,12 @@
 	 
     }
 	
+	
+	//Below are all socket functions / connections
+	
+	//Listen to "status" event and update _status element 
 	socket.on("status",function(data){
+		console.log(`Received status update.`);
 		_status.textContent = data;
 		_fileform.reset();
 	});
@@ -225,9 +232,24 @@
 	  socket.connect();
 	});
 	
-	window.onoload = function () {
-		socket.emit("status","check",room);
-		}
+	function checkStatus() {
+		socket.emit("client","check",room);
+		console.log("Querying status..");
+		if (isDebug) {
+				window.document.title = "InstantPhoto - Client(Development)";
+			  }
+	}
 	
+	window.onload = () => { 
+		setTimeout(checkStatus(),3000);
+			}
+			
+			
+	//Default debug Code, do not modify
+	function _consoleLog(stringData) {
+		if(isDebug) {
+			console.log(stringData);
+			} 
+		}
     </script>
 </html>
