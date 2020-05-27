@@ -19,8 +19,6 @@ For Heroku:
 Just clone this repo and its now ready to go. 
 
 
-*This project is originally for doing specific file attachments.*
-
 # To-Do:
  1. Adding more features / plugins
 	a. datastream encrypting
