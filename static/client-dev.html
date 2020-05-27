@@ -117,13 +117,16 @@
 					// Check for connection status
 					if (socket.connected) {
 						emitPhoto(image);
+						_consoleLog(`First try success!`);
 					} else {
 						// reconnect
 						socket.connect();
 						if (socket.connected) {
 							emitPhoto(image);
+							_consoleLog(`Second try success.`);
 						} else { 
 							alert("Connection lost! Will now refresh page.");
+							_consoleLog(`Connection lost!`);
 							window.location.reload();
 						}
 					}
@@ -136,7 +139,7 @@
 	
 	function emitPhoto(image) {
 		socket.emit("recvimage", image, room, (isSuccess) => {
-			if (isSuccess) { console.log('Image sent!'); } else { test(image);};
+			if (isSuccess) { _consoleLog('Image sent!'); } else { emitPhoto(image);};
 			});
 	}
 	
@@ -219,22 +222,21 @@
 	
 	//Listen to "status" event and update _status element 
 	socket.on("status",function(data){
-		console.log(`Received status update.`);
+		_consoleLog(`Received status update.`);
 		_status.textContent = data;
 		_fileform.reset();
 	});
 	
-	// Checking on socket connection
+	// Upon socket disconnection
 	socket.on('disconnect', function(){
-      // solution 1: refresh page
-	  //window.location.reload();
-	  // solution 2: reconnect socket - used when emitting photo
+	  // try to reconnect
 	  socket.connect();
+	  _consoleLog(`Trying to reconnect socket.`);
 	});
 	
 	function checkStatus() {
 		socket.emit("client","check",room);
-		console.log("Querying status..");
+		_consoleLog("Querying status..");
 		if (isDebug) {
 				window.document.title = "InstantPhoto - Client(Development)";
 			  }

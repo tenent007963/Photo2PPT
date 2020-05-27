@@ -68,6 +68,7 @@ io.on("connection", function(socket) {
 				return false;
 			}
 		} else {
+			serverIsOnline.room = false;
 			return false;
 		}
   });

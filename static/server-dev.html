@@ -207,6 +207,7 @@
 		  photocount = 0;
 		  rmtmb();
 		  socket.emit("status",`PptxGenJS not enabled!`,room);
+		  _consoleLog(`PptxGenJS disabled.`);
 	    } else {
 		  window.pptx = new PptxGenJS();
 	      pptxenabled = true;
@@ -216,6 +217,7 @@
 	      _pptxne.style.display = "none";
 	      _pptstat.innerHTML = "On";
 		  socket.emit("status",`Now adding photo ${photocount+1}`,room);
+		  _consoleLog(`PptxGenJS enabled, waiting photo.`);
 		}
 	  }
 
@@ -230,13 +232,14 @@
 	  var rn = "0";
 	  socket.emit("join", room);
 
-	  // new "transimage" - w/o room param 
+	  // new "transimage" socket - w/o room param 
 	  socket.on("transimage", function(image) {
+		  _consoleLog(`Image received, processing.`);
 		  // Add line for decompressing image data here
 		  
 	      output.src = image;
 		  triggerthumbnail(image);
-	      //Download Image Automatically if want
+	      //Download image if enabled
 		  if (saveimg == true) { 
 	          download(image, filename(), "application/octet-stream;base64");
 		  } else {
@@ -314,7 +317,8 @@
 	      document.getElementById("roomindicator").innerHTML = room;
 
 	  }
-
+		
+	  // Room initializing, check if all variable is correct
 	  function checkRoomInitialize() {
 	      if (rn == 0) {
 			  // checking all variables and setup room
@@ -329,6 +333,7 @@
 			  }
 			  // tell host that server in room is online
 			  socket.emit("server","isOnline",room);
+			  _consoleLog(`Server ready.`);
 	      } else {
 	          location.reload();
 	      };
@@ -349,6 +354,7 @@
 		  photocount = 0;
 		  socket.emit("status",`File saved. Please re-enable PPTXGenJS.`,room)
 		  rmtmb();
+		  _consoleLog(`PPT file saved. Status resetted.`);
 	  } else {
 	   alert("No GSPN Service Order number!");
 	    }}
@@ -385,31 +391,32 @@ function triggerthumbnail(image){
 		}
 }
 
+//Sub-function required for creating thumbnail
 function resizeImageToSpecificWidth(max, imgur, cb) {
   var data;
-      var img = new Image();
-      img.onload = function() {
-        if (img.width > max) {
-          var oc = document.createElement('canvas'), octx = oc.getContext('2d');
-          oc.width = img.width;
-          oc.height = img.height;
-          octx.drawImage(img, 0, 0);
-          if( img.width > img.height) {
+  var img = new Image();
+  img.onload = function() {
+    if (img.width > max) {
+		var oc = document.createElement('canvas'), octx = oc.getContext('2d');
+        oc.width = img.width;
+        oc.height = img.height;
+        octx.drawImage(img, 0, 0);
+        if( img.width > img.height) {
             oc.height = (img.height / img.width) * max;
             oc.width = max;
-          } else {
+        } else {
             oc.width = (img.width / img.height) * max;
             oc.height = max;
-          }
-          octx.drawImage(oc, 0, 0, oc.width, oc.height);          
-          octx.drawImage(img, 0, 0, oc.width, oc.height);
-          data = oc.toDataURL();
-        } else {
-          data = oc.toDataURL();
         }
-        cb(data);
-      };
-      img.src = imgur;
+        octx.drawImage(oc, 0, 0, oc.width, oc.height);          
+        octx.drawImage(img, 0, 0, oc.width, oc.height);
+        data = oc.toDataURL();
+    } else {
+       data = oc.toDataURL();
+    }
+    cb(data);
+    };
+    img.src = imgur;
   }
 	
 	   
@@ -422,8 +429,8 @@ function resizeImageToSpecificWidth(max, imgur, cb) {
   }
 }
 
+//rightbar (thumbnail) cleaning
 function rmtmb() {
-    // Removes an element from the document
     var element = document.getElementById('rightbar');
     element.innerHTML = '';
 }
@@ -484,21 +491,22 @@ function moreopt() {
       // Save file with random hash and proceed page reload
 	  pptx.save(randomHash());
 	  window.location.reload();
+	  _consoleLog(`Socket disconnected`);
 	});
 	
   	// Return server image status to client upon call
 	socket.on("status",(data) => {
-	  console.log(`Received parsed request from host`)
+	  _consoleLog(`Received parsed request from host`)
       if (data == "check") {
 		if (pptxenabled) {
-			console.log(`Sending status..`)
+			_consoleLog(`Sending status..`)
 			socket.emit("status",`Now adding photo ${photocount+1}`,room);
 			} else {
-			console.log(`Sending status..`)
+			_consoleLog(`Sending status..`)
 			socket.emit("status",`PptxGenJS not enabled!`,room);
 			}
       } else {
-		console.log(`Request dropped!`)
+		_consoleLog(`Request dropped!`)
 		return false; 
 	  }
 	});
