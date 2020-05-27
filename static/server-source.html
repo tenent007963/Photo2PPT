@@ -473,11 +473,20 @@ function moreopt() {
 					slide.addImage({data: ewanss, x: 0.5, y: 0.3, w: 8.5, h: 5.5 });
 					triggerthumbnail(ewanss);
 					if (saveimg == true) { 
-						download(ewanss, randomHash(), "application/octet-stream;base64");
+						download(ewanss, filename(), "application/octet-stream;base64");
 					}
 				}
 				_ewanatt.style.display = "block";
 				 
+			}
+		} else if(saveimg) {
+			_fileInput.files = clipboardData.files;
+			var file = document.querySelector('input[type=file]').files[0];
+			var reader =  new FileReader();
+			reader.readAsDataURL(file);
+			reader.onloadend = function () {
+				var pastedImg = reader.result;
+				download(pastedImg, randomHash(), "application/octet-stream;base64");
 			}
 		} else {
 			alert("PPTXGenJS not enabled!")
