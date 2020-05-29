@@ -172,7 +172,7 @@
 <!-- Client Code -->
     <script type="text/javascript">
 	  //Debug section
-	  var isDebug = false;	
+	  var isDebug = true;	
 	
 	  //Define all document elements
 	  const _svppt = document.getElementById("savepptx");
@@ -241,7 +241,7 @@
 		  triggerthumbnail(image);
 	      //Download image if enabled
 		  if (saveimg == true) { 
-	          download(image, filename(), "application/octet-stream;base64");
+	          download(image, smartFilename(), "application/octet-stream;base64");
 		  } else {
 		      _nsi.style.display = "block"
 			  }
@@ -252,20 +252,19 @@
 	          _pptxne.style.display = "block";
 	      }
 	  });
-
-	  //Grab Filename from input field
-	  function filename() {
-	      let GSPNsonumber = _gpint.value;
-	      return GSPNsonumber;
-	  }
 	  
-	  //Generate random hash
-	  function randomHash() {
-		var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-		var stringLength = 10;
-		function pickRandom() {	return possible[Math.floor(Math.random() * possible.length)]; }
-		var randomString = Array.apply(null, Array(stringLength)).map(pickRandom).join('');
-		return randomString;
+	  //Newer filename function to determine filename
+	  function smartFilename() {
+		let filename = _gpint.value;
+	    if (filename) {
+			return GSPNsonumber;
+		} else {
+			var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+			var stringLength = 10;
+			function pickRandom() {	return possible[Math.floor(Math.random() * possible.length)]; }
+			var randomString = Array.apply(null, Array(stringLength)).map(pickRandom).join('');
+			return randomString;
+		}
 	  }
 
 	  //Joining Different Room
@@ -342,7 +341,7 @@
 	  //Save PPTX as file and reset all to default
 	  function savepptx() {
 	    if (_gpint && _gpint.value) {
-	      pptx.save(filename());
+	      pptx.save(smartFilename());
 	      _pptstat.innerHTML = "Off";
 	      pptxenabled = false;
 	      _svppt.disabled = true;
@@ -451,8 +450,8 @@ function moreopt() {
 	}
    
    	window.addEventListener('paste', function(e) {
+		clipboardData = e.clipboardData;
 	    if (pptxenabled) {
-			clipboardData = e.clipboardData;
 			pastedData = clipboardData.getData('Text');
 			if (pastedData) {
 				setTimeout(function(){ 
@@ -473,7 +472,7 @@ function moreopt() {
 					slide.addImage({data: ewanss, x: 0.5, y: 0.3, w: 8.5, h: 5.5 });
 					triggerthumbnail(ewanss);
 					if (saveimg == true) { 
-						download(ewanss, filename(), "application/octet-stream;base64");
+						download(ewanss, smartFilename(), "application/octet-stream;base64");
 					}
 				}
 				_ewanatt.style.display = "block";
@@ -486,7 +485,7 @@ function moreopt() {
 			reader.readAsDataURL(file);
 			reader.onloadend = function () {
 				var pastedImg = reader.result;
-				download(pastedImg, randomHash(), "application/octet-stream;base64");
+				download(pastedImg, smartFilename(), "application/octet-stream;base64");
 			}
 		} else {
 			alert("PPTXGenJS not enabled!")
@@ -497,8 +496,10 @@ function moreopt() {
  
   // Upon socket disconnection
 	socket.on('disconnect', function(){
-      // Save file with random hash and proceed page reload
-	  pptx.save(randomHash());
+      // Save current active ppt with random hash and proceed page reload
+	  if (pptxenabled) {
+		pptx.save(smartFilename());
+		};
 	  window.location.reload();
 	  _consoleLog(`Socket disconnected`);
 	});

@@ -79,7 +79,7 @@
     <!-- Client Code -->
     <script type="text/javascript">
 	//Debug section
-	var isDebug = false;	
+	var isDebug = true;	
 	  
       // Get WebSocket
       var socket = io();
@@ -216,6 +216,26 @@
 	 document.getElementById("roomindicator").innerHTML = room;
 	 
     }
+	
+	
+	//Check socket connection upon window.onfocus
+	window.onfocus = () => { 
+		_consoleLog(`Window focused. Checking connection...`);
+		if (!socket.connected) {
+			_consoleLog(`Trying to reconnect...`);
+			socket.connect();
+			if (!socket.connected) {
+				_consoleLog(`Reconnect failed! Will proceed to force reload.`);
+				alert('Connection lost! Will now reload page.');
+				location.reload();
+			} else {
+				checkStatus();
+			}
+		} else {
+			_consoleLog(`Client is connected, falling back.`);
+			checkStatus();
+			}
+	}
 	
 	
 	//Below are all socket functions / connections
