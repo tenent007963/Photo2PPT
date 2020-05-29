@@ -27,3 +27,5 @@ Just clone this repo and its now ready to go.
  3. "Status" socket able to check if server side is online and return appropriate info
  4. Auto reconnect for both server & client
  5. Simplified code
+ 6. Discard unwanted ppt and save only current active ppt file
+ 7. Check for filename when generating failsafe file
