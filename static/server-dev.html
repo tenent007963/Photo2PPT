@@ -421,17 +421,17 @@ function resizeImageToSpecificWidth(max, imgur, cb) {
   }
 	
 	   
-  function formenter(e){
-  e=e||window.event;
-  var key = e.keyCode;
-  if(key==13) //Enter
-  {
+ function formenter(e){
+ e=e||window.event;
+ var key = e.keyCode;
+ if(key==13) { //Enter
 	if (pptxenabled) {
 		if (photocount >=2) {
 			savepptx();
 			}
 	} else {
-    return false; //return true to submit, false to do nothing
+		return false; //return true to submit, false to do nothing
+		}
   }
 }
 
@@ -487,11 +487,10 @@ function moreopt() {
 					}
 				}
 				_ewanatt.style.display = "block";
-				
 			} else {
 				_consoleLog(`Unknown input type, aborting.`);
 				reader.abort();
-			}
+				} 
 		} else if(saveimg) {
 			if (file instanceof Blob) {
 				reader.readAsDataURL(file);
