@@ -79,7 +79,7 @@
     <!-- Client Code -->
     <script type="text/javascript">
 	//Debug section
-	var isDebug = true;	
+	var isDebug = false;	
 	  
       // Get WebSocket
       var socket = io();
@@ -128,6 +128,7 @@
 							alert("Connection lost! Will now refresh page.");
 							_consoleLog(`Connection lost!`);
 							window.location.reload();
+							return false;
 						}
 					}
 				

@@ -141,7 +141,7 @@
 		<button type="button" id="togglepptx" onclick="togglepptx()">Create PPTX : <span id="pptxgenjsstatus">Off</span></button>
 		<button type="button" id="savepptx" onclick="savepptx()" disabled>Save PPTX</button>
 		<form style="float: right;position: relative">
-		<input type="file" id="e-warranty" style="display:none !important;" disabled="disabled" />
+		<input type="file" id="e-warranty" style="display:none !important;"/>
 		<input type="text" name="GSPN" id="GSPNint" placeholder="S/O number:" onkeypress="return formenter(event)" disabled="disabled"/>   
 		</form>
 		<span id="ewanstat" style="position: relative;color: green;display:none">&#10004; E-Warranty Attached &#10004; </span>
@@ -172,7 +172,7 @@
 <!-- Client Code -->
     <script type="text/javascript">
 	  //Debug section
-	  var isDebug = true;	
+	  var isDebug = false;	
 	
 	  //Define all document elements
 	  const _svppt = document.getElementById("savepptx");
@@ -257,7 +257,7 @@
 	  function smartFilename() {
 		let filename = _gpint.value;
 	    if (filename) {
-			return filename;
+			return filename.trim();
 		} else {
 			var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 			var stringLength = 10;
@@ -365,11 +365,13 @@
 		     saveimg = false;
 		     _imgdown.innerHTML = "No";
 			 _nsi.style.display = "block";
+			 _fileInput.disabled = true;
 			 break;
 		   case false:
              saveimg = true;
 		     _imgdown.innerHTML = "Yes";
 			 _nsi.style.display = "none";
+			 _fileInput.disabled = false;
              break;
           }}	
 	   
@@ -419,12 +421,17 @@ function resizeImageToSpecificWidth(max, imgur, cb) {
   }
 	
 	   
-  function formenter(e){
-  e=e||window.event;
-  var key = e.keyCode;
-  if(key==13) //Enter
-  {
-     return false; //return true to submit, false to do nothing
+ function formenter(e){
+ e=e||window.event;
+ var key = e.keyCode;
+ if(key==13) { //Enter
+	if (pptxenabled) {
+		if (photocount >=2) {
+			savepptx();
+			}
+	} else {
+		return false; //return true to submit, false to do nothing
+		}
   }
 }
 
@@ -451,9 +458,15 @@ function moreopt() {
    
    	window.addEventListener('paste', function(e) {
 		clipboardData = e.clipboardData;
+		_fileInput.files = clipboardData.files;
+		var file = document.querySelector('input[type=file]').files[0];
+		var reader =  new FileReader();
+		pastedData = clipboardData.getData('Text');
+		
 	    if (pptxenabled) {
-			pastedData = clipboardData.getData('Text');
+			_consoleLog(`Detecting input type`);	
 			if (pastedData) {
+				_consoleLog(`Detected input as text`);
 				setTimeout(function(){ 
 					if (_gpint.value === pastedData) { 
 						return;
@@ -461,10 +474,8 @@ function moreopt() {
 						_gpint.value = pastedData;
 						return; 
 					}},100);
-			} else {
-				_fileInput.files = clipboardData.files;
-				var file = document.querySelector('input[type=file]').files[0];
-				var reader =  new FileReader();
+			} else if (file instanceof Blob) {
+				_consoleLog(`Detected input as blob`);
 				reader.readAsDataURL(file);
 				reader.onloadend = function () {
 					var ewanss = reader.result;
@@ -476,19 +487,23 @@ function moreopt() {
 					}
 				}
 				_ewanatt.style.display = "block";
-				 
-			}
+			} else {
+				_consoleLog(`Unknown input type, aborting.`);
+				reader.abort();
+				} 
 		} else if(saveimg) {
-			_fileInput.files = clipboardData.files;
-			var file = document.querySelector('input[type=file]').files[0];
-			var reader =  new FileReader();
-			reader.readAsDataURL(file);
-			reader.onloadend = function () {
-				var pastedImg = reader.result;
-				download(pastedImg, smartFilename(), "application/octet-stream;base64");
+			if (file instanceof Blob) {
+				reader.readAsDataURL(file);
+				reader.onloadend = function () {
+					var pastedImg = reader.result;
+					download(pastedImg, smartFilename(), "application/octet-stream;base64");
+				}
+			} else {
+			_consoleLog(`Unknown input type, aborting.`);
+				reader.abort();
 			}
 		} else {
-			alert("PPTXGenJS not enabled!")
+			alert("PPTXGenJS not enabled!");
 		}
 	});
   
