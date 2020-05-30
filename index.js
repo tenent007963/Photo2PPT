@@ -61,14 +61,15 @@ io.on("connection", function(socket) {
     socket.on("server", function (data,room) {
 		// check for sent data
 		if (data === "isOnline") {
+            console.log(`Received "isOnline" packet, updating ${room} record on host side.`);
 			serverIsOnline.room = true;
 			// check if connection is dropped
 			if (!socket.connected) {
+                console.log(`Server side of ${room} disconnected, updating ${room} record.`);
 				serverIsOnline.room = false;
-				return false;
 			}
 		} else {
-			serverIsOnline.room = false;
+            //Do nothing
 			return false;
 		}
   });
