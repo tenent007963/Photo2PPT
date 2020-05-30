@@ -257,7 +257,7 @@
 	  function smartFilename() {
 		let filename = _gpint.value;
 	    if (filename) {
-			return GSPNsonumber;
+			return filename.trim();
 		} else {
 			var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 			var stringLength = 10;
@@ -426,7 +426,12 @@ function resizeImageToSpecificWidth(max, imgur, cb) {
   var key = e.keyCode;
   if(key==13) //Enter
   {
-     return false; //return true to submit, false to do nothing
+	if (pptxenabled) {
+		if (photocount >=2) {
+			savepptx();
+			}
+	} else {
+    return false; //return true to submit, false to do nothing
   }
 }
 
@@ -483,28 +488,20 @@ function moreopt() {
 				}
 				_ewanatt.style.display = "block";
 				
-			} else if (file){
-				_consoleLog(`Detected input as file`);
-				reader.readAsDataURL(file);
-				reader.onloadend = function () {
-					var ewanss = reader.result;
-					window.slide = pptx.addNewSlide();
-					slide.addImage({data: ewanss, x: 0.5, y: 0.3, w: 8.5, h: 5.5 });
-					triggerthumbnail(ewanss);
-					if (saveimg == true) { 
-						download(ewanss, smartFilename(), "application/octet-stream;base64");
-					}
-				}
-				_ewanatt.style.display = "block";
 			} else {
 				_consoleLog(`Unknown input type, aborting.`);
 				reader.abort();
 			}
 		} else if(saveimg) {
-			reader.readAsDataURL(file);
-			reader.onloadend = function () {
-				var pastedImg = reader.result;
-				download(pastedImg, smartFilename(), "application/octet-stream;base64");
+			if (file instanceof Blob) {
+				reader.readAsDataURL(file);
+				reader.onloadend = function () {
+					var pastedImg = reader.result;
+					download(pastedImg, smartFilename(), "application/octet-stream;base64");
+				}
+			} else {
+			_consoleLog(`Unknown input type, aborting.`);
+				reader.abort();
 			}
 		} else {
 			alert("PPTXGenJS not enabled!");
