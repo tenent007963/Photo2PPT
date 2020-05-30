@@ -172,8 +172,8 @@
 <!-- Client Code -->
     <script type="text/javascript">
 	  //Debug section
-	  var isDebug = false;	
-	
+	  var isDebug = ( window.location.href.match(/dev/g) ? true : false );
+	  
 	  //Define all document elements
 	  const _svppt = document.getElementById("savepptx");
 	  const _gpint = document.getElementById("GSPNint");

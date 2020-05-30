@@ -79,7 +79,7 @@
     <!-- Client Code -->
     <script type="text/javascript">
 	//Debug section
-	var isDebug = true;	
+	var isDebug = ( window.location.href.match(/dev/g) ? true : false );
 	  
       // Get WebSocket
       var socket = io();
