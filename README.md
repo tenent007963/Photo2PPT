@@ -21,6 +21,7 @@ Just clone this repo and its now ready to go.
 
 # To-Do:
  1. Adding more features / plugins
-	a. datastream encrypting
+	a. image compressing if exceed specific size
 	b. multiroom through generate / scan qr
- 2. Simplify code
+ 2. Easy switching between multiple modes
+ 99. Simplify code
