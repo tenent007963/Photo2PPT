@@ -79,16 +79,17 @@ io.on("connection", function(socket) {
   });
   
   // Register "client" events sent by client ONLY
-    socket.on("client", function (data,room) {
+    socket.on("client", (data,room,callback) => {
 		console.log(`Received request from client side.`);
 		// check for sent data
 		if (data === "check") {
 			console.log(`Determined request type.`);
 			if (serverIsOnline.room) {
-				console.log(`Parse request to server side`);
+				console.log(`Parse request to server side of ${room}.`);
 				socket.broadcast.to(room).emit("status",data);
 			} else {
-				socket.broadcast.to(room).emit("status",`Server side offline!`);
+				console.log(`Server side offline. Return callback data.`);
+				callback({serverIsOnline:false});
 			}
 		}
   });
@@ -108,11 +109,11 @@ io.on("connection", function(socket) {
   
   // Register "recvimage" events, a newer function sent by the client
 	socket.on("recvimage", (data , room, callback) => {
-	// Broadcast the "transimage" event to all server side in the room
-    socket.broadcast.to(room).emit("transimage", data);
-	// Return success msg
-     console.log(`Broadcasting image to ${room}`);
-    callback({isSuccess: true});
+		// Broadcast the "transimage" event to all server side in the room
+		socket.broadcast.to(room).emit("transimage", data);
+		// Return success msg
+		console.log(`Broadcasting image to ${room}`);
+		callback({isSuccess: true});
     });
 
   // Handle and broadcast "status" events

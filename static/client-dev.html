@@ -227,8 +227,9 @@
 			socket.connect();
 			if (!socket.connected) {
 				_consoleLog(`Reconnect failed! Will proceed to force reload.`);
+				window.location.reload();
 				alert('Connection lost! Will now reload page.');
-				location.reload();
+				throw new Error("Connection lost! Will now reload page.");
 			} else {
 				checkStatus();
 			}
@@ -256,7 +257,15 @@
 	});
 	
 	function checkStatus() {
-		socket.emit("client","check",room);
+		socket.emit("client","check",room, (serverIsOnline) => {
+			if (serverIsOnline) { 
+				_consoleLog(`Server side offline!`);
+				_status.textContent = 'Server side offline!'; 
+				_fileform.reset(); 
+				} else {
+				_consoleLog(`An error occurred.`);
+				}
+		});
 		_consoleLog("Querying status..");
 		if (isDebug) {
 				window.document.title = "InstantPhoto - Client(Development)";

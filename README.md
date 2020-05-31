@@ -23,5 +23,4 @@ Just clone this repo and its now ready to go.
  1. Adding more features / plugins
 	a. datastream encrypting
 	b. multiroom through generate / scan qr
- 2. "Status" socket able to check if server side is online and return appropriate info
- 3. Simplify code
+ 2. Simplify code
