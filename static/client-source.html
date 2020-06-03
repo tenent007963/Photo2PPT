@@ -224,7 +224,7 @@
 		_consoleLog(`Window focused. Checking connection...`);
 		if (!socket.connected) {
 			_consoleLog(`Trying to reconnect...`);
-			try ( 
+			try { 
 				socket.connect(); 
 				if (!socket.connected) throw "Reconnect error!";
 			}
