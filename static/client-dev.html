@@ -224,15 +224,25 @@
 		_consoleLog(`Window focused. Checking connection...`);
 		if (!socket.connected) {
 			_consoleLog(`Trying to reconnect...`);
-			socket.connect();
+			try ( 
+				socket.connect(); 
+				if (!socket.connected) throw "Reconnect error!";
+			}
+			catch(err) {
+				alert(`${err} Will now force reload.`);
+				window.location.reload();
+			}
+			//Old code block
+		/*	socket.connect();	
 			if (!socket.connected) {
 				_consoleLog(`Reconnect failed! Will proceed to force reload.`);
 				window.location.reload();
-				alert('Connection lost! Will now reload page.');
 				throw new Error("Connection lost! Will now reload page.");
+				return false;
 			} else {
 				checkStatus();
-			}
+			} */ 
+			
 		} else {
 			_consoleLog(`Client is connected, falling back.`);
 			checkStatus();
