@@ -24,4 +24,5 @@ Just clone this repo and its now ready to go.
 	a. image compressing if exceed specific size
 	b. multiroom through generate / scan qr
  2. Easy switching between multiple modes
+ 3. Better UI for client side
  99. Simplify code
