@@ -59,7 +59,7 @@
   <button type="button" id="refresh" onclick="window.location.reload();" style="float: left" >Refresh page</button>
   
     <!-- File input -->
-	<div class="center">
+	<div class="center" id="container">
 	<button type="button" class="button" id="plusroom" onclick="plusroom()">Change Room +</button>
 	<button type="button" class="button" id="minusroom" onclick="minusroom()" disabled>Change Room -</button>
 	<br />
@@ -89,6 +89,7 @@
 	  var _src2 = document.getElementById("input2");
 	  var _status = document.getElementById("status");
 	  var _fileform = document.getElementById("holder");
+	  var _container = document.getElementById("container");
 
       // Join a channel
       let room = "test";
@@ -229,19 +230,11 @@
 				if (!socket.connected) throw "Reconnect error!";
 			}
 			catch(err) {
-				alert(`${err} Will now force reload.`);
+				_consoleLog(`Reconnect failed! Will proceed to force reload.`);
+				//alert(`${err} Will now force reload.`); //This code will cause page to lose focus and thus infinite loop
+				_container.textContent = 'Socket disconnected! Will proceed to force reload.';
 				window.location.reload();
 			}
-			//Old code block
-		/*	socket.connect();	
-			if (!socket.connected) {
-				_consoleLog(`Reconnect failed! Will proceed to force reload.`);
-				window.location.reload();
-				throw new Error("Connection lost! Will now reload page.");
-				return false;
-			} else {
-				checkStatus();
-			} */ 
 			
 		} else {
 			_consoleLog(`Client is connected, falling back.`);
