@@ -41,6 +41,15 @@ var server=http.createServer(function(req,res){
 		case '/favicon':
             doc = fs.readFile(__dirname + '/static/favicon.ico', fsCallback);
         break;
+		case '/jquery.js':
+            doc = fs.readFile(__dirname + '/static/jquery-3.5.1.min.js', fsCallback);
+        break;
+		case '/bootstrap.css':
+            doc = fs.readFile(__dirname + '/static/bootstrap.min.css', fsCallback);
+        break;
+		case '/bootstrap.js':
+            doc = fs.readFile(__dirname + '/static/bootstrap.min.js', fsCallback);
+        break;
         default:
             doc = fs.readFile(__dirname + '/static/index.html', fsCallback);
         break;
