@@ -42,7 +42,9 @@
 		position: relative; 
 		width: 140px; 
 		height: 30px;
-		text-align: center;
+		cursor: pointer;
+		transition: all 0.5s;
+		position: relative;
 		}
 	
 	form {
@@ -61,16 +63,62 @@
     text-align: left;
 	font-size: xx-small;
 	}
+	
+	.refresh-btn {
+	color: #887272;
+	transition: all 0.5s;
+	position: relative;
+	width: 50%;
+    text-align: center;
+}
+.refresh-btn::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	background-color: rgba(255,255,255,0.3);
+	transition: all 0.3s;
+}
+.refresh-btn:hover::before {
+	opacity: 0 ;
+	transform: scale(0.5,0.5);
+}
+.refresh-btn::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	opacity: 0;
+	transition: all 0.3s;
+	border: 1px solid rgba(255,255,255,0.7);
+	transform: scale(1.2,1.2);
+}
+.refresh-btn:hover::after {
+	opacity: 1;
+	transform: scale(1,1);
+}
+
 	</style>
   </head>
   
   <body>
-  <button type="button" id="refresh" onclick="window.location.reload();" style="float: left" >Refresh page</button>
+<!--  <button type="button" style="float: left" >Refresh page</button> -->
+  <div class="refresh-page">
+  <div class="button refresh-btn" onclick="window.location.reload();" id="refresh">
+    <span>Reload Page</span>
+  </div>
+</div>
   
     <!-- File input -->
 	<div class="center" id="container">
-	<button type="button" class="button" id="plusroom" onclick="plusroom()">Change Room +</button>
-	<button type="button" class="button" id="minusroom" onclick="minusroom()" disabled>Change Room -</button>
+	<button type="button" class="button room-btn" id="plusroom" onclick="plusroom()">Change Room +</button>
+	<button type="button" class="button room-btn" id="minusroom" onclick="minusroom()" disabled>Change Room -</button>
 	<br />
 	<h4 id="croom">Current room: <span id="roomindicator"></span></h4>
 	<h4 id="status">Getting Status...</h4>
