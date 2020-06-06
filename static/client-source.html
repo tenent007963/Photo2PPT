@@ -6,6 +6,9 @@
     <title>InstantPhoto - Client</title>
     <link rel="icon" href="./favicon">
     <script src="/socket.io/socket.io.js"></script>
+	<script src="./jquery.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="></script>
+	<link rel="stylesheet" href="./bootstrap.css">
+	<script src="./bootstrap.js"></script>
 	<style>
 	html, body, body div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, figure, footer, header, hgroup, menu, nav, section, time, mark, audio, video {
     margin: 0;
@@ -38,7 +41,10 @@
 	button {
 		position: relative; 
 		width: 140px; 
-		height: 25px;
+		height: 30px;
+		cursor: pointer;
+		transition: all 0.5s;
+		position: relative;
 		}
 	
 	form {
@@ -46,32 +52,94 @@
 	}
 	
 	form {
-	max-width: 200px;
+	max-width: 250px;
 	}
 	
 	input {
 	width: 100%;
 	}
+	
+	.custom-file-label {
+    text-align: left;
+	font-size: xx-small;
+	}
+	
+	.refresh-btn {
+	color: #887272;
+	transition: all 0.5s;
+	position: relative;
+	width: 50%;
+    text-align: center;
+}
+.refresh-btn::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	background-color: rgba(255,255,255,0.3);
+	transition: all 0.3s;
+}
+.refresh-btn:hover::before {
+	opacity: 0 ;
+	transform: scale(0.5,0.5);
+}
+.refresh-btn::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	opacity: 0;
+	transition: all 0.3s;
+	border: 1px solid rgba(255,255,255,0.7);
+	transform: scale(1.2,1.2);
+}
+.refresh-btn:hover::after {
+	opacity: 1;
+	transform: scale(1,1);
+}
+
 	</style>
   </head>
   
   <body>
-  <button type="button" id="refresh" onclick="window.location.reload();" style="float: left" >Refresh page</button>
+<!--  <button type="button" style="float: left" >Refresh page</button> -->
+  <div class="refresh-page">
+  <div class="button refresh-btn" onclick="window.location.reload();" id="refresh">
+    <span>Reload Page</span>
+  </div>
+</div>
   
     <!-- File input -->
 	<div class="center" id="container">
-	<button type="button" class="button" id="plusroom" onclick="plusroom()">Change Room +</button>
-	<button type="button" class="button" id="minusroom" onclick="minusroom()" disabled>Change Room -</button>
+	<button type="button" class="button room-btn" id="plusroom" onclick="plusroom()">Change Room +</button>
+	<button type="button" class="button room-btn" id="minusroom" onclick="minusroom()" disabled>Change Room -</button>
 	<br />
 	<h4 id="croom">Current room: <span id="roomindicator"></span></h4>
 	<h4 id="status">Getting Status...</h4>
 	<br />
-	<form id="holder" name="upload">
+	<form class="md-form" id="holder" name="upload">
+	<div class="custom-file mb-3">
+      <input type="file" class="custom-file-input" id="input1" name="fresh" accept="image/*" capture="camera" autofocus>
+      <label class="custom-file-label" for="customFile">Open Camera</label>
+    </div>
+	<div class="custom-file mb-3">
+      <input type="file" class="custom-file-input" id="input2" name="gallery" accept="image/*">
+      <label class="custom-file-label" for="customFile">Gallery Upload</label>
+    </div>
+	<!-- Old Code Block -->
+<!--
 	<span>Take photo directly:</span>
 	<input id="input1" type="file" name="fresh" accept="image/*" capture="camera" autofocus>
 	<br /><br />
 	<span>Upload photo from gallery:</span>
-	<input id="input2" type="file" name="gallery" accept="image/*">
+	<input id="input2" type="file" name="gallery" accept="image/*">  -->
+	
 	</form> 
 	
 	</div>	
@@ -242,6 +310,11 @@
 			}
 	}
 	
+	//AJAX Codes
+	$(".custom-file-input").on("change", function() {
+		var fileName = $(this).val().split("\\").pop();
+		$(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+	});
 	
 	//Below are all socket functions / connections
 	
