@@ -25,4 +25,5 @@ Just clone this repo and its now ready to go.
 	b. multiroom through generate / scan qr
  2. Easy switching between multiple modes
  3. Better UI for client side
+ 4. Server side : Replace initialization screen to mode selection ( CS, Tech, PDF) 
  99. Simplify code
