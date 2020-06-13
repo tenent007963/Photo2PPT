@@ -27,4 +27,5 @@ Just clone this repo and its now ready to go.
  3. Better UI for client side
  4. Server side : Replace initialization screen to mode selection ( CS, Tech, PDF) 
  5. Change and improve Form mechanics
+ 6. Add realtime ping ms at bottom right corner on both side
  99. Simplify code
