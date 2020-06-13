@@ -26,4 +26,5 @@ Just clone this repo and its now ready to go.
  2. Fix enter key bug (Focus on input: reload, other button: default action)
  3. Better UI for client side
  4. Server side : Replace initialization screen to mode selection ( CS, Tech, PDF) 
+ 5. Change and improve Form mechanics
  99. Simplify code
