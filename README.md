@@ -23,9 +23,8 @@ Just clone this repo and its now ready to go.
  1. Adding more features / plugins
 	a. image compressing if exceed specific size
 	b. multiroom through generate / scan qr
- 2. Fix enter key bug (Focus on input: reload, other button: default action)
- 3. Better UI for client side
- 4. Server side : Replace initialization screen to mode selection ( CS, Tech, PDF) 
- 5. Change and improve Form mechanics
- 6. Add realtime ping ms at bottom right corner on both side
+ 2. Better UI for client side
+ 3. Server side : Replace initialization screen to mode selection ( CS, Tech, PDF) 
+ 4. Change and improve Form mechanics
+ 5. Add realtime ping ms at bottom right corner on both side
  99. Simplify code

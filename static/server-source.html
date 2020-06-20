@@ -140,9 +140,9 @@
 		<button type="button" id="saveimage" onclick="saveimage()">Save Image : <span id="wannasavemou">Yes</span></button>
 		<button type="button" id="togglepptx" onclick="togglepptx()">Create PPTX : <span id="pptxgenjsstatus">Off</span></button>
 		<button type="button" id="savepptx" onclick="savepptx()" disabled>Save PPTX</button>
-		<form style="float: right;position: relative">
+		<form style="float: right;position: relative" action="#" onsubmit="return false;">
 		<input type="file" id="e-warranty" style="display:none !important;"/>
-		<input type="text" name="GSPN" id="GSPNint" placeholder="S/O number:" onkeypress="return formenter(event)" disabled="disabled"/>   
+		<input type="text" name="GSPN" id="GSPNint" placeholder="S/O number:" disabled="disabled"/>	
 		</form>
 		<span id="ewanstat" style="position: relative;color: green;display:none">&#10004; E-Warranty Attached &#10004; </span>
 	</div>
@@ -419,21 +419,25 @@ function resizeImageToSpecificWidth(max, imgur, cb) {
     };
     img.src = imgur;
   }
-	
-	   
- function formenter(e){
- e=e||window.event;
- var key = e.keyCode;
- if(key==13) { //Enter
-	if (pptxenabled) {
-		if (photocount >=2) {
-			savepptx();
+  
+	//An all new function for Enter keypress on window
+	window.addEventListener("keydown", function(event) {
+		if (event.key == "Enter") {
+			_consoleLog(`Enter Key Pressed`);
+			if (!pptxenabled) {
+				_consoleLog('Nothing to do.Exit now.');
+				return false; //return true to submit, false to do nothing
+			} else {
+				if (photocount >=2) {
+					savepptx();
+					_consoleLog(`Saving PPT file`);
+				} else {
+					_consoleLog('PptxGenJS enabled but not enough photos, assuming mispress.');
+					return false; //return true to submit, false to do nothing
+				}
 			}
-	} else {
-		return false; //return true to submit, false to do nothing
 		}
-  }
-}
+	});		
 
 //rightbar (thumbnail) cleaning
 function rmtmb() {
