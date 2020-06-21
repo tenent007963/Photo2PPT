@@ -99,9 +99,10 @@
 	
 	.preview {
 		position:relative; 
-		width:240px; 
+		width: 280px; 
 		height: 720px;
 		float:right;
+		overflow: auto;
 	}
 	
 	.savepptx {
@@ -113,6 +114,12 @@
 		padding:5px;
 		margin: 10% auto;
 		transition: .5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+	}
+	
+	.latency {
+		bottom: 0;
+		right: 3px;
+		position: absolute;
 	}
 	
 	#header {
@@ -159,6 +166,8 @@
 	<div class="preview" id="rightbar">
 	
 	</div>
+	
+	<p class="latency" id="socketlatency">Getting Latency...</p>
 </div>
 </body>
 
@@ -186,6 +195,7 @@
 	  const _ewanatt = document.getElementById("ewanstat");
 	  const _btncoint = document.getElementById("btn-container");
 	  const _moreopt = document.getElementById("moreopt");
+	  const _latency = document.getElementById("socketlatency");
 	
 	  //Initialize elements status
 	  var pptxenabled = false;
@@ -386,6 +396,7 @@ function triggerthumbnail(image){
 			tmbdiv.appendChild(tmbnail);
 			photocount++
 			socket.emit("status",`Now adding photo ${photocount+1}`,room);
+			tmbdiv.scrollTop = tmbdiv.scrollHeight;
 			});
 	} else {
 		return false;
@@ -516,7 +527,7 @@ function moreopt() {
   // Upon socket disconnection
 	socket.on('disconnect', function(){
       // Save current active ppt with random hash and proceed page reload
-	  if (pptxenabled) {
+	  if (pptxenabled && photocount >= 2) {
 		pptx.save(smartFilename());
 		};
 	  window.location.reload();
@@ -538,6 +549,17 @@ function moreopt() {
 		_consoleLog(`Request dropped!`)
 		return false; 
 	  }
+	});
+	
+	// Latency checking
+	socket.on('pong', function(ping) {
+		_latency.textContent = ping + 'ms';
+		_consoleLog(`Received Pong: ${ping}`);
+		//Prompt if latency over acceptable threshold
+		if (ping >= 500) {
+			alert('High latency detected, some functions might not working properly.')
+			_latency.style.color = "red";
+			}
 	});
 	
 	window.onload = checkRoomInitialize();

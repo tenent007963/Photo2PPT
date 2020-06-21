@@ -24,7 +24,5 @@ Just clone this repo and its now ready to go.
 	a. image compressing if exceed specific size
 	b. multiroom through generate / scan qr
  2. Better UI for client side
- 3. Server side : Replace initialization screen to mode selection ( CS, Tech, PDF) 
- 4. Change and improve Form mechanics
- 5. Add realtime ping ms at bottom right corner on both side
+ 3. Server side : Replace initialization screen to mode selection ( CS, Tech, PDF)
  99. Simplify code

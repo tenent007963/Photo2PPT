@@ -60,7 +60,7 @@ var server=http.createServer(function(req,res){
 console.log("InstantPhoto had started!");
 
 // Initialize Socket.io and its variables
-var io = require('socket.io').listen(server);
+var io = require('socket.io').listen(server,{pingInterval: 5000});
 var serverIsOnline = new Object;
 
 // Register "connection" events to the WebSocket
