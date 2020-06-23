@@ -100,8 +100,8 @@
 	.preview {
 		position:relative; 
 		width: 280px; 
-		height: 720px;
-		float:right;
+		height: 75vh;
+		float: right;
 		overflow: auto;
 	}
 	
@@ -196,12 +196,14 @@
 	  const _btncoint = document.getElementById("btn-container");
 	  const _moreopt = document.getElementById("moreopt");
 	  const _latency = document.getElementById("socketlatency");
+	  const _tmbdiv = document.getElementById("rightbar");
 	
 	  //Initialize elements status
 	  var pptxenabled = false;
 	  var saveimg = true;
 	  var optenb = false;
 	  var photocount = 0;
+	  var latencycount = 0;
 
 	  //Enable PPTXGenJS...or not?
 	  function togglepptx() {
@@ -245,8 +247,6 @@
 	  // new "transimage" socket - w/o room param 
 	  socket.on("transimage", function(image) {
 		  _consoleLog(`Image received, processing.`);
-		  // Add line for decompressing image data here
-		  
 	      output.src = image;
 		  triggerthumbnail(image);
 	      //Download image if enabled
@@ -392,12 +392,11 @@ function triggerthumbnail(image){
 			var tmbnail = document.createElement("img");
 			tmbnail.src = dat;
 			tmbnail.setAttribute('id', 'tmbtnb');
-			var tmbdiv = document.getElementById("rightbar");
-			tmbdiv.appendChild(tmbnail);
+			_tmbdiv.appendChild(tmbnail);
+			});
+			setTimeout(function(){_tmbdiv.scrollTop = _tmbdiv.scrollHeight;},100);
 			photocount++
 			socket.emit("status",`Now adding photo ${photocount+1}`,room);
-			tmbdiv.scrollTop = tmbdiv.scrollHeight;
-			});
 	} else {
 		return false;
 		}
@@ -556,10 +555,19 @@ function moreopt() {
 		_latency.textContent = ping + 'ms';
 		_consoleLog(`Received Pong: ${ping}`);
 		//Prompt if latency over acceptable threshold
-		if (ping >= 500) {
-			alert('High latency detected, some functions might not working properly.')
-			_latency.style.color = "red";
+		if (ping >= 550) {
+			latencycount++;
+			if (latencycount >= 4) {
+				_latency.style.color = "red";
 			}
+			if (latencycount >= 7) {
+				alert('High latency detected, some functions might not working properly.');
+			}
+		}
+		if (ping < 500) {
+			latencycount = 0;
+			_latency.style.color = "black";
+		}
 	});
 	
 	window.onload = checkRoomInitialize();
