@@ -25,5 +25,5 @@ Just clone this repo and its now ready to go.
 	b. multiroom through generate / scan qr
  2. Better UI for client side
  3. Server side : Replace initialization screen to mode selection ( CS, Tech, PDF)
- 4. Neutralize frequency of latency warning and improve the mechanism
+ 4. Improve "Enter" key mechanism
  99. Simplify code
