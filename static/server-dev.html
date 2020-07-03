@@ -557,7 +557,8 @@ function moreopt() {
   	// Return server image status to client upon call
 	socket.on("status",(data) => {
 	  _consoleLog(`Received parsed request from host`)
-      if (data == "check") {
+      switch(data) { 
+	  case "check":
 		if (pptxenabled) {
 			_consoleLog(`Sending status..`)
 			socket.emit("status",`Now adding photo ${photocount+1}`,room);
@@ -565,10 +566,17 @@ function moreopt() {
 			_consoleLog(`Sending status..`)
 			socket.emit("status",`PptxGenJS not enabled!`,room);
 			}
-      } else {
+		break;
+	  case "save":
+		if (pptxenabled) {
+			savepptx();
+		}
+		break;
+      default:
 		_consoleLog(`Request dropped!`)
-		return false; 
-	  }
+		return false;
+		break;
+	}
 	});
 	
 	// Latency checking
