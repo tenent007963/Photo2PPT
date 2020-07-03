@@ -13,7 +13,7 @@
     "pptxgenjs": "^2.6.0",
     "socket.io": "^2.3.0"
   },
-  "version": "1.0.3",
+  "version": "1.0.4",
   "devDependencies": {},
   "repository": {
     "type": "git",

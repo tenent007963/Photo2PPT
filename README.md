@@ -8,7 +8,7 @@ Aim to let users send freshly taken photos to computer easily.
 - Easily paste clipboard photo using Ctrl+V
 - Thubnail preview for newly added photos 
 - Multiple workspace for multiuser scenario
-
+- Support hotkeys
 
 # How to use:
 
@@ -18,6 +18,13 @@ To start run `npm start` in console
 For Heroku:
 Just clone this repo and its now ready to go. 
 
+# Hotkeys:
+
+`x`: Enable / Create PPT file 
+`Ctrl + Shift + X`: Disable / Discard PPT file
+`\``: Toggle SaveImage
+`Enter`: Save PPT file if enabled
+
 
 # To-Do:
  1. Adding more features / plugins
@@ -25,5 +32,4 @@ Just clone this repo and its now ready to go.
 	b. multiroom through generate / scan qr
  2. Better UI for client side
  3. Server side : Replace initialization screen to mode selection ( CS, Tech, PDF)
- 4. Improve "Enter" key mechanism
  99. Simplify code
