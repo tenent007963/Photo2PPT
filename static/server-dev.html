@@ -432,7 +432,9 @@ function resizeImageToSpecificWidth(max, imgur, cb) {
   
 	//An all new function for Enter keypress on window
 	window.addEventListener("keydown", function(event) {
-		if (event.key == "Enter") {
+		switch(event.key) { 
+		case "Enter":
+			event.preventDefault();
 			_consoleLog(`Enter Key Pressed`);
 			if (!pptxenabled) {
 				_consoleLog('Nothing to do.Exit now.');
@@ -446,6 +448,25 @@ function resizeImageToSpecificWidth(max, imgur, cb) {
 					return false; //return true to submit, false to do nothing
 				}
 			}
+			break;
+		case "x":
+			if (!pptxenabled) {
+				togglepptx();
+				}
+			break;
+		case (event.ctrlKey && event.shiftKey && "X"):
+			if (pptxenabled) {
+				togglepptx();
+				alert(`File discarded!`);
+			}
+			break;
+		case '`':
+			saveimage();
+			break;
+		default:
+			_consoleLog(`${event.key}`);
+			return false;
+			break;
 		}
 	});		
 
