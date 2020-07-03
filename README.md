@@ -8,7 +8,7 @@ Aim to let users send freshly taken photos to computer easily.
 - Easily paste clipboard photo using Ctrl+V
 - Thubnail preview for newly added photos 
 - Multiple workspace for multiuser scenario
-- Support hotkeys
+- Support hotkeys and remote controlling
 
 # How to use:
 
