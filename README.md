@@ -34,4 +34,5 @@ Just clone this repo and its now ready to go.
  3. Server side : Replace initialization screen to mode selection ( CS, Tech, PDF)
  4. Auto lock room from host side to prevent multiple server connected same room
  5. Implement cookie usage for client side to remember last room name
+ 6. Image rotation for portrait photos
  99. Simplify code
