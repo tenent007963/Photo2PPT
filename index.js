@@ -50,14 +50,15 @@ var server=http.createServer(function(req,res){
 		case '/bootstrap.js':
             doc = fs.readFile(__dirname + '/static/bootstrap.min.js', fsCallback);
         break;
+		case '/compressor.js':
+			doc = fs.readFile(__dirname + '/node_modules/compressorjs/dist/compressor.js', fsCallback);
+		break;
         default:
             doc = fs.readFile(__dirname + '/static/index.html', fsCallback);
         break;
     }
 	
 }).listen(PORT);
-
-console.log("InstantPhoto had started!");
 
 // Initialize Socket.io and its variables
 var io = require('socket.io').listen(server,{pingInterval: 5000});
@@ -132,6 +133,9 @@ io.on("connection", function(socket) {
 	});
   
   });
+
+
+console.log("InstantPhoto had started!");
 
 /*
 //required only if running on local machine

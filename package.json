@@ -7,7 +7,9 @@
   "main": "index.js",
   "license": "ISC",
   "dependencies": {
+    "compressorjs": "^1.0.6",
     "express": "^4.17.1",
+    "image-compressor.js": "^1.1.4",
     "ip": "^1.1.5",
     "opn": "^6.0.0",
     "pptxgenjs": "^2.6.0",

@@ -39,14 +39,14 @@
 	header h1 {
 		margin:0 2px;
 		font-family: 'Roboto', sans-serif;
-		position: fixed;
+		position: absolute;
 		background-image: repeating-linear-gradient(45deg, violet, indigo, blue, green, yellow, orange, red, violet);
 		text-align: left;
 		background-size: 800% 800%;
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
 		font-size: 35px;
-		animation: rainbow 20s ease infinite
+		animation: rainbow 20s infinite
 	}
 	
 	h1 {
@@ -100,7 +100,7 @@
 	.preview {
 		position:relative; 
 		width: 280px; 
-		height: 75vh;
+		height: 70vh;
 		float: right;
 		overflow: auto;
 	}
@@ -179,7 +179,7 @@
 </div>
 </footer>
 <!-- Client Code -->
-    <script type="text/javascript">
+    <script type="text/javascript">	  
 	  //Debug section
 	  var isDebug = ( window.location.href.match(/dev/g) ? true : false );
 	  
@@ -430,12 +430,13 @@ function resizeImageToSpecificWidth(max, imgur, cb) {
     img.src = imgur;
   }
   
-	//An all new function for Enter keypress on window
+	//Listening to Hotkeys 
 	window.addEventListener("keydown", function(event) {
+		
 		switch(event.key) { 
 		case "Enter":
-			event.preventDefault();
 			_consoleLog(`Enter Key Pressed`);
+			event.preventDefault();
 			if (!pptxenabled) {
 				_consoleLog('Nothing to do.Exit now.');
 				return false; //return true to submit, false to do nothing
@@ -465,7 +466,6 @@ function resizeImageToSpecificWidth(max, imgur, cb) {
 			break;
 		default:
 			_consoleLog(`${event.key}`);
-			return false;
 			break;
 		}
 	});		
