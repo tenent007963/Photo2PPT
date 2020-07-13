@@ -28,12 +28,12 @@ Just clone this repo and its now ready to go.
 
 # To-Do:
  1. Adding more features / plugins
-	a. image compressing if exceed specific size
-	b. multiroom through generate / scan qr
+	a. multiroom through generate / scan qr
+	b. Implement cookie usage for client side to remember last room name
  2. Better UI for client side
  3. Server side : Replace initialization screen to mode selection ( CS, Tech, PDF)
  4. Auto lock room from host side to prevent multiple server connected same room
- 5. Implement cookie usage for client side to remember last room name
- 6. Image rotation for portrait photos
- 7. Async photo uploading to prevent overlap
+ 5. Check hotkey sometimes not working
+ 6. Async photo uploading to prevent overlap
+ 7. Enable console.log send back to heroku for debug purpose
  99. Simplify code
