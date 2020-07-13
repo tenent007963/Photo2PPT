@@ -6,6 +6,7 @@
     <title>InstantPhoto - Client</title>
     <link rel="icon" href="./favicon">
     <script src="/socket.io/socket.io.js"></script>
+	<script src="/compressor.js"></script>
 	<script src="./jquery.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="></script>
 	<link rel="stylesheet" href="./bootstrap.css">
 	<script src="./bootstrap.js"></script>
@@ -139,13 +140,6 @@
       <input type="file" class="custom-file-input" id="input2" name="gallery" accept="image/*">
       <label class="custom-file-label" for="customFile">Gallery Upload</label>
     </div>
-	<!-- Old Code Block -->
-<!--
-	<span>Take photo directly:</span>
-	<input id="input1" type="file" name="fresh" accept="image/*" capture="camera" autofocus>
-	<br /><br />
-	<span>Upload photo from gallery:</span>
-	<input id="input2" type="file" name="gallery" accept="image/*">  -->
 	
 	</form> 
 	<button type="button" class="button save-btn" id="savefile" onclick="savefile()">Save File</button>
@@ -178,21 +172,32 @@
 			sauce.addEventListener("change", function (event) {
 
 				// Prepeare file reader
-				var file = event.target.files[0];
+				const file = event.target.files[0];
+				if (!file) {
+					return;
+				}
 				var fileReader = new FileReader();
 		
 				// Determine input type 
 				if (file instanceof Blob) {
-					// Check for file size
-					
-					// Read file
-					fileReader.readAsDataURL(file);
+					// Check for file size (in kb)
+					fileSize = (file.size / 1024).toFixed(3);
+					// Add line for compressing image data here
+					new Compressor(file, {
+						quality: 0.7,
+						checkOrientation: false,
+						success(result) {
+							// Read file
+							fileReader.readAsDataURL(result);
+						},
+						error(err) {
+						  console.log(err.message);
+						},
+					});
 				}
 				fileReader.onloadend = function (event) {
 					// Send an image event to the socket
 					var image = event.target.result;
-					// Add line for compressing image data here
-				
 					// Check for connection status
 					if (socket.connected) {
 						emitPhoto(image);
