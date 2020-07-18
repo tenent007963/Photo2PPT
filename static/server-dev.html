@@ -497,7 +497,6 @@ async function orientCheck(data) {
 
 	//Listening to Hotkeys 
 	window.addEventListener("keydown", function(event) {
-		
 		switch(event.key) { 
 		case "Enter":
 			_consoleLog(`Enter Key Pressed`);
@@ -515,12 +514,17 @@ async function orientCheck(data) {
 				}
 			}
 			break;
-		case "x":
+		case "x" :
 			if (!pptxenabled) {
 				togglepptx();
 				}
 			break;
-		case (event.ctrlKey && event.shiftKey && "X"):
+		case "X":
+			if (!pptxenabled) {
+				togglepptx();
+				}
+			break;
+		case ( (event.ctrlKey && event.shiftKey && event.altKey) & "z" || "Z"  ):
 			if (pptxenabled) {
 				togglepptx();
 				alert(`File discarded!`);
