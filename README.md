@@ -23,7 +23,7 @@ Just clone this repo and its now ready to go.
 `x`: Enable / Create PPT file\
 `Ctrl + Shift + X`: Disable / Discard PPT file\
 `\`: Toggle SaveImage\
-`Enter`: Save PPT file if enabled\
+`Enter`: Save PPT file if enabled
 
 
 # To-Do:
