@@ -36,4 +36,5 @@ Just clone this repo and its now ready to go.
  4. Enable console.log send back to heroku for debug purpose
  5. Check hotkey sometimes not working
  6. Socket.io perform file multi-part upload 
+ 7. Lock process when retrieving/processing images and unlock to save file
  99. Simplify code
