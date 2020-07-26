@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
+	<meta http-equiv="Cache-control" content="no-cache">
     <title>InstantPhoto - Server</title>
     <link rel="icon" href="./favicon">
     <script src="/socket.io/socket.io.js"></script>
@@ -10,6 +11,8 @@
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap" rel="stylesheet">
     <!-- Bundle: Easiest to use, supports all browsers -->
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@2.5.0/dist/pptxgen.bundle.js"></script>
+	<!-- Qrcode-generator -->
+	<script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.js"></script>
 	<style>
 	@keyframes rainbow { 
     0%{background-position:0% 50%}
@@ -127,6 +130,11 @@
 		width: 90%;
 		margin:0 8px;
 	}
+	
+	#roomqr {
+		height: 25px;
+		width: 25px;
+	}
 	</style>
   </head>
   <body>
@@ -142,7 +150,7 @@
 		<div class="topbar" id="topbar">
 			<div class="btn-container" id="btn-container" style="display:none">
 				<button type="button" id="clrtmb" onclick="rmtmb()">Clear Thumbnail</button>
-				<button type="button" id="changeroom" onclick="joinroom()">Change Room</button>
+				<button type="button" id="changeroom" onclick="refreshroom()">Change Room</button>
 			</div>
 		<button type="button" id="moreopt" onclick="moreopt()">Expand</button>
 		<button type="button" id="saveimage" onclick="saveimage()">Save Image : <span id="wannasavemou">Yes</span></button>
@@ -158,6 +166,7 @@
 		<h1>Waiting input on client side...</h1>
 		<br />
 		<h3>Current room: <span id="roomindicator"></span></h3>
+		<div id="roomqr"></div>
 		<br />
 	</div>
 	<!-- Image output -->
@@ -198,6 +207,10 @@
 	  const _moreopt = document.getElementById("moreopt");
 	  const _latency = document.getElementById("socketlatency");
 	  const _tmbdiv = document.getElementById("rightbar");
+	  const _roomqr = document.getElementById("roomqr");
+	  const _roomindicator = document.getElementById("roomindicator");
+	  const _mainContainer = document.getElementById("main");
+	  const _initContainer = document.getElementById("init");
 	
 	  //Initialize elements status
 	  var pptxenabled = false;
@@ -240,11 +253,6 @@
 	  // Get DOM elements
 	  var output = document.getElementById("download");
 
-	  // Join default channel "test"
-	  var room = "test";
-	  var rn = "0";
-	  socket.emit("join", room);
-
 	  // new "transimage" socket - w/o room param 
 	  socket.on("transimage", function(image) {
 		  _consoleLog(`Image received, processing.`);
@@ -269,6 +277,16 @@
 	      }
 	  });
 	  
+	  //External Func for random string generating
+	  function genRand(len) {
+        var hash = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ12346789";
+        var randomStr = '';
+        for(var i = 0; i < len; i++){
+            randomStr += hash[parseInt(Math.random()*hash.length)];
+        }
+        return randomStr;
+	  } 
+	  
 	  //Newer filename function to determine filename
 	  function smartFilename() {
 		let filename = _gpint.value;
@@ -283,75 +301,54 @@
 		}
 	  }
 
-	  //Joining Different Room
-	  function joinroom() {
-	  let oldroom = room;
-
-	      rn++;
-
-	switch (rn) {
-	  case 1:
-       room = "room1";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 2: 
-	   room = "room2";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 3:
-	   room = "room3";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 4: 
-	   room = "room4";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 5: 
-	   room = "room5";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 6: 
-	   room = "room6";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 7:
-	   alert("You have hit the end of available rooms! Page will now refresh.");
-	   location.reload();
-	   break;
-	  default:
-	   room = "test";
-		break;
-		}
-
-	      document.getElementById("roomindicator").innerHTML = room;
-
-	  }
+	async function genQR(data) {
+		var qrcode = new QRCode("roomqr");
+		qrcode.makeCode(data);
+	}
+	
+		
+	  //Refresh Room
+	  function refreshroom() {
+		if(room) {
+			let oldroom = room;
+			socket.emit("leave", oldroom);
+			}
+	  
+		var room = genRand(10);
+		
+	  // Join default channel "test"
+	  // for debug only
+	  /*
+	  var room = "test";
+	  var rn = "0";
+	  socket.emit("join", room);
+	  */
+		
+	    _roomindicator.innerHTML = room;
+		genQR(room);
+		socket.emit("join", room);
+		socket.emit("server","isOnline",room);
+	  }       
+   
 		
 	  // Room initializing, check if all variable is correct
 	  function checkRoomInitialize() {
-	      if (rn == 0) {
-			  // checking all variables and setup room
-	          var isHiddenOrNot = document.getElementById("init");
-			  isHiddenOrNot.style.display = "none";
-			  var showTheContent = document.getElementById("main");
-	          showTheContent.style.display = "block";
-	          document.getElementById("roomindicator").innerHTML = room;
+		try {
 			  //check isDebug environment
 			  if (isDebug) {
 				window.document.title = "InstantPhoto - Server(Development)";
 			  }
-			  // tell host that server in room is online
-			  socket.emit("server","isOnline",room);
+			  //Run through necessary func
+			  refreshroom();
+			  //Display interface
+			  _initContainer.style.display = "none";
+	          _mainContainer.style.display = "block";
 			  _consoleLog(`Server ready.`);
-	      } else {
-	          location.reload();
-	      };
+			}
+		catch (err) {
+			_mainContainer.innerHTML = err.message;
+			location.reload();
+			}
 	  }
 		
 	  //Save PPTX as file and reset all to default
