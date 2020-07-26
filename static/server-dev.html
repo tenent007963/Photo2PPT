@@ -131,9 +131,8 @@
 		margin:0 8px;
 	}
 	
-	#roomqr {
-		height: 25px;
-		width: 25px;
+	#popup {
+		display: none;
 	}
 	</style>
   </head>
@@ -162,12 +161,12 @@
 		</form>
 		<span id="ewanstat" style="position: relative;color: green;display:none">&#10004; E-Warranty Attached &#10004; </span>
 	</div>
-	<div class="header" id="header"> 
-		<h1>Waiting input on client side...</h1>
-		<br />
-		<h3>Current room: <span id="roomindicator"></span></h3>
-		<div id="roomqr"></div>
-		<br />
+	<div class="header" id="top"> 
+		<h1 id="header">Waiting input on client side...</h1>
+	</div>
+	<div class="popup" id="popup">
+	<h3>Current room: <span id="roomindicator"></span></h3>
+	<div id="roomqr"></div>
 	</div>
 	<!-- Image output -->
 	<img style="max-width:640px; max-height:480px;" src="" id="download"/>
@@ -211,13 +210,15 @@
 	  const _roomindicator = document.getElementById("roomindicator");
 	  const _mainContainer = document.getElementById("main");
 	  const _initContainer = document.getElementById("init");
+	  const _header = document.getElementById("header");
 	
-	  //Initialize elements status
+	  //Initialize elements
 	  var pptxenabled = false;
 	  var saveimg = true;
 	  var optenb = false;
 	  var photocount = 0;
 	  var latencycount = 0;
+	  var room;
 
 	  //Enable PPTXGenJS...or not?
 	  function togglepptx() {
@@ -234,6 +235,7 @@
 		  rmtmb();
 		  socket.emit("status",`PptxGenJS not enabled!`,room);
 		  _consoleLog(`PptxGenJS disabled.`);
+		  _header.innerHTML = "PptxGenJS disabled.";
 	    } else {
 		  window.pptx = new PptxGenJS();
 	      pptxenabled = true;
@@ -244,6 +246,7 @@
 	      _pptstat.innerHTML = "On";
 		  socket.emit("status",`Now adding photo ${photocount+1}`,room);
 		  _consoleLog(`PptxGenJS enabled, waiting photo.`);
+		  _header.innerHTML = "PptxGenJS enabled, waiting photo.";
 		}
 	  }
 
@@ -271,6 +274,7 @@
 			    _consoleLog(`Response: ${rotated_image}`);
 				triggerthumbnail(rotated_image);
 				slide.addImage({ data: rotated_image, x: 0, y: 0, w: 9.5, h: 5.5});
+				_header.innerHTML = `Added Image #${photocount}.`;
 			  });
 	      } else {
 	          _pptxne.style.display = "block";
@@ -314,7 +318,7 @@
 			socket.emit("leave", oldroom);
 			}
 	  
-		var room = genRand(10);
+		room = genRand(10);
 		
 	  // Join default channel "test"
 	  // for debug only
