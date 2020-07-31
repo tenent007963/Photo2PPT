@@ -20,6 +20,77 @@
 	<!-- Bootstrap dependencies -->
 	<link rel="stylesheet" href="./bootstrap.css">
 	<script src="./bootstrap.js"></script>
+	<!-- Custom Style -->
+	<style>
+ @keyframes rainbow { 
+    0%{background-position:0% 50%}
+    50%{background-position:100% 25%}
+    100%{background-position:0% 50%}
+	}
+
+	body {
+		background: #2BC0E4;  /* fallback for old browsers */
+		background: -webkit-linear-gradient(to right, #2BC0E4, #EAECC6);  /* Chrome 10-25, Safari 5.1-6 */
+		background: linear-gradient(to right, #2BC0E4, #EAECC6); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+		margin:0;
+	}
+	
+	header h1 {
+		font-family: 'Roboto', sans-serif;
+		background-image: repeating-linear-gradient(45deg, violet, indigo, blue, green, yellow, orange, red, violet);
+		text-align: left;
+		background-size: 800% 800%;
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		font-size: 35px;
+		animation: rainbow 20s infinite;
+		position: absolute;
+		padding-left: 20px;
+	}
+	
+	#topbar {
+		width: 99%;
+		overflow: hidden;
+		padding: 10px 5px;
+		background-color: #45b3a9; 
+		display:flex;
+		flex-direction: row-reverse;
+		justify-content: flex-start;
+		align-content: flex-start;
+		flex-wrap:wrap;
+		}
+	
+	.styledButton {
+		min-width: 120px;
+		min-height: 35px;
+		margin: 0 3px;
+		position: relative;
+		border: 3px solid white;
+		justify-content: center;
+		align-items: center;
+		background: transparent;
+		cursor: pointer;
+		transition: .3s;
+		color: white;
+	}
+	.styledButton:hover {
+		box-shadow: 0px 0px 15px 5px #fff;
+	}
+	
+	.preview {
+		position:relative; 
+		width: 280px; 
+		height: 70vh;
+		float: right;
+		overflow: auto;
+	}
+		
+	.latency {
+		bottom: 0;
+		right: 10px;
+		position: absolute;
+	}
+</style>
   </head>
   <body>
 	<header>
