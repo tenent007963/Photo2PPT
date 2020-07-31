@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
+	<meta http-equiv="Cache-control" content="no-cache">
 	<!-- <meta name="viewport" content="initial-scale=1.5,maximum-scale=3,user-scalable=no"/>  -->
     <title>InstantPhoto - Client</title>
     <link rel="icon" href="./favicon">
@@ -11,12 +12,14 @@
 	<link rel="stylesheet" href="./bootstrap.css">
 	<script src="./bootstrap.js"></script>
 	<style>
+	html,body {
+    height: 100%;
+	}
 	body {
 		background: #9796f0;  /* fallback for old browsers */
 		background: -webkit-linear-gradient(to right, #fbc7d4, #9796f0);  /* Chrome 10-25, Safari 5.1-6 */
 		background: linear-gradient(to bottom, #fbc7d4, #9796f0) no-repeat ; /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 		margin:0;
-		
 	}
 	
 	.custom-file-label {
@@ -62,6 +65,12 @@
 	float:left;
 	width: 100px;
 }
+
+.footer {
+		bottom: 0;
+		right: 10px;
+		position: absolute;
+	}
 	</style>
   </head>
   
@@ -83,7 +92,7 @@
 				<br />
 			</div>
 		</div> -->
-		<div class="row align-items-center justify-content-start">
+		<div class="row-fluid align-items-center justify-content-start">
 			<div class="col">
 				<h4 id="croom">Current room: <span id="roomindicator"></span></h4>
 				<h4 id="status">Getting Status...</h4>
