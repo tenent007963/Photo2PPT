@@ -3,12 +3,13 @@
   <head>
     <meta charset="utf-8">
 	<meta http-equiv="Cache-control" content="no-cache">
-	<!-- <meta name="viewport" content="initial-scale=1.5,maximum-scale=3,user-scalable=no"/>  -->
+	<meta name="viewport" content="initial-scale=1.5,maximum-scale=3,user-scalable=no"/>
     <title>InstantPhoto - Client</title>
     <link rel="icon" href="./favicon">
     <script src="/socket.io/socket.io.js"></script>
 	<script src="/compressor.js"></script>
 	<script src="./jquery.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="></script>
+	<script src="https://raw.githubusercontent.com/mebjas/html5-qrcode/master/minified/html5-qrcode.min.js"></script>
 	<link rel="stylesheet" href="./bootstrap.css">
 	<script src="./bootstrap.js"></script>
 	<style>
@@ -20,6 +21,10 @@
 		background: -webkit-linear-gradient(to right, #fbc7d4, #9796f0);  /* Chrome 10-25, Safari 5.1-6 */
 		background: linear-gradient(to bottom, #fbc7d4, #9796f0) no-repeat ; /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 		margin:0;
+	}
+	
+	.container {
+	margin-top: 10%;
 	}
 	
 	.custom-file-label {
@@ -67,7 +72,7 @@
 }
 
 .footer {
-		bottom: 0;
+		bottom: 10px;
 		right: 10px;
 		position: absolute;
 	}
@@ -84,21 +89,15 @@
 	</header>
   
     <!-- File input -->
-	<div class="container align-items-center" id="container">
-<!--	<div class="row align-items-center justify-content-start">
-			<div class="col">
-				<button type="button" class="button room-btn" id="plusroom" onclick="plusroom()">Change Room +</button>
-				<button type="button" class="button room-btn" id="minusroom" onclick="minusroom()" disabled>Change Room -</button>
-				<br />
-			</div>
-		</div> -->
+	<div class="container" id="container">
+		
 		<div class="row-fluid align-items-center justify-content-start">
 			<div class="col">
 				<h4 id="croom">Current room: <span id="roomindicator"></span></h4>
 				<h4 id="status">Getting Status...</h4>
 			</div>
 		</div>	
-		<div class="row align-items-center justify-content-start">
+		<div class="row-fluid align-items-center justify-content-start">
 			<div class="col">
 				<form class="md-form" id="holder" name="upload">
 					<div class="custom-file mb-3">
@@ -129,7 +128,7 @@
 					<form>
 						<h3>Enter room code:</h3>
 						<input type="text" name="roomCode" id="roomCode" placeholder="Code here" disabled="disabled"/>	
-						<div id="roomqr"></div>
+						<div id="reader"></div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
