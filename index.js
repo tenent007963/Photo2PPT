@@ -53,6 +53,9 @@ var server=http.createServer(function(req,res){
 		case '/compressor.js':
 			doc = fs.readFile(__dirname + '/node_modules/compressorjs/dist/compressor.js', fsCallback);
 		break;
+        case '/html5-qrcode.min.js':
+            doc = fs.readFile(__dirname + '/static/html5-qrcode.min.js', fsCallback);
+            break;
         default:
             doc = fs.readFile(__dirname + '/static/index.html', fsCallback);
         break;

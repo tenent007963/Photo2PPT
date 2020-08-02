@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
 	<meta http-equiv="Cache-control" content="no-cache">
@@ -94,7 +94,7 @@
   </head>
   <body>
 	<header>
-		<h1>InstantPhoto<h1>
+		<h1>InstantPhoto</h1>
 	</header>
 	<div class="container" id="init">
 		<button type="button" onclick="checkRoomInitialize();" id="init-button">Click here to start!</button>
@@ -163,7 +163,7 @@
 <!-- Client Code -->
     <script type="text/javascript">	  
 	  //Debug section
-	  var isDebug = ( window.location.href.match(/dev/g) ? true : false );
+	  let isDebug = ( !!window.location.href.match(/dev/g) );
 	  
 	  //Define all document elements
 	  const _svppt = document.getElementById("savepptx");
