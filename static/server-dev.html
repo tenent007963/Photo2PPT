@@ -6,6 +6,7 @@
     <link rel="icon" href="./favicon">
     <script src="/socket.io/socket.io.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.js"></script>
+	<script src="/compressor.js"></script>
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap" rel="stylesheet">
     <!-- Bundle: Easiest to use, supports all browsers -->
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@2.5.0/dist/pptxgen.bundle.js"></script>
@@ -446,7 +447,7 @@ async function orientCheck(data) {
         img.onload = function(){
 			if (img.height > img.width) {
 				_consoleLog(`Orientation incorrect, rotating`);
-				resolve(rotateImage());
+				rotateImage();
 			} else {
 				_consoleLog(`Orientation correct,exit now`);
 				resolve(returnImg());
@@ -466,8 +467,28 @@ async function orientCheck(data) {
 			ctx.rotate(90 * Math.PI / 180);
 			ctx.drawImage(output, cx, cy);
 			_consoleLog(`Image rotation complete.`);
-			return canvas.toDataURL("image/png");
+			//return canvas.toDataURL("image/png");
+			canvas.toBlob(function(blobData){ compressImg(blobData);});
         }
+		
+		let compressImg = (imgStream) => {
+			var fileReader = new FileReader()
+			new Compressor(imgStream, {
+						quality: 0.6,
+						checkOrientation: false,
+						success(result) {
+							// Read file
+							fileReader.readAsDataURL(result);
+						},
+						error(err) {
+						  _consoleLog(err.message);
+						},
+					});
+			fileReader.onloadend = function (event) {
+				resolve(event.target.result);
+			}
+		}
+		
 		let returnImg = () => {
 			return data;
 		}
