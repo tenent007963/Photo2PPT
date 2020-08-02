@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
+	<meta http-equiv="Cache-control" content="no-cache">
     <title>InstantPhoto - Server</title>
     <link rel="icon" href="./favicon">
     <script src="/socket.io/socket.io.js"></script>
@@ -10,26 +11,23 @@
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap" rel="stylesheet">
     <!-- Bundle: Easiest to use, supports all browsers -->
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@2.5.0/dist/pptxgen.bundle.js"></script>
+	<!-- Qrcode-generator -->
+	<script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.js"></script>
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+	<!-- Google Fonts -->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+	<!-- Bootstrap dependencies -->
+	<link rel="stylesheet" href="./bootstrap.css">
+	<script src="./bootstrap.js"></script>
+	<!-- Custom Style -->
 	<style>
-	@keyframes rainbow { 
+ @keyframes rainbow { 
     0%{background-position:0% 50%}
     50%{background-position:100% 25%}
     100%{background-position:0% 50%}
 	}
-	
-	html, body, body div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, figure, footer, header, hgroup, menu, nav, section, time, mark, audio, video {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    outline: 0;
-	font-size: 100%;
-    vertical-align: baseline;
-	}
-	
-	html {
-		height: 100%;
-	}
-	
+
 	body {
 		background: #2BC0E4;  /* fallback for old browsers */
 		background: -webkit-linear-gradient(to right, #2BC0E4, #EAECC6);  /* Chrome 10-25, Safari 5.1-6 */
@@ -38,36 +36,16 @@
 	}
 	
 	header h1 {
-		margin:0 2px;
 		font-family: 'Roboto', sans-serif;
-		position: absolute;
 		background-image: repeating-linear-gradient(45deg, violet, indigo, blue, green, yellow, orange, red, violet);
 		text-align: left;
 		background-size: 800% 800%;
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
 		font-size: 35px;
-		animation: rainbow 20s infinite
-	}
-	
-	h1 {
-		font-size: x-large;
-	}
-	
-	.init {
-		z-index: 99;
-		height: 100%
-		width: 100%;
-		margin:0; 
-		padding:0; 
-		top: 50%;
-		align-content: center;
-		text: center;
-	}
-	
-	.container {
-		width: 100%;
-		height: 100%;
+		animation: rainbow 20s infinite;
+		position: absolute;
+		padding-left: 20px;
 	}
 	
 	#topbar {
@@ -79,9 +57,10 @@
 		flex-direction: row-reverse;
 		justify-content: flex-start;
 		align-content: flex-start;
+		flex-wrap:wrap;
 		}
 	
-	button {
+	.styledButton {
 		min-width: 120px;
 		min-height: 35px;
 		margin: 0 3px;
@@ -94,7 +73,7 @@
 		transition: .3s;
 		color: white;
 	}
-	button:hover {
+	.styledButton:hover {
 		box-shadow: 0px 0px 15px 5px #fff;
 	}
 	
@@ -105,71 +84,73 @@
 		float: right;
 		overflow: auto;
 	}
-	
-	.savepptx {
-		font-size:1.5rem;
-		border:2px solid black;
-		border-radius:100px;
-		width:40px;
-		height:40px;
-		padding:5px;
-		margin: 10% auto;
-		transition: .5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-	}
-	
+		
 	.latency {
 		bottom: 0;
-		right: 3px;
+		right: 10px;
 		position: absolute;
 	}
-	
-	#header {
-		width: 90%;
-		margin:0 8px;
-	}
-	</style>
+</style>
   </head>
   <body>
-  <header>
-  <h1>InstantPhoto<h1>
-  </header>
-  <div class="init" id="init">
-  <button type="button" onclick="checkRoomInitialize();" id="init-button">Click here to start!</button>
-  </div>
+	<header>
+		<h1>InstantPhoto<h1>
+	</header>
+	<div class="container" id="init">
+		<button type="button" onclick="checkRoomInitialize();" id="init-button">Click here to start!</button>
+	</div>
   
     <!-- Container -->
-	<div class="container" id="main">
-		<div class="topbar" id="topbar">
+	<div class="container-fluid" id="main">
+		<div class="btn-toolbar topbar" role=toolbar" aria-label="Normal Usage Topbar" id="topbar">
 			<div class="btn-container" id="btn-container" style="display:none">
-				<button type="button" id="clrtmb" onclick="rmtmb()">Clear Thumbnail</button>
-				<button type="button" id="changeroom" onclick="joinroom()">Change Room</button>
+				<button type="button" class="btn btn-light" id="clrtmb" onclick="rmtmb()">Clear Thumbnail</button>
+				<button type="button" class="btn btn-light" data-toggle="modal" data-target="#popup">Change Room</button>
 			</div>
-		<button type="button" id="moreopt" onclick="moreopt()">Expand</button>
-		<button type="button" id="saveimage" onclick="saveimage()">Save Image : <span id="wannasavemou">Yes</span></button>
-		<button type="button" id="togglepptx" onclick="togglepptx()">Create PPTX : <span id="pptxgenjsstatus">Off</span></button>
-		<button type="button" id="savepptx" onclick="savepptx()" disabled>Save PPTX</button>
-		<form style="float: right;position: relative" action="#" onsubmit="return false;">
-		<input type="file" id="e-warranty" style="display:none !important;"/>
-		<input type="text" name="GSPN" id="GSPNint" placeholder="S/O number:" disabled="disabled"/>	
-		</form>
-		<span id="ewanstat" style="position: relative;color: green;display:none">&#10004; E-Warranty Attached &#10004; </span>
-	</div>
-	<div class="header" id="header"> 
-		<h1>Waiting input on client side...</h1>
-		<br />
-		<h3>Current room: <span id="roomindicator"></span></h3>
-		<br />
-	</div>
-	<!-- Image output -->
-	<img style="max-width:640px; max-height:480px;" src="" id="download"/>
+			<button type="button" class="btn btn-light mr-1" id="moreopt" onclick="moreopt()">Expand</button>
+			<button type="button" class="btn btn-light mr-1" id="saveimage" onclick="saveimage()">Save Image : <span id="wannasavemou">Yes</span></button>
+			<button type="button" class="btn btn-light mr-1" id="togglepptx" onclick="togglepptx()">Create PPTX : <span id="pptxgenjsstatus">Off</span></button>
+			<button type="button" class="btn btn-light mr-1" id="savepptx" onclick="savepptx()" disabled>Save PPTX</button>
+			<form style="float: right;position: relative" action="#" onsubmit="return false;">
+			<input type="file" id="e-warranty" style="display:none !important;"/>
+			<input type="text" name="GSPN" id="GSPNint" placeholder="S/O number:" disabled="disabled"/>	
+			</form>
+			<span id="ewanstat" style="position: relative;color: green;display:none">&#10004; E-Warranty Attached &#10004; </span>
+		</div>
+		<div class="head" id="top"> 
+			<h5 id="head">Waiting input on client side...</h5>
+		</div>
+		<!-- Image output -->
+		<img style="max-width:640px; max-height:480px;" src="" id="download"/>
 	
-	<!-- Preview sidebar -->
-	<div class="preview" id="rightbar">
+		<!-- Preview sidebar -->
+		<div class="preview" id="rightbar">
+		</div>
 	
+		<p class="latency" id="socketlatency">Getting Latency...</p>
 	</div>
 	
-	<p class="latency" id="socketlatency">Getting Latency...</p>
-</div>
+	<div class="modal fade" id="popup" tabindex="-1" role="dialog" aria-labelledby="roomqr-popup" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="popup-title">Room details</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p>Current room: <span id="roomindicator"></span></p>
+					<p></p>
+					<div id="roomqr"></div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" id="changeroom" onclick="refreshroom()">Change Room</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 
 <footer>
@@ -198,13 +179,19 @@
 	  const _moreopt = document.getElementById("moreopt");
 	  const _latency = document.getElementById("socketlatency");
 	  const _tmbdiv = document.getElementById("rightbar");
+	  const _roomqr = document.getElementById("roomqr");
+	  const _roomindicator = document.getElementById("roomindicator");
+	  const _mainContainer = document.getElementById("main");
+	  const _initContainer = document.getElementById("init");
+	  const _header = document.getElementById("head");
 	
-	  //Initialize elements status
+	  //Initialize elements
 	  var pptxenabled = false;
 	  var saveimg = true;
 	  var optenb = false;
 	  var photocount = 0;
 	  var latencycount = 0;
+	  var room;
 
 	  //Enable PPTXGenJS...or not?
 	  function togglepptx() {
@@ -221,6 +208,7 @@
 		  rmtmb();
 		  socket.emit("status",`PptxGenJS not enabled!`,room);
 		  _consoleLog(`PptxGenJS disabled.`);
+		  _header.innerHTML = "PptxGenJS disabled.";
 	    } else {
 		  window.pptx = new PptxGenJS();
 	      pptxenabled = true;
@@ -231,6 +219,7 @@
 	      _pptstat.innerHTML = "On";
 		  socket.emit("status",`Now adding photo ${photocount+1}`,room);
 		  _consoleLog(`PptxGenJS enabled, waiting photo.`);
+		  _header.innerHTML = "PptxGenJS enabled, waiting photo.";
 		}
 	  }
 
@@ -239,11 +228,6 @@
 
 	  // Get DOM elements
 	  var output = document.getElementById("download");
-
-	  // Join default channel "test"
-	  var room = "test";
-	  var rn = "0";
-	  socket.emit("join", room);
 
 	  // new "transimage" socket - w/o room param 
 	  socket.on("transimage", function(image) {
@@ -263,11 +247,22 @@
 			    _consoleLog(`Response: ${rotated_image}`);
 				triggerthumbnail(rotated_image);
 				slide.addImage({ data: rotated_image, x: 0, y: 0, w: 9.5, h: 5.5});
+				_header.innerHTML = `Added Image #${photocount}.`;
 			  });
 	      } else {
 	          _pptxne.style.display = "block";
 	      }
 	  });
+	  
+	  //External Func for random string generating
+	  function genRand(len) {
+        var hash = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ12346789";
+        var randomStr = '';
+        for(var i = 0; i < len; i++){
+            randomStr += hash[parseInt(Math.random()*hash.length)];
+        }
+        return randomStr;
+	  } 
 	  
 	  //Newer filename function to determine filename
 	  function smartFilename() {
@@ -283,75 +278,55 @@
 		}
 	  }
 
-	  //Joining Different Room
-	  function joinroom() {
-	  let oldroom = room;
-
-	      rn++;
-
-	switch (rn) {
-	  case 1:
-       room = "room1";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 2: 
-	   room = "room2";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 3:
-	   room = "room3";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 4: 
-	   room = "room4";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 5: 
-	   room = "room5";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 6: 
-	   room = "room6";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 7:
-	   alert("You have hit the end of available rooms! Page will now refresh.");
-	   location.reload();
-	   break;
-	  default:
-	   room = "test";
-		break;
-		}
-
-	      document.getElementById("roomindicator").innerHTML = room;
-
-	  }
+	async function genQR(data) {
+		var qrcode = new QRCode("roomqr");
+		qrcode.makeCode(data);
+	}
+	
+		
+	  //Refresh Room
+	  function refreshroom() {
+	    //Theres a bug here, the condition wont meet even room exist
+		if(room) {
+			let oldroom = room;
+			socket.emit("leave", oldroom);
+			}
+	  
+		room = genRand(10);
+		
+	  // Join default channel "test"
+	  // for debug only
+	  /*
+	  var room = "test";
+	  var rn = "0";
+	  */
+		
+	    _roomindicator.innerHTML = room;
+		_roomqr.innerHTML = "";
+		genQR(room);
+		socket.emit("join", room);
+		socket.emit("server","isOnline",room);
+	  }       
+   
 		
 	  // Room initializing, check if all variable is correct
 	  function checkRoomInitialize() {
-	      if (rn == 0) {
-			  // checking all variables and setup room
-	          var isHiddenOrNot = document.getElementById("init");
-			  isHiddenOrNot.style.display = "none";
-			  var showTheContent = document.getElementById("main");
-	          showTheContent.style.display = "block";
-	          document.getElementById("roomindicator").innerHTML = room;
+		try {
 			  //check isDebug environment
 			  if (isDebug) {
 				window.document.title = "InstantPhoto - Server(Development)";
 			  }
-			  // tell host that server in room is online
-			  socket.emit("server","isOnline",room);
+			  //Run through necessary func
+			  refreshroom();
+			  //Display interface
+			  _initContainer.style.display = "none";
+	          _mainContainer.style.display = "block";
 			  _consoleLog(`Server ready.`);
-	      } else {
-	          location.reload();
-	      };
+			}
+		catch (err) {
+			_mainContainer.innerHTML = err.message;
+			location.reload();
+			}
 	  }
 		
 	  //Save PPTX as file and reset all to default
@@ -497,7 +472,6 @@ async function orientCheck(data) {
 
 	//Listening to Hotkeys 
 	window.addEventListener("keydown", function(event) {
-		
 		switch(event.key) { 
 		case "Enter":
 			_consoleLog(`Enter Key Pressed`);
@@ -515,12 +489,17 @@ async function orientCheck(data) {
 				}
 			}
 			break;
-		case "x":
+		case "x" :
 			if (!pptxenabled) {
 				togglepptx();
 				}
 			break;
-		case (event.ctrlKey && event.shiftKey && "X"):
+		case "X":
+			if (!pptxenabled) {
+				togglepptx();
+				}
+			break;
+		case ( (event.ctrlKey && event.shiftKey && event.altKey) & "z" || "Z"  ):
 			if (pptxenabled) {
 				togglepptx();
 				alert(`File discarded!`);

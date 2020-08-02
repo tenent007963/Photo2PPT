@@ -2,65 +2,29 @@
 <html>
   <head>
     <meta charset="utf-8">
+	<meta http-equiv="Cache-control" content="no-cache">
 	<meta name="viewport" content="initial-scale=1.5,maximum-scale=3,user-scalable=no"/>
     <title>InstantPhoto - Client</title>
     <link rel="icon" href="./favicon">
     <script src="/socket.io/socket.io.js"></script>
 	<script src="/compressor.js"></script>
 	<script src="./jquery.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="></script>
+	<script src="https://raw.githubusercontent.com/mebjas/html5-qrcode/master/minified/html5-qrcode.min.js"></script>
 	<link rel="stylesheet" href="./bootstrap.css">
 	<script src="./bootstrap.js"></script>
 	<style>
-	
-	
-	html, body, body div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, figure, footer, header, hgroup, menu, nav, section, time, mark, audio, video {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    outline: 0;
-	font-size: 100%;
-    /* vertical-align: baseline; */
+	html,body {
+    height: 100%;
 	}
-	
-	html {
-		height: 100%;
-		margin: 0;
-		width: 90%;
-		}
-	
 	body {
 		background: #9796f0;  /* fallback for old browsers */
 		background: -webkit-linear-gradient(to right, #fbc7d4, #9796f0);  /* Chrome 10-25, Safari 5.1-6 */
-		background: linear-gradient(to bottom, #fbc7d4, #9796f0); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+		background: linear-gradient(to bottom, #fbc7d4, #9796f0) no-repeat ; /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 		margin:0;
 	}
-	.center{
-		/* bottom: 25%;
-		padding-top: 35%;	*/
-		height:100%;
-		text-align:center;
-		margin-top: calc(100% - 70%);
-		}
-		
-	button {
-		position: relative; 
-		width: 140px; 
-		height: 30px;
-		cursor: pointer;
-		transition: all 0.5s;
-		position: relative;
-		}
 	
-	form {
-	    display: inline-block;
-	}
-	
-	form {
-	max-width: 250px;
-	}
-	
-	input {
-	width: 100%;
+	.container {
+	margin-top: 10%;
 	}
 	
 	.custom-file-label {
@@ -71,8 +35,6 @@
 	.refresh-btn {
 	color: #887272;
 	transition: all 0.5s;
-	position: relative;
-	width: 50%;
     text-align: center;
 }
 .refresh-btn::before {
@@ -80,8 +42,6 @@
 	position: absolute;
 	top: 0;
 	left: 0;
-	width: 100%;
-	height: 100%;
 	z-index: 1;
 	background-color: rgba(255,255,255,0.3);
 	transition: all 0.3s;
@@ -95,8 +55,6 @@
 	position: absolute;
 	top: 0;
 	left: 0;
-	width: 100%;
-	height: 100%;
 	z-index: 1;
 	opacity: 0;
 	transition: all 0.3s;
@@ -112,40 +70,82 @@
 	float:left;
 	width: 100px;
 }
+
+.footer {
+		bottom: 10px;
+		right: 10px;
+		position: absolute;
+	}
 	</style>
   </head>
   
   <body>
-<!--  <button type="button" style="float: left" >Refresh page</button> -->
-<div class="refresh-page">
-  <div class="button refresh-btn" onclick="window.location.reload();" id="refresh">
-    <span>Reload Page</span>
-  </div>
-</div>
+	<header>
+		<div class="refresh-page">
+			<div class="btn refresh-btn" onclick="window.location.reload();" id="refresh">
+				<span>Reload Page</span>
+			</div>
+		</div>
+	</header>
   
     <!-- File input -->
-	<div class="center" id="container">
-	<button type="button" class="button room-btn" id="plusroom" onclick="plusroom()">Change Room +</button>
-	<button type="button" class="button room-btn" id="minusroom" onclick="minusroom()" disabled>Change Room -</button>
-	<br />
-	<h4 id="croom">Current room: <span id="roomindicator"></span></h4>
-	<h4 id="status">Getting Status...</h4>
-	<br />
-	<form class="md-form" id="holder" name="upload">
-	<div class="custom-file mb-3">
-      <input type="file" class="custom-file-input" id="input1" name="fresh" accept="image/*" capture="camera" autofocus>
-      <label class="custom-file-label" for="customFile">Open Camera</label>
-    </div>
-	<div class="custom-file mb-3">
-      <input type="file" class="custom-file-input" id="input2" name="gallery" accept="image/*">
-      <label class="custom-file-label" for="customFile">Gallery Upload</label>
-    </div>
+	<div class="container" id="container">
+		
+		<div class="row-fluid align-items-center justify-content-start">
+			<div class="col">
+				<h4 id="croom">Current room: <span id="roomindicator"></span></h4>
+				<h4 id="status">Getting Status...</h4>
+			</div>
+		</div>	
+		<div class="row-fluid align-items-center justify-content-start">
+			<div class="col">
+				<form class="md-form" id="holder" name="upload">
+					<div class="custom-file mb-3">
+						<input type="file" class="custom-file-input" id="input1" name="fresh" accept="image/*" capture="camera" autofocus>
+						<label class="custom-file-label" for="customFile">Open Camera</label>
+					</div>
+					<div class="custom-file mb-3">
+						<input type="file" class="custom-file-input" id="input2" name="gallery" accept="image/*">
+						<label class="custom-file-label" for="customFile">Gallery Upload</label>
+					</div>
+				</form> 
+				<button type="button" class="button save-btn" id="savefile" onclick="savefile()">Save File</button>
+			</div>
+		</div>
+	</div>
 	
-	</form> 
-	<button type="button" class="button save-btn" id="savefile" onclick="savefile()">Save File</button>
+	<!-- Popup for connecting room -->
+	<div class="modal fade" id="popup" tabindex="-1" role="dialog" aria-labelledby="-joinroom-popup" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="joinroom">Join A Room</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<form>
+						<h3>Enter room code:</h3>
+						<input type="text" name="roomCode" id="roomCode" placeholder="Code here" disabled="disabled"/>	
+						<div id="reader"></div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary">Save changes</button>
+				</div>
+			</div>
+		</div>
+	</div>
 	
-	</div>	
 	</body>
+	
+	<footer>
+		<div class="footer" id="joinroom">
+			<button type="button" class="btn btn-light" data-toggle="modal" data-target="#popup">Join Room</button>
+		</div>
+	</footer>
+	
     <!-- Client Code -->
     <script type="text/javascript">
 	//Debug section

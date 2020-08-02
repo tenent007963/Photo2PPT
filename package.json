@@ -13,9 +13,10 @@
     "ip": "^1.1.5",
     "opn": "^6.0.0",
     "pptxgenjs": "^2.6.0",
+    "qrcode": "^1.4.4",
     "socket.io": "^2.3.0"
   },
-  "version": "1.0.9",
+  "version": "1.1.1",
   "devDependencies": {},
   "repository": {
     "type": "git",
