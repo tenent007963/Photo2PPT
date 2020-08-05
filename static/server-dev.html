@@ -319,6 +319,7 @@
 			  //Run through necessary func
 			  refreshroom();
 			  //Display interface
+			$('#popup').modal('show');
 			  _initContainer.style.display = "none";
 	          _mainContainer.style.display = "block";
 			  _consoleLog(`Server ready.`);
@@ -603,6 +604,7 @@ function moreopt() {
 	  _consoleLog(`Received parsed request from host`)
       switch(data) { 
 	  case "check":
+		  $('#popup').modal('hide');
 		if (pptxenabled) {
 			_consoleLog(`Sending status..`)
 			socket.emit("status",`Now adding photo ${photocount+1}`,room);

@@ -94,7 +94,7 @@
 		<div class="row-fluid align-items-center justify-content-start">
 			<div class="col">
 				<h4 id="croom">Status: <span id="roomindicator">Offline</span></h4>
-				<h4 id="status">Getting Status...</h4>
+				<h4 id="status">Waiting join room...</h4>
 			</div>
 		</div>	
 		<div class="row-fluid align-items-center justify-content-start">
@@ -246,9 +246,10 @@
 			let oldroom = room;
 			socket.emit("leave",oldroom);
 		}
-
+		room = rm;
 		socket.emit("join",rm);
-
+		checkStatus();
+		$('#popup').modal('hide');
 	 document.getElementById("roomindicator").innerHTML = "Online";
 	 
     }
@@ -268,6 +269,7 @@
 	html5QrcodeScanner.render(onScanSuccess, onScanFailure);
 	
 	//Check socket connection upon window.onfocus
+	/*
 	window.onfocus = () => { 
 		_consoleLog(`Window focused. Checking connection...`);
 		if (!socket.connected) {
@@ -288,6 +290,7 @@
 			checkStatus();
 			}
 	}
+	*/
 	
 	//AJAX Codes
 	$(".custom-file-input").on("change", function() {
@@ -327,8 +330,8 @@
 			  }
 	}
 	
-	window.onload = () => { 
-		setTimeout(checkStatus(),3000);
+	window.onload = () => {
+		$('#popup').modal('show');
 			}
 			
 			
