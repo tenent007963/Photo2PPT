@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
-	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 	<meta name="viewport" content="initial-scale=1.5,maximum-scale=3,user-scalable=no"/>
     <title>InstantPhoto - Client</title>
     <link rel="icon" href="./favicon">
     <script src="/socket.io/socket.io.js"></script>
 	<script src="/compressor.js"></script>
-	<script src="./jquery.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="></script>
-	<script src="https://raw.githubusercontent.com/mebjas/html5-qrcode/master/minified/html5-qrcode.min.js"></script>
+	<script src="./jquery.js"></script>
+	<script src="./html5-qrcode.min.js"></script>
 	<link rel="stylesheet" href="./bootstrap.css">
 	<script src="./bootstrap.js"></script>
 	<style>
@@ -93,8 +93,8 @@
 		
 		<div class="row-fluid align-items-center justify-content-start">
 			<div class="col">
-				<h4 id="croom">Current room: <span id="roomindicator"></span></h4>
-				<h4 id="status">Getting Status...</h4>
+				<h4 id="croom">Status: <span id="roomindicator">Offline</span></h4>
+				<h4 id="status">Waiting to join room...</h4>
 			</div>
 		</div>	
 		<div class="row-fluid align-items-center justify-content-start">
@@ -102,11 +102,11 @@
 				<form class="md-form" id="holder" name="upload">
 					<div class="custom-file mb-3">
 						<input type="file" class="custom-file-input" id="input1" name="fresh" accept="image/*" capture="camera" autofocus>
-						<label class="custom-file-label" for="customFile">Open Camera</label>
+						<label class="custom-file-label" for="input1">Open Camera</label>
 					</div>
 					<div class="custom-file mb-3">
 						<input type="file" class="custom-file-input" id="input2" name="gallery" accept="image/*">
-						<label class="custom-file-label" for="customFile">Gallery Upload</label>
+						<label class="custom-file-label" for="input2">Gallery Upload</label>
 					</div>
 				</form> 
 				<button type="button" class="button save-btn" id="savefile" onclick="savefile()">Save File</button>
@@ -115,11 +115,11 @@
 	</div>
 	
 	<!-- Popup for connecting room -->
-	<div class="modal fade" id="popup" tabindex="-1" role="dialog" aria-labelledby="-joinroom-popup" aria-hidden="true">
+	<div class="modal fade" id="popup" tabindex="-1" role="dialog" aria-labelledby="joinroom-popup" aria-hidden="true">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="joinroom">Join A Room</h5>
+					<h5 class="modal-title" id="joinroom-title">Join A Room</h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 					</button>
@@ -127,12 +127,13 @@
 				<div class="modal-body">
 					<form>
 						<h3>Enter room code:</h3>
-						<input type="text" name="roomCode" id="roomCode" placeholder="Code here" disabled="disabled"/>	
-						<div id="reader"></div>
+						<input type="text" name="roomCode" id="roomCode" placeholder="Code here"/>
+					</form>
+					<!--	<div id="reader"></div>  -->
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-					<button type="button" class="btn btn-primary">Save changes</button>
+					<button type="button" class="btn btn-primary" onclick="getRoom()">Join</button>
 				</div>
 			</div>
 		</div>
@@ -141,7 +142,7 @@
 	</body>
 	
 	<footer>
-		<div class="footer" id="joinroom">
+		<div class="footer" id="joinroom-button">
 			<button type="button" class="btn btn-light" data-toggle="modal" data-target="#popup">Join Room</button>
 		</div>
 	</footer>
@@ -149,23 +150,26 @@
     <!-- Client Code -->
     <script type="text/javascript">
 	//Debug section
-	var isDebug = ( window.location.href.match(/dev/g) ? true : false );
+	let isDebug = ( !!window.location.href.match(/dev/g) );
 	  
       // Get WebSocket
-      var socket = io();
+      let socket = io();
 
       // Get DOM elements
-      var _src1 = document.getElementById("input1");
-	  var _src2 = document.getElementById("input2");
-	  var _status = document.getElementById("status");
-	  var _fileform = document.getElementById("holder");
-	  var _container = document.getElementById("container");
+      let _src1 = document.getElementById("input1");
+	  let _src2 = document.getElementById("input2");
+	  let _status = document.getElementById("status");
+	  let _fileform = document.getElementById("holder");
+	  let _container = document.getElementById("container");
+	  let _roomCodeInput = document.getElementById("roomCode");
 
       // Join a channel
+	  /* Debug code
       let room = "test";
 	  let rm = "0";
-      socket.emit("join", room);
-	  document.getElementById("roomindicator").innerHTML = room;
+	  socket.emit("join", room);
+	   */
+	  var room;
 
 		// Listen to Source1 and Source2 input events
 		[_src1,_src2].forEach(function(sauce){ 
@@ -215,106 +219,65 @@
 							return false;
 						}
 					}
-				
 				};
-				
-				
 			});
 		});	
 	
 	function emitPhoto(image) {
 		socket.emit("recvimage", image, room, (isSuccess) => {
-			if (isSuccess) { _consoleLog('Image sent!'); } else { emitPhoto(image);};
+			if (isSuccess) { _consoleLog('Image sent!') } else { emitPhoto(image)}
 			});
 	}
 	
 	function savefile() {
 		socket.emit("status","save", room);
 	}
-	
-	function plusroom() {
-	 rm++ ;
-	 joinroom(rm);
-    }	
-	
-	function minusroom() {
-	 rm-- ;
-	 joinroom(rm)
-    }	
 
+	//Retrieving room code from input
+	function getRoom() {
+		let room = _roomCodeInput.value;
+		joinroom(room);
+	}
+
+
+	//Join room
 	function joinroom(rm) {
-	 let oldroom = room;
-
-	 if (rm >= 6) {
-	   if (rm = 6) {	 
-	     document.getElementById("plusroom").disabled = true;
-		} else { 
-	     rm-- ;
-	     alert("Invalid Room selected.");
-	   } }
-	 
-	 if (rm >= 1 , rm < 6 ) {
-	 document.getElementById("plusroom").disabled = false;
-	 document.getElementById("minusroom").disabled = false;
-	 }
-	 
-	 if (rm <= 1) {
-	  if (rm = 1 ) {
-	   document.getElementById("minusroom").disabled = true;
-	  } else { 
-	   rm++ ;
-	   alert("You had reached the end!");
-	 }  }
-	
-	switch (rm) {
-	  case 1:
-       room = "room1";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 2: 
-	   room = "room2";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 3:
-	   room = "room3";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 4: 
-	   room = "room4";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 5: 
-	   room = "room5";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 6: 
-	   room = "room6";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break; 
-	  default:
-	   room = "test";
-		break;
+		if(room) {
+			let oldroom = room;
+			socket.emit("leave",oldroom);
 		}
-		
-	 document.getElementById("roomindicator").innerHTML = room;
-	 
+		room = rm;
+		socket.emit("join",rm);
+	 	document.getElementById("roomindicator").innerHTML = "Online";
+	 	checkStatus();
     }
-	
-	
+
+    //Initialize QR Scanner
+	function onScanSuccess(qrCodeMessage) {
+		joinroom(qrCodeMessage);
+	}
+
+	function onScanFailure(error) {
+		// handle scan failure, usually better to ignore and keep scanning
+		_consoleLog(`QR error = ${error}`);
+	}
+
+	/*
+	let html5QrcodeScanner = new Html5QrcodeScanner(
+			"reader", { fps: 25, qrbox: 250 });
+	html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+	*/
+
 	//Check socket connection upon window.onfocus
-	window.onfocus = () => { 
+	//Disabled during debug
+	/*
+	window.onfocus = () => {
 		_consoleLog(`Window focused. Checking connection...`);
 		if (!socket.connected) {
 			_consoleLog(`Trying to reconnect...`);
 			try { 
 				socket.connect(); 
-				if (!socket.connected) throw "Reconnect error!";
+				if (!socket.connected) throw _consoleLog("Reconnect error!");
 			}
 			catch(err) {
 				_consoleLog(`Reconnect failed! Will proceed to force reload.`);
@@ -328,7 +291,8 @@
 			checkStatus();
 			}
 	}
-	
+	*/
+
 	//AJAX Codes
 	$(".custom-file-input").on("change", function() {
 		var fileName = $(this).val().split("\\").pop();
@@ -366,11 +330,12 @@
 				window.document.title = "InstantPhoto - Client(Development)";
 			  }
 	}
-	
+
+	/*
 	window.onload = () => { 
 		setTimeout(checkStatus(),3000);
 			}
-			
+	*/
 			
 	//Default debug Code, do not modify
 	function _consoleLog(stringData) {
