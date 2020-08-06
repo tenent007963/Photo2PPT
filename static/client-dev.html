@@ -129,7 +129,7 @@
 						<h3>Enter room code:</h3>
 						<input type="text" name="roomCode" id="roomCode" placeholder="Code here"/>
 					</form>
-					<!--	<div id="reader"></div>  -->
+						<div id="reader"></div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -248,8 +248,9 @@
 		}
 		room = rm;
 		socket.emit("join",rm);
-	 	document.getElementById("roomindicator").innerHTML = "Online";
-	 	checkStatus();
+		checkStatus();
+		$('#popup').modal('hide');
+	 document.getElementById("roomindicator").innerHTML = "Online";
     }
 
     //Initialize QR Scanner
@@ -262,11 +263,10 @@
 		_consoleLog(`QR error = ${error}`);
 	}
 
-	/*
+
 	let html5QrcodeScanner = new Html5QrcodeScanner(
 			"reader", { fps: 25, qrbox: 250 });
 	html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-	*/
 
 	//Check socket connection upon window.onfocus
 	//Disabled during debug
@@ -331,11 +331,10 @@
 			  }
 	}
 
-	/*
-	window.onload = () => { 
-		setTimeout(checkStatus(),3000);
+	
+	window.onload = () => {
+		$('#popup').modal('show');
 			}
-	*/
 			
 	//Default debug Code, do not modify
 	function _consoleLog(stringData) {
