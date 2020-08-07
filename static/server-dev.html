@@ -240,15 +240,7 @@
 		      _nsi.style.display = "block"
 			  }
 	      if (pptxenabled == true) {
-		      window.slide = pptx.addNewSlide();
-			  // Creating anonymous async func to check img orientation
-			  // checking was done by outer func
-			  orientCheck(image).then(rotated_image => {
-			    _consoleLog(`Response: ${rotated_image}`);
-				triggerthumbnail(rotated_image);
-				slide.addImage({ data: rotated_image, x: 0, y: 0, w: 9.5, h: 5.5});
-				_header.innerHTML = `Added Image #${photocount}.`;
-			  });
+		      addSlide(image);
 	      } else {
 	          _pptxne.style.display = "block";
 	      }
@@ -329,7 +321,22 @@
 			location.reload();
 			}
 	  }
-		
+
+	  //Whenever adding a new slide, image data will parse into this function
+	  function addSlide(image) {
+		  window.slide = pptx.addNewSlide();
+		  // Creating anonymous async func to check img orientation
+		  // checking was done by outer func
+		  orientCheck(image).then(rotated_image => {
+			  _consoleLog(`Response: ${rotated_image}`);
+			  triggerthumbnail(rotated_image);
+			  //slide.addImage({ data: rotated_image, x: 0, y: 0, w: 9.5, h: 5.5});
+			  slide.addImage({ data: rotated_image, x: 0, y: 0}); //trying not to fix image size
+			  _header.innerHTML = `Added Image #${photocount}.`;
+		  });
+	  }
+
+
 	  //Save PPTX as file and reset all to default
 	  function savepptx() {
 	    if (_gpint && _gpint.value) {
@@ -559,9 +566,7 @@ function moreopt() {
 				reader.readAsDataURL(file);
 				reader.onloadend = function () {
 					var ewanss = reader.result;
-					window.slide = pptx.addNewSlide();
-					slide.addImage({data: ewanss, x: 0.5, y: 0.3, w: 8.5, h: 5.5 });
-					triggerthumbnail(ewanss);
+					addSlide(ewanss);
 					if (saveimg == true) { 
 						download(ewanss, smartFilename(), "application/octet-stream;base64");
 					}
