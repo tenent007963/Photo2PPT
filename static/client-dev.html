@@ -269,8 +269,6 @@
 	html5QrcodeScanner.render(onScanSuccess, onScanFailure);
 
 	//Check socket connection upon window.onfocus
-	//Disabled during debug
-	/*
 	window.onfocus = () => {
 		_consoleLog(`Window focused. Checking connection...`);
 		if (!socket.connected) {
@@ -291,13 +289,13 @@
 			checkStatus();
 			}
 	}
-	*/
 
 	//AJAX Codes
 	$(".custom-file-input").on("change", function() {
 		var fileName = $(this).val().split("\\").pop();
 		$(this).siblings(".custom-file-label").addClass("selected").html(fileName);
 	});
+	
 	
 	//Below are all socket functions / connections
 	
