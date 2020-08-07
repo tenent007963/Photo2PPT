@@ -256,11 +256,11 @@
     //Initialize QR Scanner
 	function onScanSuccess(qrCodeMessage) {
 		joinroom(qrCodeMessage);
-		html5QrCode.clear();
-		html5QrCode.stop().then(ignore => {
+		html5QrcodeScanner.clear();
+		html5QrcodeScanner.stop().then(ignore => {
 		// QR Code scanning is stopped.
 		}).catch(err => {
-		html5QrCode.stop();
+		html5QrcodeScanner.stop();
 		_consoleLog(err);
 		});
 	}
