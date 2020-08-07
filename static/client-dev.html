@@ -256,6 +256,7 @@
     //Initialize QR Scanner
 	function onScanSuccess(qrCodeMessage) {
 		joinroom(qrCodeMessage);
+		html5QrCode.clear();
 	}
 
 	function onScanFailure(error) {
