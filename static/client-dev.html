@@ -268,11 +268,23 @@
 		// handle scan failure, usually better to ignore and keep scanning
 		_consoleLog(`QR error = ${error}`);
 	}
+	
+	// This method will trigger user permissions
+	Html5Qrcode.getCameras().then(devices => {
+	/**
+	* devices would be an array of objects of type:
+	* { id: "id", label: "label" }
+	*/
+		if (devices && devices.length) {
+			var cameraId = devices[2].id;
+			let html5Qrcode = new Html5Qrcode("reader");
+			html5Qrcode.start(cameraId, { fps: 30 },onScanSuccess, onScanFailure);
+		}
+	}).catch(err => {
+	// handle err
+	});
 
-
-	let html5Qrcode = new Html5Qrcode(
-			"reader", { fps: 30 });
-	html5Qrcode.start(onScanSuccess, onScanFailure);
+	
 
 	//Check socket connection upon window.onfocus
 	window.onfocus = () => {
