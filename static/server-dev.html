@@ -63,9 +63,9 @@
 	.styledButton {
 		min-width: 120px;
 		min-height: 35px;
-		margin: 0 3px;
+		margin: 0 2px;
 		position: relative;
-		border: 3px solid white;
+		border: 2px solid white;
 		justify-content: center;
 		align-items: center;
 		background: transparent;
@@ -105,9 +105,9 @@
 		<div class="btn-toolbar topbar" role=toolbar" aria-label="Normal Usage Topbar" id="topbar">
 			<div class="btn-container" id="btn-container" style="display:none">
 				<button type="button" class="btn btn-light" id="clrtmb" onclick="rmtmb()">Clear Thumbnail</button>
-				<button type="button" class="btn btn-light" data-toggle="modal" data-target="#popup">Change Room</button>
 			</div>
-			<button type="button" class="btn btn-light mr-1" id="moreopt" onclick="moreopt()">Expand</button>
+			<button type="button" class="btn btn-light mr-1" id="moreopt" onclick="moreopt()" style="display:none;">Expand</button>
+			<button type="button" class="btn btn-light" data-toggle="modal" data-target="#popup">Room Details</button>
 			<button type="button" class="btn btn-light mr-1" id="saveimage" onclick="saveimage()">Save Image : <span id="wannasavemou">Yes</span></button>
 			<button type="button" class="btn btn-light mr-1" id="togglepptx" onclick="togglepptx()">Create PPTX : <span id="pptxgenjsstatus">Off</span></button>
 			<button type="button" class="btn btn-light mr-1" id="savepptx" onclick="savepptx()" disabled>Save PPTX</button>

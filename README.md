@@ -31,6 +31,7 @@ Just clone this repo and its now ready to go.
 	a. Implement cookie usage for client side to remember last room name\
 	b. Auto lock room from host side to prevent multiple server connected same room\
  2. Server side : Replace initialization screen to mode selection ( CS, Tech, PDF)
+ 3. Server side : Developer-only toolbar and User-only toolbar
  3. Enable console.log send back to heroku for debug purpose
  4. Socket.io perform file multi-part upload 
  5. Lock process when retrieving/processing images and unlock to save file
