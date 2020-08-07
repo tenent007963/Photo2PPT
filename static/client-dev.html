@@ -257,6 +257,12 @@
 	function onScanSuccess(qrCodeMessage) {
 		joinroom(qrCodeMessage);
 		html5QrCode.clear();
+		html5QrCode.stop().then(ignore => {
+		// QR Code scanning is stopped.
+		}).catch(err => {
+		html5QrCode.stop();
+		_consoleLog(err);
+		});
 	}
 
 	function onScanFailure(error) {
