@@ -256,7 +256,6 @@
     //Initialize QR Scanner
 	function onScanSuccess(qrCodeMessage) {
 		joinroom(qrCodeMessage);
-		html5QrcodeScanner.clear();
 		html5QrcodeScanner.stop().then(ignore => {
 		// QR Code scanning is stopped.
 		}).catch(err => {
@@ -272,7 +271,7 @@
 
 
 	let html5QrcodeScanner = new Html5QrcodeScanner(
-			"reader", { fps: 25 });
+			"reader", { fps: 30 });
 	html5QrcodeScanner.render(onScanSuccess, onScanFailure);
 
 	//Check socket connection upon window.onfocus
