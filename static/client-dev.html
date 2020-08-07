@@ -170,6 +170,7 @@
 	  socket.emit("join", room);
 	   */
 	  var room;
+	  var cameraId;
 
 		// Listen to Source1 and Source2 input events
 		[_src1,_src2].forEach(function(sauce){ 
@@ -276,15 +277,14 @@
 	* { id: "id", label: "label" }
 	*/
 		if (devices && devices.length) {
-			var cameraId = devices[2].id;
-			let html5Qrcode = new Html5Qrcode("reader");
-			html5Qrcode.start(cameraId, { fps: 30 },onScanSuccess, onScanFailure);
+			cameraId = devices[2].id;
 		}
 	}).catch(err => {
 	// handle err
 	});
-
 	
+	let html5Qrcode = new Html5Qrcode("reader");
+	html5Qrcode.start(cameraId, { fps: 30 },onScanSuccess, onScanFailure);
 
 	//Check socket connection upon window.onfocus
 	window.onfocus = () => {
