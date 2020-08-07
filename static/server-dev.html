@@ -330,8 +330,7 @@
 		  orientCheck(image).then(rotated_image => {
 			  _consoleLog(`Response: ${rotated_image}`);
 			  triggerthumbnail(rotated_image);
-			  //slide.addImage({ data: rotated_image, x: 0, y: 0, w: 9.5, h: 5.5});
-			  slide.addImage({ data: rotated_image, x: 0, y: 0}); //trying not to fix image size
+			  slide.addImage({ data: rotated_image, x: 0, y: 0, w: 10, h: 5.6});
 			  _header.innerHTML = `Added Image #${photocount}.`;
 		  });
 	  }
