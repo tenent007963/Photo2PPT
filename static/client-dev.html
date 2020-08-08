@@ -11,6 +11,7 @@
 	<script src="./jquery.js"></script>
 	<script src="./html5-qrcode.min.js"></script>
 	<link rel="stylesheet" href="./bootstrap.css">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/inter-ui@3.13.1/Inter%20(web)/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 	<script src="./bootstrap.js"></script>
 	<style>
 	html,body {
@@ -76,6 +77,14 @@
 		right: 10px;
 		position: absolute;
 	}
+
+.offline {
+	color: red;
+}
+
+.online {
+	color: green;
+}
 	</style>
   </head>
   
@@ -93,8 +102,8 @@
 		
 		<div class="row-fluid align-items-center justify-content-start">
 			<div class="col">
-				<h4 id="croom">Status: <span id="roomindicator">Offline</span></h4>
-				<h4 id="status">Waiting to join room...</h4>
+				<h5 id="croom">Status: <span id="roomindicator" class="offline">&#x25cf; Offline</span></h5>
+				<h5 id="status">Waiting to join room...</h5>
 			</div>
 		</div>	
 		<div class="row-fluid align-items-center justify-content-start">
@@ -125,10 +134,11 @@
 					</button>
 				</div>
 				<div class="modal-body">
-					<form>
-						<h3>Enter room code:</h3>
-						<input type="text" name="roomCode" id="roomCode" placeholder="Code here"/>
+					<form action="#" onsubmit="return getRoom()">
+						<span>Enter room code:</span>
+						<input type="text" name="roomCode" id="roomCode" placeholder="Code here" style="width:65%"/>
 					</form>
+					<p></p>
 						<div id="reader"></div>
 				</div>
 				<div class="modal-footer">
@@ -162,6 +172,7 @@
 	  let _fileform = document.getElementById("holder");
 	  let _container = document.getElementById("container");
 	  let _roomCodeInput = document.getElementById("roomCode");
+	  let _roomIndicator = document.getElementById("roomindicator");
 
       // Join a channel
 	  /* Debug code
@@ -240,7 +251,6 @@
 		joinroom(room);
 	}
 
-
 	//Join room
 	function joinroom(rm) {
 		if(room) {
@@ -251,7 +261,7 @@
 		socket.emit("join",rm);
 		checkStatus();
 		$('#popup').modal('hide');
-	 document.getElementById("roomindicator").innerHTML = "Online";
+		setOnline();
     }
 
     //Initialize QR Scanner
@@ -269,7 +279,17 @@
 		// handle scan failure, usually better to ignore and keep scanning
 		_consoleLog(`QR error = ${error}`);
 	}
-	
+
+	let setOnline = () => {
+		_roomIndicator.innerHTML = "&#x25cf; Online";
+		_roomIndicator.className = "online";
+	}
+
+	let setOffline = () => {
+		_roomIndicator.innerHTML = "&#x25cf; Offline";
+		_roomIndicator.className = "offline";
+	}
+
 	// This method will trigger user permissions
 	Html5Qrcode.getCameras().then(devices => {
 	/**
@@ -291,6 +311,7 @@
 		_consoleLog(`Window focused. Checking connection...`);
 		if (!socket.connected) {
 			_consoleLog(`Trying to reconnect...`);
+			setOffline();
 			try { 
 				socket.connect(); 
 				if (!socket.connected) throw _consoleLog("Reconnect error!");
@@ -305,6 +326,7 @@
 		} else {
 			_consoleLog(`Client is connected, falling back.`);
 			checkStatus();
+			setOnline();
 			}
 	}
 
@@ -329,9 +351,11 @@
 	  // try to reconnect
 	  socket.connect();
 	  _consoleLog(`Trying to reconnect socket.`);
+	  setOffline();
 	});
 	
 	function checkStatus() {
+		_consoleLog("Querying status..");
 		socket.emit("client","check",room, (serverIsOnline) => {
 			if (serverIsOnline) { 
 				_consoleLog(`Server side offline!`);
@@ -341,15 +365,13 @@
 				_consoleLog(`An error occurred.`);
 				}
 		});
-		_consoleLog("Querying status..");
-		if (isDebug) {
-				window.document.title = "InstantPhoto - Client(Development)";
-			  }
 	}
 
-	
 	window.onload = () => {
 		$('#popup').modal('show');
+		if (isDebug) {
+			window.document.title = "InstantPhoto - Client(Development)";
+		}
 			}
 			
 	//Default debug Code, do not modify
