@@ -59,6 +59,18 @@
 		align-content: flex-start;
 		flex-wrap:wrap;
 		}
+
+ #bottombar {
+	 width: 99%;
+	 overflow: hidden;
+	 padding: 10px 5px;
+	 background-color: #45b3a9;
+	 display:flex;
+	 flex-direction: row;
+	 justify-content: flex-start;
+	 align-content: flex-start;
+	 flex-wrap:wrap;
+ }
 	
 	.styledButton {
 		min-width: 110px;
@@ -104,11 +116,7 @@
   
     <!-- Container -->
 	<div class="container-fluid" id="main">
-		<div class="btn-toolbar topbar" role=toolbar" aria-label="Normal Usage Topbar" id="topbar">
-			<div class="btn-container" id="btn-container" style="display:none">
-				<button type="button" class="btn btn-light" id="clrtmb" onclick="rmtmb()">Clear Thumbnail</button>
-			</div>
-			<button type="button" class="btn btn-light mr-1" id="moreopt" onclick="moreopt()" style="display:none;">Expand</button>
+		<div class="btn-toolbar topbar" role="toolbar" aria-label="Normal Usage Topbar" id="topbar">
 			<button type="button" class="btn btn-light" data-toggle="modal" data-target="#popup">Room Details</button>
 			<button type="button" class="btn btn-light mr-1" id="saveimage" onclick="saveimage()">Save Image : <span id="wannasavemou">Yes</span></button>
 			<button type="button" class="btn btn-light mr-1" id="togglepptx" onclick="togglepptx()">Create PPTX : <span id="pptxgenjsstatus">Off</span></button>
@@ -153,14 +161,21 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="warnings" style="color: red">
+		<span id="pptxnotenabled" style="display:none">Warning : PPTX not enabled!</span>
+		<br />
+		<span id="nosaveimage" style="display:none">Notice : Image not downloaded!</span>
+	</div>
 </body>
 
 <footer>
-<div class="warnings" style="color: red"> 
-<span id="pptxnotenabled" style="display:none">Warning : PPTX not enabled!</span>
-<br />
-<span id="nosaveimage" style="display:none">Notice : Image not downloaded!</span>
-</div>
+	<div class="btn-toolbar bottombar" role="toolbar" aria-label="Developer Bottombar" id="bottombar" style="display:none">
+		<button type="button" class="btn btn-light mr-1" id="moreopt" onclick="moreopt()" style="display:none;">Expand</button>
+		<div class="btn-container" id="btn-container" >
+			<button type="button" class="btn btn-light" id="clrtmb" onclick="rmtmb()">Clear Thumbnail</button>
+		</div>
+	</div>
 </footer>
 <!-- Client Code -->
     <script type="text/javascript">	  
