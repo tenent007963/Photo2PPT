@@ -116,9 +116,9 @@
   
     <!-- Container -->
 	<div class="container-fluid" id="main">
-		<div class="btn-toolbar topbar" role="toolbar" aria-label="Normal Usage Topbar" id="topbar">
+		<div class="btn-toolbar topbar cs" role="toolbar" aria-label="Normal Usage Topbar" id="topbar">
 			<button type="button" class="btn btn-light" data-toggle="modal" data-target="#popup">Room Details</button>
-			<button type="button" class="btn btn-light mr-1" id="saveimage" onclick="saveimage()">Save Image : <span id="wannasavemou">Yes</span></button>
+			<button type="button" class="btn btn-light mr-1" id="saveimage" onclick="saveimage()">Save Image : <span id="wannasavemou">No</span></button>
 			<button type="button" class="btn btn-light mr-1" id="togglepptx" onclick="togglepptx()">Create PPTX : <span id="pptxgenjsstatus">Off</span></button>
 			<button type="button" class="btn btn-light mr-1" id="savepptx" onclick="savepptx()" disabled>Save PPTX</button>
 			<form style="float: right;position: relative" action="#" onsubmit="return false;">
@@ -173,7 +173,9 @@
 	<div class="btn-toolbar bottombar" role="toolbar" aria-label="Developer Bottombar" id="bottombar" style="display:none">
 		<button type="button" class="btn btn-light mr-1" id="moreopt" onclick="moreopt()" style="display:none;">Expand</button>
 		<div class="btn-container" id="btn-container" >
-			<button type="button" class="btn btn-light" id="clrtmb" onclick="rmtmb()">Clear Thumbnail</button>
+			<button type="button" class="btn btn-dark" id="clrtmb" onclick="rmtmb()">Clear Thumbnail</button>
+			<button type="button" class="btn btn-dark" id="pinglog" onclick="_log(ping)"><span id="ping">Show</span> Ping Log</button>
+			<button type="button" class="btn btn-dark" id="imgdatalog" onclick="_log(imgdata)"><span id="imgdata">Show</span> ImgData Log</button>
 		</div>
 	</div>
 </footer>
@@ -201,14 +203,18 @@
 	  const _mainContainer = document.getElementById("main");
 	  const _initContainer = document.getElementById("init");
 	  const _header = document.getElementById("head");
+	  const _ping = document.getElementById("ping");
+	  const _imgdata = document.getElementById("imgdata")
 	
 	  //Initialize elements
 	  var pptxenabled = false;
-	  var saveimg = true;
+	  var saveimg = false;
 	  var optenb = false;
 	  var photocount = 0;
 	  var latencycount = 0;
 	  var room;
+	  var logping = false;
+	  var logimgdata = false;
 
 	  //Enable PPTXGenJS...or not?
 	  function togglepptx() {
@@ -345,7 +351,9 @@
 		  // Creating anonymous async func to check img orientation
 		  // checking was done by outer func
 		  orientCheck(image).then(rotated_image => {
-			  _consoleLog(`Response: ${rotated_image}`);
+			  if(logimgdata) {
+				  _consoleLog(`Response: ${rotated_image}`);
+			  }
 			  triggerthumbnail(rotated_image);
 			  slide.addImage({ data: rotated_image, x: 0, y: 0, w: 10, h: 5.6});
 			  _header.innerHTML = `Added Image #${photocount}.`;
@@ -538,14 +546,18 @@ async function orientCheck(data) {
 		}
 	});		
 
-//rightbar (thumbnail) cleaning
-function rmtmb() {
-    var element = document.getElementById('rightbar');
-    element.innerHTML = '';
-}
 
-function moreopt() {
-	switch(optenb) {
+	  //Below are all functions that are used in dev mode
+
+	  //rightbar (thumbnail) cleaning
+	  function rmtmb() {
+    	var element = document.getElementById('rightbar');
+    	element.innerHTML = '';
+	  }
+
+	  //toggle more buttons
+	  function moreopt() {
+		switch(optenb) {
 		   case true:
 		     optenb = false;
 			 _btncoint.style.display = "none";
@@ -557,7 +569,33 @@ function moreopt() {
 			 _moreopt.textContent = "Collapse";
              break;
 			 }
-	}
+	  }
+
+	  //static function for enable/disable logging
+	  function _log(option) {
+	  	switch(option) {
+	  		case "ping":
+				if(!logping) {
+					logping = false;
+					_ping.textContent = "Show";
+				} else {
+					logping = true;
+					_ping.textContent = "Hide";
+				}
+	  			break;
+			case "imgdata":
+				if(!logimgdata) {
+					logimgdata = false;
+					_imgdata.textContent = "Show";
+				} else {
+					logimgdata = true;
+					_imgdata.textContent = "Show";
+				}
+				break;
+			default:
+				return false;
+		}
+	  }
    
    	window.addEventListener('paste', function(e) {
 		clipboardData = e.clipboardData;
@@ -625,12 +663,11 @@ function moreopt() {
 	  _consoleLog(`Received parsed request from host`)
       switch(data) { 
 	  case "check":
+		  _consoleLog(`Sending status..`);
 		  $('#popup').modal('hide');
-		if (pptxenabled) {
-			_consoleLog(`Sending status..`)
+		  if (pptxenabled) {
 			socket.emit("status",`Now adding photo ${photocount+1}`,room);
 			} else {
-			_consoleLog(`Sending status..`)
 			socket.emit("status",`PptxGenJS not enabled!`,room);
 			}
 		break;
@@ -640,7 +677,7 @@ function moreopt() {
 		}
 		break;
       default:
-		_consoleLog(`Request dropped!`)
+		_consoleLog(`Request dropped!`);
 		return false;
 		break;
 	}
@@ -649,7 +686,10 @@ function moreopt() {
 	// Latency checking
 	socket.on('pong', function(ping) {
 		_latency.textContent = ping + 'ms';
-		_consoleLog(`Received Pong: ${ping}`);
+		if(logping) {
+			_consoleLog(`Received Pong: ${ping}`);
+		}
+		socket.emit("server","isOnline",room);
 		//Prompt if latency over acceptable threshold
 		if (ping >= 550) {
 			latencycount++;
@@ -668,7 +708,20 @@ function moreopt() {
 	
 	window.onload = checkRoomInitialize();
 	
-	
+	//Small cheat code to make sure heroku dyno doesn't go idling when user is connected
+	  function httpGetAsync(theUrl, callback)
+	  {
+		  var xmlHttp = new XMLHttpRequest();
+		  xmlHttp.onreadystatechange = function() {
+			  if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+				  callback(xmlHttp.responseText);
+		  }
+		  xmlHttp.open("GET", theUrl, true); // true for asynchronous
+		  xmlHttp.send(null);
+	  }
+
+
+
 	//Default debug Code, do not modify
 	function _consoleLog(stringData) {
 		if(isDebug) {

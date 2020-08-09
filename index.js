@@ -64,7 +64,7 @@ var server=http.createServer(function(req,res){
 }).listen(PORT);
 
 // Initialize Socket.io and its variables
-var io = require('socket.io').listen(server,{pingInterval: 5000});
+var io = require('socket.io').listen(server,{pingInterval: 5000,pingTimeout: 60000,autoConnect: true});
 var serverIsOnline = new Object;
 
 // Register "connection" events to the WebSocket
@@ -81,8 +81,8 @@ io.on("connection", function(socket) {
                 console.log(`Server side of ${room} disconnected, updating ${room} record.`);
 				serverIsOnline.room = false;
 			}
-			socket.on('disconnect', function () {
-				console.log(`Socket for ${room} disconnected, updating ${room} record.`);
+			socket.on('disconnect', function (reason) {
+				console.log(`Socket for ${room} disconnected, updating ${room} record. Reason:${reason}`);
 				serverIsOnline.room = false;
 				});
 		} else {

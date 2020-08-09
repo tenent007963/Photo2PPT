@@ -220,7 +220,8 @@
 						_consoleLog(`First try success!`);
 					} else {
 						// reconnect
-						socket.connect();
+						socket.connect(); //method1
+						socket.emit("join",room);
 						if (socket.connected) {
 							emitPhoto(image);
 							_consoleLog(`Second try success.`);
