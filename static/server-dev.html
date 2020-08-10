@@ -52,7 +52,7 @@
 		width: 99%;
 		overflow: hidden;
 		padding: 10px 5px;
-		background-color: #45b3a9; 
+		background-color: rgba(69, 179, 169,0.5);
 		display:flex;
 		flex-direction: row-reverse;
 		justify-content: flex-start;
@@ -61,10 +61,12 @@
 		}
 
  #bottombar {
+	 bottom: 0;
+	 position: absolute;
 	 width: 99%;
 	 overflow: hidden;
-	 padding: 10px 5px;
-	 background-color: #45b3a9;
+	 padding: 7px 8px;
+	 background-color: rgba(169, 179, 69, 0.3);
 	 display:flex;
 	 flex-direction: row;
 	 justify-content: flex-start;
@@ -171,7 +173,6 @@
 
 <footer>
 	<div class="btn-toolbar bottombar" role="toolbar" aria-label="Developer Bottombar" id="bottombar" style="display:none">
-		<!-- Bottombar (Dev Bar) #TODO -->
 		<button type="button" class="btn btn-light mr-1" id="moreopt" onclick="moreopt()" style="display:none;">Expand</button>
 		<div class="btn-container" id="btn-container" >
 			<button type="button" class="btn btn-dark" id="clrtmb" onclick="rmtmb()">Clear Thumbnail</button>
@@ -614,13 +615,36 @@ async function orientCheck(data) {
 
 	  //Enable Dev toolbar (bottombar)
 	  function devTool() {
-		  let xyz;
 		  if (typeof xyz === 'undefined') {
 			  xyz = 1;
 		  }
 		  xyz++;
-		  if(xyz===10){
-			_bottombar.style.display = 'block';
+		  if(xyz===11){
+			  let passcode = prompt("Please enter passcode for the development section:", "WritePasswordHere");
+			  let passphrase = prompt("Please enter passphrase for verification:", "WritePassphraseHere");
+			  if (passcode === null || passcode === "") {
+				  _consoleLog("User cancelled the prompt.");
+				  return false;
+			  } else if(passphrase === null || passphrase === "") {
+				  _consoleLog("No passphrase.");
+				  return false;
+			  } else {
+			  	const enckey = 'U2FsdGVkX18iazBzCd0Chor8UE+OucOwE3Tlc3yL2wg='; //Pre-enc key
+			  	let decKey = CryptoJS.AES.decrypt(enckey, passphrase).toString; //Static dec key from pre-enc key
+			  	let inputkey = CryptoJS.AES.encrypt(passcode, passphrase); //Enc key from user input
+				let inputKeyDec = CryptoJS.AES.decrypt(inputkey, passphrase).toString; //Static dec key from user input
+				// decrypted.toString(CryptoJS.enc.Utf8)
+			  	if (decKey === inputKeyDec) { //Verify both static dec key
+					_bottombar.style.display="block";
+					_consoleLog("Activated.");
+					return true;
+				} else if(decKey !== inputKeyDec) {
+					_consoleLog(`decKey=${decKey},inputKeyDec=${inputKeyDec}, incorrect key.`);
+					return false;
+				} else {
+			  		_consoleLog('Unknown Error.')
+				}
+			  }
 		  }
 	  }
 
@@ -647,24 +671,28 @@ async function orientCheck(data) {
 	  }
 
 	  //static function for enable/disable logging
-	  function _log(option) {
-		  switch(option) {
-			  case "ping":
+	  function _log(opt) {
+		  switch(opt) {
+			  case 'ping':
 				  if(!logping) {
-					  logping = false;
-					  _ping.textContent = "Show";
-				  } else {
 					  logping = true;
-					  _ping.textContent = "Hide";
+					  _ping.innerHTML = "Hide";
+					  _consoleLog('Ping En-log');
+				  } else {
+					  logping = false;
+					  _ping.innerHTML = "Show";
+					  _consoleLog('Ping De-log');
 				  }
 				  break;
-			  case "imgdata":
+			  case 'imgdata':
 				  if(!logimgdata) {
-					  logimgdata = false;
-					  _imgdata.textContent = "Show";
-				  } else {
 					  logimgdata = true;
-					  _imgdata.textContent = "Show";
+					  _imgdata.innerHTML = "Hide";
+					  _consoleLog('ImgData En-log');
+				  } else {
+					  logimgdata = false;
+					  _imgdata.innerHTML = "Show";
+					  _consoleLog('ImgData De-log');
 				  }
 				  break;
 			  default:
@@ -766,4 +794,5 @@ async function orientCheck(data) {
 			} 
 		}
     </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js" crossorigin="anonymous"></script>
 </html>
