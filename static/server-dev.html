@@ -479,7 +479,7 @@ async function orientCheck(data) {
 			return data;
 		}
     });
-
+}
 
 	// Select Modes #TODO
 	//CS mode
@@ -512,7 +512,7 @@ async function orientCheck(data) {
 			location.reload();
 		}
 	}
-}
+
 
 
 	  //Active listener for window
@@ -722,7 +722,8 @@ async function orientCheck(data) {
 		}
 	});
 	
-	window.onload = checkRoomInitialize();
+	// noinspection JSValidateTypes
+	  window.onload = checkRoomInitialize();
 	
 	//Small cheat code to make sure heroku dyno doesn't go idling when user is connected
 	  function httpGetAsync(theUrl, callback)
