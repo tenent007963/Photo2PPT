@@ -28,10 +28,8 @@ Just clone this repo and its now ready to go.
 
 # To-Do:
  1. Adding more features / plugins\
-	a. Implement cookie usage for client side to remember last room name\
-	b. Auto lock room from host side to prevent multiple server connected same room
- 2. Server side : Replace initialization screen to mode selection ( CS, Tech, PDF)
- 3. Enable console.log send back to heroku for debug purpose
- 5. Socket.io perform file multi-part upload 
- 6. Lock process when retrieving/processing images and unlock to save file
+	a. Auto lock room from host side to prevent multiple server connected same room
+ 2. Enable console.log send back to heroku for debug purpose
+ 3. Socket.io perform file multi-part upload 
+ 4. Lock process when retrieving/processing images and unlock to save file
  99. Make the whole damn code async and simplify the heck out of it

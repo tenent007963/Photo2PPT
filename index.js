@@ -34,8 +34,8 @@ let server=http.createServer(function(req,res){
 		case '/phone':
             doc = fs.readFile(__dirname + '/static/client-source.html', 'utf8', fsCallback);
         break;
-		case '/sync':
-            doc = fs.readFile(__dirname + '/static/sync.html', 'utf8', fsCallback);
+		case '/pdf':
+            doc = fs.readFile(__dirname + '/static/pdf.html', 'utf8', fsCallback);
         break;
 		case '/favicon':
             doc = fs.readFile(__dirname + '/static/favicon.ico', 'utf8', fsCallback);
@@ -67,7 +67,7 @@ let server=http.createServer(function(req,res){
 
 // Initialize Socket.io and its variables
 const io = require('socket.io').listen(server,{pingInterval: 5000,pingTimeout: 60000,autoConnect: true});
-let  serverIsOnline = new Object;
+let serverIsOnline = new Object;
 
 // Register "connection" events to the WebSocket
 io.on("connection", function(socket) {
@@ -78,7 +78,7 @@ io.on("connection", function(socket) {
         switch(data){
             case "isOnline":
                 console.log(`Received "isOnline" packet, updating ${room} record on host side.`);
-                serverIsOnline.room = true;
+                serverIsOnline.room = true; //https://stackoverflow.com/questions/20424226/easy-way-to-set-javascript-object-multilevel-property
                 // check if connection is dropped, method 1
                 if (socket.disconnected) {
                   console.log(`Server side of ${room} disconnected, updating ${room} record.`);

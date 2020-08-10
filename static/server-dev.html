@@ -6,8 +6,12 @@
     <title>InstantPhoto - Server</title>
     <link rel="icon" href="./favicon">
     <script src="/socket.io/socket.io.js"></script>
+    <!-- Download.js -->
 	<script src="//cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.js"></script>
+    <!-- Compressor.js -->
 	<script src="/compressor.js"></script>
+	<!-- JS-Cookie -->
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap" rel="stylesheet">
     <!-- Bundle: Easiest to use, supports all browsers -->
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@2.5.0/dist/pptxgen.bundle.js"></script>
@@ -48,7 +52,7 @@
 		padding-left: 20px;
 	}
 	
-	#topbar {
+	.topbar {
 		width: 99%;
 		overflow: hidden;
 		padding: 10px 5px;
@@ -95,6 +99,11 @@
 		text-align:center;
 		margin:0 auto;
 	}
+
+	.container{
+		margin: 0 auto;
+		padding-top: 30%;
+	}
 	
 	.preview {
 		position:relative; 
@@ -115,15 +124,15 @@
 	<header>
 		<h1>InstantPhoto</h1>
 	</header>
+
+	<!-- Container -->
 	<div class="container" id="init">
 		<h3>Select your role:</h3>
-		<button type="button" onclick="initCS()" id="csMode">CSO</button>
-		<button type="button" onclick="initTech()" id="techMode">Tech</button>
+		<button type="button" class="btn btn-outline-primary btn-lg" onclick="initCS()" id="csMode">CSO</button>
+		<button type="button" class="btn btn-outline-primary btn-lg" onclick="initTech()" id="techMode">Tech</button>
 	</div>
-  
-    <!-- Container -->
-	<div class="container-fluid" id="main">
-		<div class="btn-toolbar topbar cs" role="toolbar" aria-label="Normal Usage Topbar" id="topbar">
+  	<div class="container-fluid" id="main" style="display:none">
+		<div class="btn-toolbar topbar" role="toolbar" aria-label="Normal Tooolbar for CS" id="cs" style="display:none">
 			<button type="button" class="btn btn-light" data-toggle="modal" data-target="#popup">Room Details</button>
 			<button type="button" class="btn btn-light mr-1" id="saveimage" onclick="saveimage()">Save Image : <span id="wannasavemou">No</span></button>
 			<button type="button" class="btn btn-light mr-1" id="togglepptx" onclick="togglepptx()">Create PPTX : <span id="pptxgenjsstatus">Off</span></button>
@@ -133,6 +142,9 @@
 			<input type="text" name="GSPN" id="GSPNint" placeholder="S/O number:" disabled="disabled"/>	
 			</form>
 			<span id="ewanstat" style="position: relative;color: green;display:none">&#10004; E-Warranty Attached &#10004; </span>
+		</div>
+		<div class="btn-toolbar topbar" role="toolbar" aria-label="Normal toolbar for tech" id="tech" style="display:none">
+
 		</div>
 		<div class="head" id="top"> 
 			<h5 id="head">Waiting input on client side...</h5>
@@ -214,8 +226,9 @@
 	  const _ping = document.getElementById("ping");
 	  const _imgdata = document.getElementById("imgdata");
 	  const _bottombar = document.getElementById("bottombar");
-	  const _rightbar = document.getElementById('rightbar');
-	
+	  const _cs = document.getElementById("cs");
+	  const _tech = document.getElementById("tech");
+
 	  //Initialize elements
 	  let pptxenabled = false;
 	  let saveimg = false;
@@ -308,16 +321,13 @@
 		
 	  //Refresh Room
 	  function refreshroom() {
-	    //Theres a bug here, the condition wont meet even room exist
-		if(room) {
-			let oldroom = room;
-			socket.emit("leave", oldroom);
-			}
-	  
-		room = genRand(10);
-		
-	  // Join default channel "test"
-	  // for debug only
+	      if (socket.connected && room) {
+			  socket.emit("leave", room);
+		  }
+		  room = genRand(10);
+		  Cookies.set('room',room,{ expires: 31 ,path: ''})
+
+	  // Join default channel "test" ,for debug only
 	  /*
 	  const room = "test";
 	  */
@@ -489,34 +499,64 @@ async function orientCheck(data) {
 	// Select Modes #TODO
 	//CS mode
 	function initCS() {
-
+		_cs.style.display= "flex";
+		Cookies.set('mode', 'cs',{ expires: 31 ,path: ''});
 	}
 
 	//Tech mode
 	function initTech() {
-
+		_tech.style.display= "flex";
+		Cookies.set('mode', 'tech',{ expires: 31,path: ''});
 	}
 
-	// Room initializing, check if all variable is correct
+	  // Room Pre-initialize, load cookies and other presets from last session
 	function checkRoomInitialize() {
 		try {
 			//check isDebug environment
 			if (isDebug) {
 				window.document.title = "InstantPhoto - Server(Development)";
 			}
-			//Run through necessary func
-			refreshroom();
-			//Display interface
-			$('#popup').modal('show');
-			_initContainer.style.display = "none";
-			_mainContainer.style.display = "block";
-			_consoleLog(`Server ready.`);
+			//Socket room initialization
+			let getRoom = Cookies.get('room');
+			if (!getRoom) {
+				refreshroom();
+				_consoleLog(`Joining new room`);
+			} else {
+				roomConnect(getRoom);
+				_consoleLog(`Joining old room, room code: ${getRoom}`)
+			}
+			//Mode checking
+			let getMode = Cookies.get('mode');
+			switch(getMode){
+				case "cs":
+					initCS();
+					roomInit();
+					_consoleLog(`Init CS Mode.`)
+					break;
+				case "tech":
+					initTech();
+					roomInit();
+					_consoleLog(`Init Tech Mode.`)
+					break;
+				default:
+					break;
+			}
+			_consoleLog(`Server Preparation done.`);
 		}
 		catch (err) {
 			_mainContainer.innerHTML = err.message;
-			location.reload();
+			//location.reload();
 		}
 	}
+
+	// Room initialization
+	  function roomInit(){
+		  _initContainer.style.display = "none";
+		  _mainContainer.style.display = "block";
+		  //Display roomqr popup
+		  $('#popup').modal('show');
+		  _consoleLog(`Server ready.`);
+	  }
 
 
 
@@ -655,7 +695,7 @@ async function orientCheck(data) {
 
 	  //rightbar (thumbnail) cleaning
 	  function rmtmb() {
-		  _rightbar.innerHTML = '';
+		  _tmbdiv.innerHTML = '';
 		  _consoleLog(`Rightbar (Preview bar) cleaned.`);
 	  }
 
@@ -707,6 +747,22 @@ async function orientCheck(data) {
 
 
   // Below are all socket functions / connections
+
+	  //Function to manual call socket connect
+	  function roomConnect(val) {
+	  	try {
+	  		room = val;
+			socket.connect();
+			socket.emit('join', val);
+			genQR(val);
+			socket.emit("server","isOnline",val);
+			_roomindicator.innerHTML = room;
+			_consoleLog(`Old session reconnected.`)
+			return true;
+		} catch(err) {
+	  		return err;
+		}
+	  }
  
   // Upon socket disconnection
 	socket.on('disconnect', function(){
@@ -763,7 +819,10 @@ async function orientCheck(data) {
 			_latency.style.color = "black";
 		}
 	});
-	
+
+
+	//Preserve area
+
 	// noinspection JSValidateTypes
 	  window.onload = checkRoomInitialize();
 	
@@ -793,7 +852,7 @@ async function orientCheck(data) {
 
 
 	//Default debug Code, do not modify
-	function _consoleLog(stringData) {
+	async function _consoleLog(stringData) {
 		if(isDebug) {
 			console.log(stringData);
 			} 
