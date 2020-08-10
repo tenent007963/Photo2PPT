@@ -301,7 +301,7 @@
 			cameraId = devices[2].id;
 		}
 	}).catch(err => {
-	// handle err
+		_consoleLog(err)
 	});
 	
 	const html5Qrcode = new Html5QrcodeScanner("reader", { fps: 30 });
@@ -314,8 +314,11 @@
 			_consoleLog(`Trying to reconnect...`);
 			setOffline();
 			try { 
-				socket.connect(); 
+				socket.connect();
+				socket.emit("join",room);
+				setOnline();
 				if (!socket.connected) throw _consoleLog("Reconnect error!");
+				_consoleLog(`Client reconnected.`)
 			}
 			catch(err) {
 				_consoleLog(`Reconnect failed! Will proceed to force reload.`);
