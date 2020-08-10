@@ -144,7 +144,7 @@
 		<div class="modal-dialog modal-dialog-centered" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="popup-title">Room details</h5>
+					<h5 class="modal-title" id="popup-title" onclick="devTool()">Room details</h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 					</button>
@@ -175,8 +175,8 @@
 		<button type="button" class="btn btn-light mr-1" id="moreopt" onclick="moreopt()" style="display:none;">Expand</button>
 		<div class="btn-container" id="btn-container" >
 			<button type="button" class="btn btn-dark" id="clrtmb" onclick="rmtmb()">Clear Thumbnail</button>
-			<button type="button" class="btn btn-dark" id="pinglog" onclick="_log(ping)"><span id="ping">Show</span> Ping Log</button>
-			<button type="button" class="btn btn-dark" id="imgdatalog" onclick="_log(imgdata)"><span id="imgdata">Show</span> ImgData Log</button>
+			<button type="button" class="btn btn-dark" id="pinglog" onclick="_log('ping')"><span id="ping">Show</span> Ping Log</button>
+			<button type="button" class="btn btn-dark" id="imgdatalog" onclick="_log('imgdata')"><span id="imgdata">Show</span> ImgData Log</button>
 		</div>
 	</div>
 </footer>
@@ -189,7 +189,8 @@
 	  const _svppt = document.getElementById("savepptx");
 	  const _gpint = document.getElementById("GSPNint");
 	  const _pptstat = document.getElementById("pptxgenjsstatus");
-	  const _togppt = document.getElementById("togglepptx"); //no longer in use
+	  //const _togppt = document.getElementById("togglepptx"); //no longer in use
+	  const output = document.getElementById("download");
 	  const _pptxne = document.getElementById("pptxnotenabled");
 	  const _fileInput = document.getElementById("e-warranty");
 	  const _imgdown = document.getElementById("wannasavemou");
@@ -205,17 +206,19 @@
 	  const _initContainer = document.getElementById("init");
 	  const _header = document.getElementById("head");
 	  const _ping = document.getElementById("ping");
-	  const _imgdata = document.getElementById("imgdata")
+	  const _imgdata = document.getElementById("imgdata");
+	  const _bottombar = document.getElementById("bottombar");
+	  const _rightbar = document.getElementById('rightbar');
 	
 	  //Initialize elements
-	  var pptxenabled = false;
-	  var saveimg = false;
-	  var optenb = false;
-	  var photocount = 0;
-	  var latencycount = 0;
-	  var room;
-	  var logping = false;
-	  var logimgdata = false;
+	  let pptxenabled = false;
+	  let saveimg = false;
+	  let optenb = false;
+	  let photocount = 0;
+	  let latencycount = 0;
+	  let room;
+	  let logping = false;
+	  let logimgdata = false;
 
 	  //Enable PPTXGenJS...or not?
 	  function togglepptx() {
@@ -248,22 +251,19 @@
 	  }
 
 	  // Get WebSocket
-	  var socket = io();
-
-	  // Get DOM elements
-	  var output = document.getElementById("download");
+	  const socket = io();
 
 	  // new "transimage" socket - w/o room param 
 	  socket.on("transimage", function(image) {
 		  _consoleLog(`Image received, processing.`);
 	      output.src = image;
 	      //Download image if enabled
-		  if (saveimg == true) { 
+		  if (saveimg === true) {
 	          download(image, smartFilename(), "application/octet-stream;base64");
 		  } else {
 		      _nsi.style.display = "block"
 			  }
-	      if (pptxenabled == true) {
+	      if (pptxenabled === true) {
 		      addSlide(image);
 	      } else {
 	          _pptxne.style.display = "block";
@@ -272,9 +272,9 @@
 	  
 	  //External Func for random string generating
 	  function genRand(len) {
-        var hash = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ12346789";
-        var randomStr = '';
-        for(var i = 0; i < len; i++){
+        const hash = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ12346789";
+        let randomStr = '';
+        for(let i = 0; i < len; i++){
             randomStr += hash[parseInt(Math.random()*hash.length)];
         }
         return randomStr;
@@ -286,16 +286,16 @@
 	    if (filename) {
 			return filename.trim();
 		} else {
-			var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-			var stringLength = 10;
+			const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+			const stringLength = 10;
 			function pickRandom() {	return possible[Math.floor(Math.random() * possible.length)]; }
-			var randomString = Array.apply(null, Array(stringLength)).map(pickRandom).join('');
+			let randomString = Array.apply(null, Array(stringLength)).map(pickRandom).join('');
 			return randomString;
 		}
 	  }
 
 	async function genQR(data) {
-		var qrcode = new QRCode("roomqr");
+		const qrcode = new QRCode("roomqr");
 		qrcode.makeCode(data);
 	}
 	
@@ -313,8 +313,7 @@
 	  // Join default channel "test"
 	  // for debug only
 	  /*
-	  var room = "test";
-	  var rn = "0";
+	  const room = "test";
 	  */
 		
 	    _roomindicator.innerHTML = room;
@@ -380,7 +379,7 @@
 //generate thumbnail for current received image and show at sidebar
 function triggerthumbnail(image){
 	resizeImageToSpecificWidth(200, image, function(dat) {
-		var tmbnail = document.createElement("img");
+		const tmbnail = document.createElement("img");
 		tmbnail.src = dat;
 		tmbnail.setAttribute('id', 'tmbtnb');
 		_tmbdiv.appendChild(tmbnail);
@@ -392,11 +391,11 @@ function triggerthumbnail(image){
 
 //Sub-function required for creating thumbnail
 function resizeImageToSpecificWidth(max, imgur, cb) {
-  var data;
-  var img = new Image();
+  let data;
+  const img = new Image();
   img.onload = function() {
-    if (img.width > max) {
-		var oc = document.createElement('canvas'), octx = oc.getContext('2d');
+	  const oc = document.createElement('canvas'), octx = oc.getContext('2d');
+	  if (img.width > max) {
         oc.width = img.width;
         oc.height = img.height;
         octx.drawImage(img, 0, 0);
@@ -458,7 +457,7 @@ async function orientCheck(data) {
         }
 		
 		let compressImg = (imgStream) => {
-			var fileReader = new FileReader()
+			const fileReader = new FileReader()
 			new Compressor(imgStream, {
 						quality: 0.6,
 						checkOrientation: false,
@@ -564,8 +563,8 @@ async function orientCheck(data) {
    	window.addEventListener('paste', function(e) {
 		clipboardData = e.clipboardData;
 		_fileInput.files = clipboardData.files;
-		var file = document.querySelector('input[type=file]').files[0];
-		var reader =  new FileReader();
+		const file = document.querySelector('input[type=file]').files[0];
+		const reader =  new FileReader();
 		pastedData = clipboardData.getData('Text');
 		
 	    if (pptxenabled) {
@@ -574,18 +573,18 @@ async function orientCheck(data) {
 				_consoleLog(`Detected input as text`);
 				setTimeout(function(){ 
 					if (_gpint.value === pastedData) { 
-						return;
+						return false;
 					} else {
 						_gpint.value = pastedData;
-						return; 
+						return false;
 					}},100);
 			} else if (file instanceof Blob) {
 				_consoleLog(`Detected input as blob`);
 				reader.readAsDataURL(file);
 				reader.onloadend = function () {
-					var ewanss = reader.result;
+					let ewanss = reader.result;
 					addSlide(ewanss);
-					if (saveimg == true) { 
+					if (saveimg === true) {
 						download(ewanss, smartFilename(), "application/octet-stream;base64");
 					}
 				}
@@ -598,7 +597,7 @@ async function orientCheck(data) {
 			if (file instanceof Blob) {
 				reader.readAsDataURL(file);
 				reader.onloadend = function () {
-					var pastedImg = reader.result;
+					let pastedImg = reader.result;
 					download(pastedImg, smartFilename(), "application/octet-stream;base64");
 				}
 			} else {
@@ -613,10 +612,22 @@ async function orientCheck(data) {
 
 	  //Below are all functions that are used in dev mode
 
+	  //Enable Dev toolbar (bottombar)
+	  function devTool() {
+		  let xyz;
+		  if (typeof xyz === 'undefined') {
+			  xyz = 1;
+		  }
+		  xyz++;
+		  if(xyz===10){
+			_bottombar.style.display = 'block';
+		  }
+	  }
+
 	  //rightbar (thumbnail) cleaning
 	  function rmtmb() {
-		  var element = document.getElementById('rightbar');
-		  element.innerHTML = '';
+		  _rightbar.innerHTML = '';
+		  _consoleLog(`Rightbar (Preview bar) cleaned.`);
 	  }
 
 	  //toggle more buttons
@@ -669,7 +680,7 @@ async function orientCheck(data) {
       // Save current active ppt with random hash and proceed page reload
 	  if (pptxenabled && photocount >= 2) {
 		pptx.save(smartFilename());
-		};
+		}
 	  window.location.reload();
 	  _consoleLog(`Socket disconnected`);
 	});
@@ -694,7 +705,6 @@ async function orientCheck(data) {
 		break;
       default:
 		_consoleLog(`Request dropped!`);
-		return false;
 		break;
 	}
 	});
@@ -705,7 +715,6 @@ async function orientCheck(data) {
 		if(logping) {
 			_consoleLog(`Received Pong: ${ping}`);
 		}
-		socket.emit("server","keepAlive",room);
 		//Prompt if latency over acceptable threshold
 		if (ping >= 550) {
 			latencycount++;
@@ -728,16 +737,26 @@ async function orientCheck(data) {
 	//Small cheat code to make sure heroku dyno doesn't go idling when user is connected
 	  function httpGetAsync(theUrl, callback)
 	  {
-		  var xmlHttp = new XMLHttpRequest();
+		  const xmlHttp = new XMLHttpRequest();
 		  xmlHttp.onreadystatechange = function() {
-			  if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+			  if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
 				  callback(xmlHttp.responseText);
 		  }
 		  xmlHttp.open("GET", theUrl, true); // true for asynchronous
-		  xmlHttp.send(null);
+		  xmlHttp.send(`Dont sleep fker - Morning call from server side of ${room}`);
 	  }
-		//To execute every 25 mins #TODO
 
+	  //To execute every 25 mins
+	  setInterval((function() {
+		  function loop() {
+			  socket.emit("server","keepAlive",room);
+			  httpGetAsync('/keepalive',function(res){
+			  	_consoleLog(`Keepalive status from host: ${res}`);
+			  })
+		  }
+		  loop();
+		  return loop;
+	  }()), 1500000);
 
 
 	//Default debug Code, do not modify

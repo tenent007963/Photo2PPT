@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+	<meta content="no-cache, no-store, must-revalidate" http-equiv="Cache-Control">
 	<meta name="viewport" content="initial-scale=1.5,maximum-scale=3,user-scalable=no"/>
     <title>InstantPhoto - Client</title>
     <link rel="icon" href="./favicon">
@@ -136,7 +136,7 @@
 				<div class="modal-body">
 					<form action="#" onsubmit="return getRoom()">
 						<span>Enter room code:</span>
-						<input type="text" name="roomCode" id="roomCode" placeholder="Code here" style="width:65%"/>
+						<input label="roomCode" type="text" name="roomCode" id="roomCode" placeholder="Code here" style="width:65%"/>
 					</form>
 					<p></p>
 						<div id="reader"></div>
@@ -180,8 +180,8 @@
 	  let rm = "0";
 	  socket.emit("join", room);
 	   */
-	  var room;
-	  var cameraId;
+	  let room;
+	  let cameraId;
 
 		// Listen to Source1 and Source2 input events
 		[_src1,_src2].forEach(function(sauce){ 
@@ -192,7 +192,7 @@
 				if (!file) {
 					return;
 				}
-				var fileReader = new FileReader();
+				const fileReader = new FileReader();
 		
 				// Determine input type 
 				if (file instanceof Blob) {
@@ -213,7 +213,7 @@
 				}
 				fileReader.onloadend = function (event) {
 					// Send an image event to the socket
-					var image = event.target.result;
+					let image = event.target.result;
 					// Check for connection status
 					if (socket.connected) {
 						emitPhoto(image);
@@ -316,9 +316,13 @@
 			try { 
 				socket.connect();
 				socket.emit("join",room);
+				socket.on('connect_error',function(reason) {
+					setOffline();
+					_status.textContent = reason;
+					window.location.reload();
+				});
+				_consoleLog(`Client reconnected.`);
 				setOnline();
-				if (!socket.connected) throw _consoleLog("Reconnect error!");
-				_consoleLog(`Client reconnected.`)
 			}
 			catch(err) {
 				_consoleLog(`Reconnect failed! Will proceed to force reload.`);
@@ -336,7 +340,7 @@
 
 	//AJAX Codes
 	$(".custom-file-input").on("change", function() {
-		var fileName = $(this).val().split("\\").pop();
+		let fileName = $(this).val().split("\\").pop();
 		$(this).siblings(".custom-file-label").addClass("selected").html(fileName);
 	});
 	
@@ -354,9 +358,20 @@
 	socket.on('disconnect', function(){
 	  // try to reconnect
 	  socket.connect();
+	  socket.emit("join",room);
 	  _consoleLog(`Trying to reconnect socket.`);
-	  setOffline();
+	  socket.on('connect_error',function(reason) {
+		  setOffline();
+		  _status.textContent = reason;
+		  window.location.reload();
+	  });
 	});
+
+	socket.on('reconnect_error',function(reason){
+		setOffline();
+		_status.textContent = reason;
+		window.location.reload();
+	})
 	
 	function checkStatus() {
 		_consoleLog("Querying status..");

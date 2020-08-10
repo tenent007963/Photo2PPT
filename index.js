@@ -1,15 +1,14 @@
 // Import packages
-var fs = require('fs'); 
-var http=require('http');
-var path = require("path");
-var url=require('url');
-var PptxGenJS = require("pptxgenjs");
+const fs = require('fs');
+const http=require('http');
+const url=require('url');
+//const monitorio = require('monitor.io'); // Monitoring each socket connection if possible, ref 'https://drewblaisdell.github.io/monitor.io/'
 
 const PORT = process.env.PORT || 3000;
 
-var server=http.createServer(function(req,res){
-    var pathname=url.parse(req.url).pathname;
-	var fsCallback = function(error, data) {
+let server=http.createServer(function(req,res){
+    let pathname=url.parse(req.url).pathname;
+    let fsCallback = function(error, data) {
         if(error) throw error;
 
         res.writeHead(200);
@@ -18,54 +17,57 @@ var server=http.createServer(function(req,res){
     }
     switch(pathname){
         case '/pc-min':
-            doc = fs.readFile(__dirname + '/static/server-min.html', fsCallback);
+            doc = fs.readFile(__dirname + '/static/server-min.html', 'utf8', fsCallback);
         break;
 		case '/server-dev':
-            doc = fs.readFile(__dirname + '/static/server-dev.html', fsCallback);
+            doc = fs.readFile(__dirname + '/static/server-dev.html', 'utf8', fsCallback);
         break;
 		case '/pc':
-            doc = fs.readFile(__dirname + '/static/server-source.html', fsCallback);
+            doc = fs.readFile(__dirname + '/static/server-source.html', 'utf8', fsCallback);
         break;
 		case '/phone-min':
-            doc = fs.readFile(__dirname + '/static/client-min.html', fsCallback);
+            doc = fs.readFile(__dirname + '/static/client-min.html', 'utf8', fsCallback);
         break;
 		case '/client-dev':
-            doc = fs.readFile(__dirname + '/static/client-dev.html', fsCallback);
+            doc = fs.readFile(__dirname + '/static/client-dev.html', 'utf8', fsCallback);
         break;
 		case '/phone':
-            doc = fs.readFile(__dirname + '/static/client-source.html', fsCallback);
+            doc = fs.readFile(__dirname + '/static/client-source.html', 'utf8', fsCallback);
         break;
 		case '/sync':
-            doc = fs.readFile(__dirname + '/static/sync.html', fsCallback);
+            doc = fs.readFile(__dirname + '/static/sync.html', 'utf8', fsCallback);
         break;
 		case '/favicon':
-            doc = fs.readFile(__dirname + '/static/favicon.ico', fsCallback);
+            doc = fs.readFile(__dirname + '/static/favicon.ico', 'utf8', fsCallback);
         break;
 		case '/jquery.js':
-            doc = fs.readFile(__dirname + '/static/jquery-3.5.1.min.js', fsCallback);
+            doc = fs.readFile(__dirname + '/static/jquery-3.5.1.min.js', 'utf8', fsCallback);
         break;
 		case '/bootstrap.css':
-            doc = fs.readFile(__dirname + '/static/bootstrap.min.css', fsCallback);
+            doc = fs.readFile(__dirname + '/static/bootstrap.min.css', 'utf8', fsCallback);
         break;
 		case '/bootstrap.js':
-            doc = fs.readFile(__dirname + '/static/bootstrap.min.js', fsCallback);
+            doc = fs.readFile(__dirname + '/static/bootstrap.min.js', 'utf8', fsCallback);
         break;
 		case '/compressor.js':
-			doc = fs.readFile(__dirname + '/node_modules/compressorjs/dist/compressor.js', fsCallback);
+			doc = fs.readFile(__dirname + '/node_modules/compressorjs/dist/compressor.js', 'utf8', fsCallback);
 		break;
         case '/html5-qrcode.min.js':
-            doc = fs.readFile(__dirname + '/static/html5-qrcode.min.js', fsCallback);
+            doc = fs.readFile(__dirname + '/static/html5-qrcode.min.js', 'utf8', fsCallback);
+            break;
+        case '/keepalive':
+            doc = fs.readFile(__dirname + '/static/keepalive.txt', 'utf8', fsCallback);
             break;
         default:
-            doc = fs.readFile(__dirname + '/static/index.html', fsCallback);
+            doc = fs.readFile(__dirname + '/static/index.html', 'utf8', fsCallback);
         break;
     }
 	
 }).listen(PORT);
 
 // Initialize Socket.io and its variables
-var io = require('socket.io').listen(server,{pingInterval: 5000,pingTimeout: 60000,autoConnect: true});
-var serverIsOnline = new Object;
+const io = require('socket.io').listen(server,{pingInterval: 5000,pingTimeout: 60000,autoConnect: true});
+let  serverIsOnline = new Object;
 
 // Register "connection" events to the WebSocket
 io.on("connection", function(socket) {
@@ -92,7 +94,6 @@ io.on("connection", function(socket) {
                 break;
             default:
                 //Do nothing
-                return false;
                 break;
         }
     });
@@ -101,15 +102,19 @@ io.on("connection", function(socket) {
     socket.on("client", (data,room,callback) => {
 		console.log(`Received request from client side.`);
 		// check for sent data
-		if (data === "check") {
-			console.log(`Determined request type.`);
-			if (serverIsOnline.room) {
-				console.log(`Parse request to server side of ${room}.`);
-				socket.broadcast.to(room).emit("status",data);
-			} else {
-				console.log(`Server side offline. Return callback data.`);
-				callback({serverIsOnline:false});
-			}
+        switch(data) {
+            case "check":
+			    console.log(`Determined request type.`);
+			    if (serverIsOnline.room) {
+			    	console.log(`Parse request to server side of ${room}.`);
+		    		socket.broadcast.to(room).emit("status",data);
+		    	} else {
+		    		console.log(`Server side offline. Return callback data.`);
+				    callback({serverIsOnline:false});
+			    }
+			    break;
+            default:
+                break;
 		}
   });
 	
