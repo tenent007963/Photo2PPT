@@ -171,6 +171,7 @@
 
 <footer>
 	<div class="btn-toolbar bottombar" role="toolbar" aria-label="Developer Bottombar" id="bottombar" style="display:none">
+		<!-- Bottombar (Dev Bar) #TODO -->
 		<button type="button" class="btn btn-light mr-1" id="moreopt" onclick="moreopt()" style="display:none;">Expand</button>
 		<div class="btn-container" id="btn-container" >
 			<button type="button" class="btn btn-dark" id="clrtmb" onclick="rmtmb()">Clear Thumbnail</button>
@@ -321,28 +322,6 @@
 		genQR(room);
 		socket.emit("join", room);
 		socket.emit("server","isOnline",room);
-	  }       
-   
-		
-	  // Room initializing, check if all variable is correct
-	  function checkRoomInitialize() {
-		try {
-			  //check isDebug environment
-			  if (isDebug) {
-				window.document.title = "InstantPhoto - Server(Development)";
-			  }
-			  //Run through necessary func
-			  refreshroom();
-			  //Display interface
-			$('#popup').modal('show');
-			  _initContainer.style.display = "none";
-	          _mainContainer.style.display = "block";
-			  _consoleLog(`Server ready.`);
-			}
-		catch (err) {
-			_mainContainer.innerHTML = err.message;
-			location.reload();
-			}
 	  }
 
 	  //Whenever adding a new slide, image data will parse into this function
@@ -500,7 +479,43 @@ async function orientCheck(data) {
 			return data;
 		}
     });
+
+
+	// Select Modes #TODO
+	//CS mode
+	function initCS() {
+
+	}
+
+	//Tech mode
+	function initTech() {
+
+	}
+
+	// Room initializing, check if all variable is correct
+	function checkRoomInitialize() {
+		try {
+			//check isDebug environment
+			if (isDebug) {
+				window.document.title = "InstantPhoto - Server(Development)";
+			}
+			//Run through necessary func
+			refreshroom();
+			//Display interface
+			$('#popup').modal('show');
+			_initContainer.style.display = "none";
+			_mainContainer.style.display = "block";
+			_consoleLog(`Server ready.`);
+		}
+		catch (err) {
+			_mainContainer.innerHTML = err.message;
+			location.reload();
+		}
+	}
 }
+
+
+	  //Active listener for window
 
 	//Listening to Hotkeys 
 	window.addEventListener("keydown", function(event) {
@@ -544,58 +559,7 @@ async function orientCheck(data) {
 			_consoleLog(`${event.key}`);
 			break;
 		}
-	});		
-
-
-	  //Below are all functions that are used in dev mode
-
-	  //rightbar (thumbnail) cleaning
-	  function rmtmb() {
-    	var element = document.getElementById('rightbar');
-    	element.innerHTML = '';
-	  }
-
-	  //toggle more buttons
-	  function moreopt() {
-		switch(optenb) {
-		   case true:
-		     optenb = false;
-			 _btncoint.style.display = "none";
-			 _moreopt.textContent = "Expand";
-			 break;
-		   case false:
-             optenb = true;
-			 _btncoint.style.display = "block";
-			 _moreopt.textContent = "Collapse";
-             break;
-			 }
-	  }
-
-	  //static function for enable/disable logging
-	  function _log(option) {
-	  	switch(option) {
-	  		case "ping":
-				if(!logping) {
-					logping = false;
-					_ping.textContent = "Show";
-				} else {
-					logping = true;
-					_ping.textContent = "Hide";
-				}
-	  			break;
-			case "imgdata":
-				if(!logimgdata) {
-					logimgdata = false;
-					_imgdata.textContent = "Show";
-				} else {
-					logimgdata = true;
-					_imgdata.textContent = "Show";
-				}
-				break;
-			default:
-				return false;
-		}
-	  }
+	});
    
    	window.addEventListener('paste', function(e) {
 		clipboardData = e.clipboardData;
@@ -645,7 +609,59 @@ async function orientCheck(data) {
 			alert("PPTXGenJS not enabled!");
 		}
 	});
-  
+
+
+	  //Below are all functions that are used in dev mode
+
+	  //rightbar (thumbnail) cleaning
+	  function rmtmb() {
+		  var element = document.getElementById('rightbar');
+		  element.innerHTML = '';
+	  }
+
+	  //toggle more buttons
+	  function moreopt() {
+		  switch(optenb) {
+			  case true:
+				  optenb = false;
+				  _btncoint.style.display = "none";
+				  _moreopt.textContent = "Expand";
+				  break;
+			  case false:
+				  optenb = true;
+				  _btncoint.style.display = "block";
+				  _moreopt.textContent = "Collapse";
+				  break;
+		  }
+	  }
+
+	  //static function for enable/disable logging
+	  function _log(option) {
+		  switch(option) {
+			  case "ping":
+				  if(!logping) {
+					  logping = false;
+					  _ping.textContent = "Show";
+				  } else {
+					  logping = true;
+					  _ping.textContent = "Hide";
+				  }
+				  break;
+			  case "imgdata":
+				  if(!logimgdata) {
+					  logimgdata = false;
+					  _imgdata.textContent = "Show";
+				  } else {
+					  logimgdata = true;
+					  _imgdata.textContent = "Show";
+				  }
+				  break;
+			  default:
+				  return false;
+		  }
+	  }
+
+
   // Below are all socket functions / connections
  
   // Upon socket disconnection
@@ -689,7 +705,7 @@ async function orientCheck(data) {
 		if(logping) {
 			_consoleLog(`Received Pong: ${ping}`);
 		}
-		socket.emit("server","isOnline",room);
+		socket.emit("server","keepAlive",room);
 		//Prompt if latency over acceptable threshold
 		if (ping >= 550) {
 			latencycount++;
@@ -719,6 +735,7 @@ async function orientCheck(data) {
 		  xmlHttp.open("GET", theUrl, true); // true for asynchronous
 		  xmlHttp.send(null);
 	  }
+		//To execute every 25 mins #TODO
 
 
 

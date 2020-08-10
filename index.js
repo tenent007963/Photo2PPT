@@ -73,24 +73,30 @@ io.on("connection", function(socket) {
 	// Register "server" events sent by server ONLY
     socket.on("server", function (data,room) {
 		// check for sent data
-		if (data === "isOnline") {
-            console.log(`Received "isOnline" packet, updating ${room} record on host side.`);
-			serverIsOnline.room = true;
-			// check if connection is dropped, method 1
-			if (socket.disconnected) {
-                console.log(`Server side of ${room} disconnected, updating ${room} record.`);
-				serverIsOnline.room = false;
-			}
-			socket.on('disconnect', function (reason) {
-				console.log(`Socket for ${room} disconnected, updating ${room} record. Reason:${reason}`);
-				serverIsOnline.room = false;
-				});
-		} else {
-            //Do nothing
-			return false;
-		}
-  });
-  
+        switch(data){
+            case "isOnline":
+                console.log(`Received "isOnline" packet, updating ${room} record on host side.`);
+                serverIsOnline.room = true;
+                // check if connection is dropped, method 1
+                if (socket.disconnected) {
+                  console.log(`Server side of ${room} disconnected, updating ${room} record.`);
+                  serverIsOnline.room = false;
+                }
+                socket.on('disconnect', function (reason) {
+                    console.log(`Socket for ${room} disconnected, updating ${room} record. Reason:${reason}`);
+                    serverIsOnline.room = false;
+                });
+                break;
+            case "keepAlive":
+                serverIsOnline.room = true;
+                break;
+            default:
+                //Do nothing
+                return false;
+                break;
+        }
+    });
+
   // Register "client" events sent by client ONLY
     socket.on("client", (data,room,callback) => {
 		console.log(`Received request from client side.`);
