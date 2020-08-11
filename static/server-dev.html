@@ -499,12 +499,14 @@ async function orientCheck(data) {
 	// Select Modes #TODO
 	//CS mode
 	function initCS() {
+		roomInit();
 		_cs.style.display= "flex";
 		Cookies.set('mode', 'cs',{ expires: 31 ,path: ''});
 	}
 
 	//Tech mode
 	function initTech() {
+		initTech();
 		_tech.style.display= "flex";
 		Cookies.set('mode', 'tech',{ expires: 31,path: ''});
 	}
@@ -530,11 +532,9 @@ async function orientCheck(data) {
 			switch(getMode){
 				case "cs":
 					initCS();
-					roomInit();
 					_consoleLog(`Init CS Mode.`)
 					break;
 				case "tech":
-					initTech();
 					roomInit();
 					_consoleLog(`Init Tech Mode.`)
 					break;

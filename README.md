@@ -28,8 +28,12 @@ Just clone this repo and its now ready to go.
 
 # To-Do:
  1. Adding more features / plugins\
-	a. Auto lock room from host side to prevent multiple server connected same room
- 2. Enable console.log send back to heroku for debug purpose
- 3. Socket.io perform file multi-part upload 
- 4. Lock process when retrieving/processing images and unlock to save file
+	a. Auto lock room from host side to prevent multiple server connected same room\
+	b. Change sync mode to PDF mode\
+	c. Enable console.log send back to heroku for debug purpose\
+	d. Lock process when retrieving/processing images and unlock to save file\
+	e. Socket.io perform file multi-part upload 
+ 2. Bug fixes\
+    a. Client will show online when joining non-existing room
+ 98. Make whole html page js generated
  99. Make the whole damn code async and simplify the heck out of it
