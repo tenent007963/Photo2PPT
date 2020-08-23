@@ -5,7 +5,7 @@
     <title>InstantPhoto - PDF Mode</title>
     <script src="/socket.io/socket.io.js"></script>
     <!-- jsPDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.0.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.0.0/jspdf.es.min.js"></script>
   </head>
   <body>
 
@@ -44,6 +44,15 @@
         // Read file
         fileReader.readAsDataURL(file);
       })
+
+      //
+      import { jsPDF } from "jspdf";
+
+      // Default export is a4 paper, portrait, using millimeters for units
+      const doc = new jsPDF();
+
+      doc.text("Hello world!", 10, 10);
+      doc.save("a4.pdf");
 
       socket.on("image", function (image) {
         output.src = image;
