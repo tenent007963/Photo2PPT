@@ -7,6 +7,7 @@ const {Client} = require('pg'); //Postgres
 
 const PORT = process.env.PORT || 3000;
 
+console.log(process.env.DATABASE_URL);
 
 //Init postgres connection
 const client = new Client({
@@ -19,7 +20,7 @@ function initDB() {
     client.connect();
     client.query('CREATE TABLE IF NOT EXISTS availableroom (room_id CHAR(11) PRIMARY KEY, server CHAR(8), client CHAR(8));', (err, res) => {
         if (err) throw err;
-        //console.log(`Raw result from postgres:`,res);
+        console.log(`Raw result from postgres:`,res);
     });
 }
 
@@ -203,11 +204,11 @@ io.on("connection", function(socket) {
                     });
                     break;
                 case "getStateOfServer":
-                    //console.log(`Querying data from postgres for room ${val}`);
+                    console.log(`Querying data from postgres for room ${val}`);
                     //sample command: SELECT server FROM public.availableroom WHERE room_id='abCDe12345';
                     client.query(`SELECT server FROM public.availableroom WHERE room_id='${val}';`, (error, result) => {
                         if (error) reject(console.log(error));
-                        //console.log(`Raw result from postgres:`,result);
+                        console.log(`Raw result from postgres:`,result);
                         let query = result.rows[0].server;
                         resolve(query.trim());
                     });
