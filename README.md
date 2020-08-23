@@ -33,5 +33,5 @@ Just clone this repo and now it's ready to go.
 	C. Enable `console.log` send back to heroku for debug purpose\
 	D. Lock process when retrieving/processing images and unlock to save file\
 	E. Socket.io perform binary-file multi-part upload 
- 98. Make whole html page js generated
- 99. Make the whole damn code async and simplify the heck out of it
+ 2. Make whole html page js generated
+ 3. Make the whole damn code async and simplify the heck out of it
