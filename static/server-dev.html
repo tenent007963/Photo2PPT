@@ -132,7 +132,7 @@
 		<button type="button" class="btn btn-outline-primary btn-lg" onclick="initTech()" id="techMode">Tech</button>
 	</div>
   	<div class="container-fluid" id="main" style="display:none">
-		<div class="btn-toolbar topbar" role="toolbar" aria-label="Normal Tooolbar for CS" id="cs" style="display:none">
+		<div class="btn-toolbar topbar" role="toolbar" aria-label="Normal Toolbar for CS" id="cs" style="display:none">
 			<button type="button" class="btn btn-light" data-toggle="modal" data-target="#popup">Room Details</button>
 			<button type="button" class="btn btn-light mr-1" id="saveimage" onclick="saveimage()">Save Image : <span id="wannasavemou">No</span></button>
 			<button type="button" class="btn btn-light mr-1" id="togglepptx" onclick="togglepptx()">Create PPTX : <span id="pptxgenjsstatus">Off</span></button>
@@ -370,7 +370,7 @@
 		  photocount = 0;
 		  socket.emit("status",`File saved. Please re-enable PPTXGenJS.`,room)
 		  rmtmb();
-		  _consoleLog(`PPT file saved. Status resetted.`);
+		  _consoleLog(`PPT file saved. Status reset.`);
 	  } else {
 	   alert("No GSPN Service Order number!");
 	    }}
@@ -576,7 +576,7 @@ async function orientCheck(data) {
 					savepptx();
 					_consoleLog(`Saving PPT file`);
 				} else {
-					_consoleLog('PptxGenJS enabled but not enough photos, assuming mispress.');
+					_consoleLog('PptxGenJS enabled but not enough photos.');
 					return false; //return true to submit, false to do nothing
 				}
 			}

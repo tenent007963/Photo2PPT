@@ -189,7 +189,7 @@
 		[_src1,_src2].forEach(function(sauce){ 
 			sauce.addEventListener("change", function (event) {
 
-				// Prepeare file reader
+				// Prepare file reader
 				const file = event.target.files[0];
 				if (!file) {
 					return;
@@ -256,13 +256,14 @@
 
 	//Join room
 	function joinroom(rm) {
-		if(typeof rm === undefined) {
+		if(rm === undefined) {
 			_status.textContent = 'Error: No room code!';
+			_consoleLog(`Error: No room code!`);
+			$('#popup').modal('show');
 			return false;
 		}
-		if(room) {
-			let oldroom = room;
-			socket.emit("leave",oldroom);
+		if(socket.connected && room) {
+			leaveroom(room);
 		}
 		Cookies.set('room',rm,{ expires: 31 ,path: ''});
 		room = rm;
@@ -270,6 +271,13 @@
 		checkStatus();
 		$('#popup').modal('hide');
     }
+
+    //Leave room
+    function leaveroom(rm){
+		socket.emit("leave",rm);
+		setOffline();
+		_status.textContent = 'Disconnected from room ' + rm + '.';
+	}
 
     //Initialize QR Scanner
 	function onScanSuccess(qrCodeMessage) {
