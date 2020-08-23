@@ -29,7 +29,7 @@ let server=http.createServer(function(req,res){
     }
     switch(pathname){
         case '/pc-min':
-            /* doc = */ fs.readFile(__dirname + '/static/server-min.html', 'utf8', fsCallback);
+            /* doc = */ fs.readFile(__dirname + '/static/server-min.html', "utf8", fsCallback);
         break;
 		case '/server-dev':
             /* doc = */ fs.readFile(__dirname + '/static/server-dev.html', 'utf8', fsCallback);

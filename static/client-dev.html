@@ -251,11 +251,13 @@
 	//Retrieving room code from input
 	function getRoom() {
 		let str = _roomCodeInput.value;
+		_consoleLog(`Value from input: ${str}.`);
 		joinroom(str);
 	}
 
 	//Join room
 	function joinroom(rm) {
+		_consoleLog(`Connecting to room ${rm}.`);
 		if(rm === undefined) {
 			_status.textContent = 'Error: No room code!';
 			_consoleLog(`Error: No room code!`);
