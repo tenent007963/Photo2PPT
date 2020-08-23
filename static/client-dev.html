@@ -250,12 +250,16 @@
 
 	//Retrieving room code from input
 	function getRoom() {
-		let room = _roomCodeInput.value;
-		joinroom(room);
+		let str = _roomCodeInput.value;
+		joinroom(str);
 	}
 
 	//Join room
 	function joinroom(rm) {
+		if(typeof rm === undefined) {
+			_status.textContent = 'Error: No room code!';
+			return false;
+		}
 		if(room) {
 			let oldroom = room;
 			socket.emit("leave",oldroom);
@@ -390,11 +394,16 @@
 				_fileform.reset();
 				setOffline();
 				return false;
-			}
-			else {
-				_status.textContent = 'An error occured.';
+			} else if(res === 'error') {
+				_status.textContent = 'Incorrect room details.';
+				_fileform.reset();
+				_consoleLog(`Incorrect room details.`);
+			} else {
+				_status.textContent = 'An error occurred. Will proceed with force refresh.';
+				window.location.reload();
 				_consoleLog(`An error occurred.`);
 			}
+
 		});
 	}
 

@@ -6,23 +6,17 @@ const {Client} = require('pg'); //Postgres
 //const monitorio = require('monitor.io'); // Monitoring each socket connection if possible, ref 'https://drewblaisdell.github.io/monitor.io/'
 
 const PORT = process.env.PORT || 3000;
+const dbURL = process.env.DATABASE_URL;
 
-console.log(process.env.DATABASE_URL);
-
-//Init postgres connection
+//Init postgres connection & setup
 const client = new Client({
-    connectionString: process.env.DATABASE_URL
+    connectionString: dbURL
 });
-initDB();
-
-//Setup postgres database
-function initDB() {
-    client.connect();
-    client.query('CREATE TABLE IF NOT EXISTS availableroom (room_id CHAR(11) PRIMARY KEY, server CHAR(8), client CHAR(8));', (err, res) => {
-        if (err) throw err;
-        console.log(`Raw result from postgres:`,res);
-    });
-}
+client.connect();
+client.query('CREATE TABLE IF NOT EXISTS availableroom (room_id CHAR(11) PRIMARY KEY, server CHAR(8), client CHAR(8));', (err, res) => {
+    if (err) throw err;
+    //console.log(`Raw result from postgres:`,res);
+});
 
 let server=http.createServer(function(req,res){
     let pathname=url.parse(req.url).pathname;
@@ -90,7 +84,7 @@ const io = require('socket.io').listen(server,{pingInterval: 5000,pingTimeout: 6
 io.on("connection", function(socket) {
 
     // Register "server" events sent by server ONLY
-    socket.on("server", function (data, room) {
+    socket.on("server", (data, room) => {
         // check for sent data
         switch (data) {
             case "isOnline":
@@ -118,6 +112,10 @@ io.on("connection", function(socket) {
     // Register "client" events sent by client ONLY
     socket.on("client", (data, room, callback) => {
         console.log(`Received request from client side.`);
+        if(typeof room === undefined) {
+            callback({serverIsOnline:'error'});
+            return false;
+        }
         // check for sent data
         switch (data) {
             case "check":
@@ -131,7 +129,11 @@ io.on("connection", function(socket) {
                         }
                         if (res === 'offline') {
                             console.log(`Server side ${room} offline. Return callback data.`);
-                            callback({serverIsOnline: false});
+                            callback({serverIsOnline:false});
+                        }
+                        if (res === 'error') {
+                            console.log(`Queried ${room} doesn't exist, please check again.`);
+                            callback({serverIsOnline:'error'});
                         }
                 }).catch(err => {
                     console.log(`Unknown error occurred. Data: ${data}, RoomID: ${room}, ErrMsg:${err}.`);
@@ -183,9 +185,9 @@ io.on("connection", function(socket) {
                 case "setOnline":
                     try {
                         //sample command: INSERT INTO availableroom (room_id, server, client) VALUES ('abCDe12345', 'online', 'N/A');
-                        client.query(`INSERT INTO availableroom (room_id, server, client) VALUES ('${val}', 'online', 'N/A');`, (err, res) => {
+                        client.query(`INSERT INTO public.availableroom (room_id, server, client) VALUES ('${val}', 'online', 'N/A');`, (err, res) => {
                             if (err) {
-                                client.query(`UPDATE availableroom SET server = 'online' WHERE room_id='${val}';`, (err, res) => {
+                                client.query(`UPDATE public.availableroom SET server = 'online' WHERE room_id='${val}';`, (err, res) => {
                                     if (err) return reject(console.log(err));
                                     resolve(res);
                                 });
@@ -198,7 +200,7 @@ io.on("connection", function(socket) {
                     console.log(`Record of ${val} updated to True.`);
                     break;
                 case "setOffline":
-                    client.query(`UPDATE availableroom SET server = 'offline' WHERE room_id='${val}';`, (err, res) => {
+                    client.query(`UPDATE public.availableroom SET server = 'offline' WHERE room_id='${val}';`, (err, res) => {
                         if (err) return reject(console.log(err));
                         resolve(res);
                     });
@@ -208,7 +210,7 @@ io.on("connection", function(socket) {
                     //sample command: SELECT server FROM public.availableroom WHERE room_id='abCDe12345';
                     client.query(`SELECT server FROM public.availableroom WHERE room_id='${val}';`, (error, result) => {
                         if (error) reject(console.log(error));
-                        console.log(`Raw result from postgres:`,result);
+                        //console.log(`Raw result from postgres:`,result);
                         let query = result.rows[0].server;
                         resolve(query.trim());
                     });
