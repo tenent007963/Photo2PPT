@@ -325,7 +325,7 @@
 			  socket.emit("leave", room);
 		  }
 		  room = genRand(10);
-		  Cookies.set('room',room,{ expires: 31 ,path: ''})
+		  Cookies.set('room',room,{ expires: 31 ,path: ''});
 
 	  // Join default channel "test" ,for debug only
 	  /*
@@ -496,7 +496,7 @@ async function orientCheck(data) {
     });
 }
 
-	// Select Modes #TODO
+	// Select Modes
 	//CS mode
 	function initCS() {
 		roomInit();
@@ -532,11 +532,11 @@ async function orientCheck(data) {
 			switch(getMode){
 				case "cs":
 					initCS();
-					_consoleLog(`Init CS Mode.`)
+					_consoleLog(`Init CS Mode.`);
 					break;
 				case "tech":
 					roomInit();
-					_consoleLog(`Init Tech Mode.`)
+					_consoleLog(`Init Tech Mode.`);
 					break;
 				default:
 					break;
@@ -545,7 +545,7 @@ async function orientCheck(data) {
 		}
 		catch (err) {
 			_mainContainer.innerHTML = err.message;
-			//location.reload();
+			setTimeout(()=>{location.reload()}, 2500);
 		}
 	}
 
@@ -855,6 +855,7 @@ async function orientCheck(data) {
 	async function _consoleLog(stringData) {
 		if(isDebug) {
 			console.log(stringData);
+			//TODO: https://help.papertrailapp.com/kb/configuration/configuring-centralized-logging-from-javascript/
 			} 
 		}
     </script>

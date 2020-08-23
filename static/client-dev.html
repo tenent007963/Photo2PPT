@@ -13,6 +13,8 @@
 	<link rel="stylesheet" href="./bootstrap.css">
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/inter-ui@3.13.1/Inter%20(web)/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 	<script src="./bootstrap.js"></script>
+    <!-- JS-Cookie -->
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 	<style>
 	html,body {
     height: 100%;
@@ -258,11 +260,11 @@
 			let oldroom = room;
 			socket.emit("leave",oldroom);
 		}
+		Cookies.set('room',rm,{ expires: 31 ,path: ''});
 		room = rm;
 		socket.emit("join",rm);
 		checkStatus();
 		$('#popup').modal('hide');
-		setOnline();
     }
 
     //Initialize QR Scanner
@@ -317,12 +319,11 @@
 				socket.connect();
 				socket.emit("join",room);
 				socket.on('connect_error',function(reason) {
-					setOffline();
 					_status.textContent = reason;
 					window.location.reload();
 				});
 				_consoleLog(`Client reconnected.`);
-				setOnline();
+				checkStatus();
 			}
 			catch(err) {
 				_consoleLog(`Reconnect failed! Will proceed to force reload.`);
@@ -334,7 +335,6 @@
 		} else {
 			_consoleLog(`Client is connected, falling back.`);
 			checkStatus();
-			setOnline();
 			}
 	}
 
@@ -346,12 +346,13 @@
 	
 	
 	//Below are all socket functions / connections
-	
+
 	//Listen to "status" event and update _status element 
 	socket.on("status",function(data){
 		_consoleLog(`Received status update.`);
 		_status.textContent = data;
 		_fileform.reset();
+		setOnline();
 	});
 	
 	// Upon socket disconnection
@@ -375,21 +376,38 @@
 	
 	function checkStatus() {
 		_consoleLog("Querying status..");
-		socket.emit("client","check",room, (serverIsOnline) => {
-			if (serverIsOnline) { 
+		socket.emit("client","check",room, (cb) => {
+			let res = cb.serverIsOnline;
+			_consoleLog(`Raw callback:${cb}, Data:${res}.`);
+			if (res) {
+				_consoleLog('Server side online!');
+				setOnline();
+				_fileform.reset();
+				return true;
+			} else if(!res){
 				_consoleLog(`Server side offline!`);
-				_status.textContent = 'Server side offline!'; 
-				_fileform.reset(); 
-				} else {
+				_status.textContent = 'Server side offline!';
+				_fileform.reset();
+				setOffline();
+				return false;
+			}
+			else {
+				_status.textContent = 'An error occured.';
 				_consoleLog(`An error occurred.`);
-				}
+			}
 		});
 	}
 
 	window.onload = () => {
-		$('#popup').modal('show');
 		if (isDebug) {
 			window.document.title = "InstantPhoto - Client(Development)";
+		}
+		let getRoom = Cookies.get('room');
+		if (!getRoom) {
+			$('#popup').modal('show');
+		} else {
+			joinroom(getRoom);
+			_consoleLog(`Joining old room, room code: ${getRoom}`)
 		}
 			}
 			
@@ -397,6 +415,7 @@
 	function _consoleLog(stringData) {
 		if(isDebug) {
 			console.log(stringData);
+			//TODO: https://help.papertrailapp.com/kb/configuration/configuring-centralized-logging-from-javascript/
 			} 
 		}
     </script>
