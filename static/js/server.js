@@ -305,7 +305,7 @@ function initCS() {
 
 //Tech mode
 function initTech() {
-    initTech();
+    roomInit();
     _tech.style.display= "flex";
     Cookies.set('mode', 'tech',{ expires: 31,path: ''});
 }
@@ -335,7 +335,7 @@ function checkRoomInitialize() {
                 _consoleLog(`Init CS Mode.`);
                 break;
             case "tech":
-                roomInit();
+                initTech();
                 _consoleLog(`Init Tech Mode.`);
                 break;
             default:
