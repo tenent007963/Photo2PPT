@@ -29,46 +29,61 @@ let server=http.createServer(function(req,res){
     }
     switch(pathname){
         case '/pc-min':
-            /* doc = */ fs.readFile(__dirname + '/static/server-min.html', "utf8", fsCallback);
+            fs.readFile(__dirname + '/static/server-min.html', "utf8", fsCallback);
         break;
 		case '/server-dev':
-            /* doc = */ fs.readFile(__dirname + '/static/server-dev.html', 'utf8', fsCallback);
+            fs.readFile(__dirname + '/static/server-dev.html', 'utf8', fsCallback);
         break;
 		case '/pc':
-            /* doc = */ fs.readFile(__dirname + '/static/server-source.html', 'utf8', fsCallback);
+            fs.readFile(__dirname + '/static/server-source.html', 'utf8', fsCallback);
         break;
 		case '/phone-min':
-            /* doc = */ fs.readFile(__dirname + '/static/client-min.html', 'utf8', fsCallback);
+            fs.readFile(__dirname + '/static/client-min.html', 'utf8', fsCallback);
         break;
 		case '/client-dev':
-            /* doc = */ fs.readFile(__dirname + '/static/client-dev.html', 'utf8', fsCallback);
+            fs.readFile(__dirname + '/static/client-dev.html', 'utf8', fsCallback);
         break;
 		case '/phone':
-            /* doc = */ fs.readFile(__dirname + '/static/client-source.html', 'utf8', fsCallback);
+            fs.readFile(__dirname + '/static/client-source.html', 'utf8', fsCallback);
         break;
 		case '/pdf':
-            /* doc = */ fs.readFile(__dirname + '/static/pdf.html', 'utf8', fsCallback);
+            fs.readFile(__dirname + '/static/pdf.html', 'utf8', fsCallback);
         break;
 		case '/favicon':
-            /* doc = */ fs.readFile(__dirname + '/static/favicon.ico', 'utf8', fsCallback);
+            fs.readFile(__dirname + '/static/favicon.ico', 'utf8', fsCallback);
         break;
 		case '/jquery.js':
-            /* doc = */ fs.readFile(__dirname + '/static/jquery-3.5.1.min.js', 'utf8', fsCallback);
+            fs.readFile(__dirname + '/static/js/jquery-3.5.1.min.js', 'utf8', fsCallback);
         break;
 		case '/bootstrap.css':
-            /* doc = */ fs.readFile(__dirname + '/static/bootstrap.min.css', 'utf8', fsCallback);
+             fs.readFile(__dirname + '/static/css/bootstrap.min.css', 'utf8', fsCallback);
         break;
 		case '/bootstrap.js':
-            /* doc = */ fs.readFile(__dirname + '/static/bootstrap.min.js', 'utf8', fsCallback);
+            fs.readFile(__dirname + '/static/js/bootstrap.min.js', 'utf8', fsCallback);
         break;
 		case '/compressor.js':
-			/* doc = */ fs.readFile(__dirname + '/node_modules/compressorjs/dist/compressor.js', 'utf8', fsCallback);
+			fs.readFile(__dirname + '/node_modules/compressorjs/dist/compressor.js', 'utf8', fsCallback);
 		break;
         case '/html5-qrcode.min.js':
-            /* doc = */ fs.readFile(__dirname + '/static/html5-qrcode.min.js', 'utf8', fsCallback);
+            fs.readFile(__dirname + '/static/js/html5-qrcode.min.js', 'utf8', fsCallback);
             break;
         case '/keepalive':
-            /* doc = */ fs.readFile(__dirname + '/static/keepalive.txt', 'utf8', fsCallback);
+            fs.readFile(__dirname + '/static/keepalive.txt', 'utf8', fsCallback);
+            break;
+        case '/server.js':
+            fs.readFile(__dirname + '/static/js/server.js', 'utf8', fsCallback);
+            break;
+        case '/client.js':
+            fs.readFile(__dirname + '/static/js/client.js', 'utf8', fsCallback);
+            break;
+        case '/server.css':
+            fs.readFile(__dirname + '/static/css/server.css', 'utf8', fsCallback);
+            break;
+        case '/client.css':
+            fs.readFile(__dirname + '/static/css/client.css', 'utf8', fsCallback);
+            break;
+        case '/dev.js':
+            fs.readFile(__dirname + '/static/js/dev.js', 'utf8', fsCallback);
             break;
         default:
             /* doc = */ fs.readFile(__dirname + '/static/index.html', 'utf8', fsCallback);

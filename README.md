@@ -21,8 +21,8 @@ Just clone this repo and now it's ready to go.
 # Hotkeys:
 
 `x`: Enable / Create PPT file\
-`Ctrl + Shift + X`: Disable / Discard PPT file\
-`\`: Toggle SaveImage\
+`Ctrl + Shift + z`: Disable / Discard PPT file\
+`` ` ``: Toggle SaveImage\
 `Enter`: Save PPT file if enabled
 
 
@@ -33,5 +33,6 @@ Just clone this repo and now it's ready to go.
 	C. Enable `console.log` send back to heroku for debug purpose\
 	D. Lock process when retrieving/processing images and unlock to save file\
 	E. Socket.io perform binary-file multi-part upload 
- 2. Make whole html page js generated
+ 2. Fix bug\
+ A. Scan QR from library has unnecessary chars 
  3. Make the whole damn code async and simplify the heck out of it
