@@ -137,6 +137,7 @@ io.on("connection", function(socket) {
                         }
                 }).catch(err => {
                     console.log(`Unknown error occurred. Data: ${data}, RoomID: ${room}, ErrMsg:${err}.`);
+                    callback({serverIsOnline:'error'});
                     return false;
                 });
                 break;
@@ -206,13 +207,17 @@ io.on("connection", function(socket) {
                     });
                     break;
                 case "getStateOfServer":
-                    console.log(`Querying data from postgres for room ${val}`);
+                    console.log(`Querying data from postgres for room ${val}.`);
                     //sample command: SELECT server FROM public.availableroom WHERE room_id='abCDe12345';
                     client.query(`SELECT server FROM public.availableroom WHERE room_id='${val}';`, (error, result) => {
                         if (error) reject(console.log(error));
                         //console.log(`Raw result from postgres:`,result);
-                        let query = result.rows[0].server;
-                        resolve(query.trim());
+                        try {
+                            let query = result.rows[0].server;
+                            resolve(query.trim());
+                        } catch(err) {
+                            reject(err);
+                        }
                     });
                     break;
                 default:

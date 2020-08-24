@@ -250,7 +250,7 @@
 
 	//Retrieving room code from input
 	function getRoom() {
-		let str = _roomCodeInput.value;
+		let str = _roomCodeInput.value.trim();
 		_consoleLog(`Value from input: ${str}.`);
 		joinroom(str);
 	}
