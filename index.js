@@ -112,7 +112,7 @@ io.on("connection", function(socket) {
     // Register "client" events sent by client ONLY
     socket.on("client", (data, room, callback) => {
         console.log(`Received request from client side.`);
-        if(typeof room === undefined) {
+        if(room === undefined|| room === '') {
             callback({serverIsOnline:'error'});
             return false;
         }
@@ -125,11 +125,11 @@ io.on("connection", function(socket) {
                         if (res === 'online') {
                             console.log(`Parse request to server side of ${room}.`);
                             socket.broadcast.to(room).emit("status", data);
-                            callback({serverIsOnline:true});
+                            callback({serverIsOnline:'true'});
                         }
                         if (res === 'offline') {
                             console.log(`Server side ${room} offline. Return callback data.`);
-                            callback({serverIsOnline:false});
+                            callback({serverIsOnline:'false'});
                         }
                         if (res === 'error') {
                             console.log(`Queried ${room} doesn't exist, please check again.`);
@@ -138,7 +138,6 @@ io.on("connection", function(socket) {
                 }).catch(err => {
                     console.log(`Unknown error occurred. Data: ${data}, RoomID: ${room}, ErrMsg:${err}.`);
                     callback({serverIsOnline:'error'});
-                    return false;
                 });
                 break;
             default:

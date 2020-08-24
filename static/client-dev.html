@@ -258,7 +258,7 @@
 	//Join room
 	function joinroom(rm) {
 		_consoleLog(`Connecting to room ${rm}.`);
-		if(rm === undefined) {
+		if(rm === undefined || rm === '') {
 			_status.textContent = 'Error: No room code!';
 			_consoleLog(`Error: No room code!`);
 			$('#popup').modal('show');
@@ -392,13 +392,14 @@
 		_consoleLog("Querying status..");
 		socket.emit("client","check",room, (cb) => {
 			let res = cb.serverIsOnline;
+			//_consoleLog(`Raw callback:${cb}, Data:${res},Datatype:${typeof res}.`);
 			_consoleLog(`Raw callback:${cb}, Data:${res}.`);
-			if (res) {
+			if (res === 'true') {
 				_consoleLog('Server side online!');
 				setOnline();
 				_fileform.reset();
 				return true;
-			} else if(!res){
+			} else if(res === 'false') {
 				_consoleLog(`Server side offline!`);
 				_status.textContent = 'Server side offline!';
 				_fileform.reset();
@@ -407,6 +408,7 @@
 			} else if(res === 'error') {
 				_status.textContent = 'Incorrect room details.';
 				_fileform.reset();
+				$('#popup').modal('show');
 				_consoleLog(`Incorrect room details.`);
 			} else {
 				_status.textContent = 'An error occurred. Will proceed with force refresh.';
