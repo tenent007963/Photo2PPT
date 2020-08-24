@@ -28,17 +28,11 @@ let server=http.createServer(function(req,res){
         res.end();
     }
     switch(pathname){
-        case '/pc-min':
-            fs.readFile(__dirname + '/static/server-min.html', "utf8", fsCallback);
-        break;
 		case '/server-dev':
             fs.readFile(__dirname + '/static/server-dev.html', 'utf8', fsCallback);
         break;
 		case '/pc':
             fs.readFile(__dirname + '/static/server-source.html', 'utf8', fsCallback);
-        break;
-		case '/phone-min':
-            fs.readFile(__dirname + '/static/client-min.html', 'utf8', fsCallback);
         break;
 		case '/client-dev':
             fs.readFile(__dirname + '/static/client-dev.html', 'utf8', fsCallback);
