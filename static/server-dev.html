@@ -370,6 +370,7 @@
 		  photocount = 0;
 		  socket.emit("status",`File saved. Please re-enable PPTXGenJS.`,room)
 		  rmtmb();
+		  _header.innerHTML = 'File saved. Please re-enable PPTXGenJS.';
 		  _consoleLog(`PPT file saved. Status reset.`);
 	  } else {
 	   alert("No GSPN Service Order number!");
@@ -525,6 +526,7 @@ async function orientCheck(data) {
 				_consoleLog(`Joining new room`);
 			} else {
 				roomConnect(getRoom);
+				_header.innerHTML = 'Joining old room, room code: ' + getRoom + '.';
 				_consoleLog(`Joining old room, room code: ${getRoom}`)
 			}
 			//Mode checking
@@ -577,6 +579,7 @@ async function orientCheck(data) {
 					_consoleLog(`Saving PPT file`);
 				} else {
 					_consoleLog('PptxGenJS enabled but not enough photos.');
+					alert('Not enough photos.');
 					return false; //return true to submit, false to do nothing
 				}
 			}
