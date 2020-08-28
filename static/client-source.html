@@ -1,382 +1,94 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta content="no-cache, no-store, must-revalidate" http-equiv="Cache-Control">
 	<meta name="viewport" content="initial-scale=1.5,maximum-scale=3,user-scalable=no"/>
-    <title>InstantPhoto - Client</title>
-    <link rel="icon" href="./favicon">
-    <script src="/socket.io/socket.io.js"></script>
+	<title>InstantPhoto - Client</title>
+	<link rel="icon" href="./favicon">
+	<script src="/socket.io/socket.io.js"></script>
 	<script src="/compressor.js"></script>
-	<script src="./jquery.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="></script>
+	<script src="./jquery.js"></script>
+	<script src="./html5-qrcode.min.js"></script>
 	<link rel="stylesheet" href="./bootstrap.css">
+	<link rel="preload" href="https://cdn.jsdelivr.net/npm/inter-ui@3.13.1/Inter%20(web)/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 	<script src="./bootstrap.js"></script>
-	<style>
-	
-	
-	html, body, body div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, figure, footer, header, hgroup, menu, nav, section, time, mark, audio, video {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    outline: 0;
-	font-size: 100%;
-    /* vertical-align: baseline; */
-	}
-	
-	html {
-		height: 100%;
-		margin: 0;
-		width: 90%;
-		}
-	
-	body {
-		background: #9796f0;  /* fallback for old browsers */
-		background: -webkit-linear-gradient(to right, #fbc7d4, #9796f0);  /* Chrome 10-25, Safari 5.1-6 */
-		background: linear-gradient(to bottom, #fbc7d4, #9796f0); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-		margin:0;
-	}
-	.center{
-		/* bottom: 25%;
-		padding-top: 35%;	*/
-		height:100%;
-		text-align:center;
-		margin-top: calc(100% - 70%);
-		}
-		
-	button {
-		position: relative; 
-		width: 140px; 
-		height: 30px;
-		cursor: pointer;
-		transition: all 0.5s;
-		position: relative;
-		}
-	
-	form {
-	    display: inline-block;
-	}
-	
-	form {
-	max-width: 250px;
-	}
-	
-	input {
-	width: 100%;
-	}
-	
-	.custom-file-label {
-    text-align: left;
-	font-size: xx-small;
-	}
-	
-	.refresh-btn {
-	color: #887272;
-	transition: all 0.5s;
-	position: relative;
-	width: 50%;
-    text-align: center;
-}
-.refresh-btn::before {
-	content: '';
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 1;
-	background-color: rgba(255,255,255,0.3);
-	transition: all 0.3s;
-}
-.refresh-btn:hover::before {
-	opacity: 0 ;
-	transform: scale(0.5,0.5);
-}
-.refresh-btn::after {
-	content: '';
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 1;
-	opacity: 0;
-	transition: all 0.3s;
-	border: 1px solid rgba(255,255,255,0.7);
-	transform: scale(1.2,1.2);
-}
-.refresh-btn:hover::after {
-	opacity: 1;
-	transform: scale(1,1);
-}
+	<!-- JS-Cookie -->
+	<script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+	<!-- Custom Style -->
+	<link rel="stylesheet" href="./client.css">
+</head>
 
-.save-btn {
-	float:left;
-	width: 100px;
-}
-	</style>
-  </head>
-  
-  <body>
-<!--  <button type="button" style="float: left" >Refresh page</button> -->
-<div class="refresh-page">
-  <div class="button refresh-btn" onclick="window.location.reload();" id="refresh">
-    <span>Reload Page</span>
-  </div>
+<body>
+<header>
+	<div class="refresh-page">
+		<div class="btn refresh-btn" onclick="window.location.reload();" id="refresh">
+			<span>Reload Page</span>
+		</div>
+	</div>
+</header>
+
+<!-- File input -->
+<div class="container" id="container">
+
+	<div class="row-fluid align-items-center justify-content-start">
+		<div class="col">
+			<h5 id="croom">Status: <span id="roomindicator" class="offline">&#x25cf; Offline</span></h5>
+			<h5 id="status">Waiting to join room...</h5>
+		</div>
+	</div>
+	<div class="row-fluid align-items-center justify-content-start">
+		<div class="col">
+			<form class="md-form" id="holder" name="upload">
+				<div class="custom-file mb-3">
+					<input type="file" class="custom-file-input" id="input1" name="fresh" accept="image/*" capture="camera" autofocus>
+					<label class="custom-file-label" for="input1">Open Camera</label>
+				</div>
+				<div class="custom-file mb-3">
+					<input type="file" class="custom-file-input" id="input2" name="gallery" accept="image/*">
+					<label class="custom-file-label" for="input2">Gallery Upload</label>
+				</div>
+			</form>
+			<button type="button" class="button save-btn" id="savefile" onclick="savefile()">Save File</button>
+		</div>
+	</div>
 </div>
-  
-    <!-- File input -->
-	<div class="center" id="container">
-	<button type="button" class="button room-btn" id="plusroom" onclick="plusroom()">Change Room +</button>
-	<button type="button" class="button room-btn" id="minusroom" onclick="minusroom()" disabled>Change Room -</button>
-	<br />
-	<h4 id="croom">Current room: <span id="roomindicator"></span></h4>
-	<h4 id="status">Getting Status...</h4>
-	<br />
-	<form class="md-form" id="holder" name="upload">
-	<div class="custom-file mb-3">
-      <input type="file" class="custom-file-input" id="input1" name="fresh" accept="image/*" capture="camera" autofocus>
-      <label class="custom-file-label" for="customFile">Open Camera</label>
-    </div>
-	<div class="custom-file mb-3">
-      <input type="file" class="custom-file-input" id="input2" name="gallery" accept="image/*">
-      <label class="custom-file-label" for="customFile">Gallery Upload</label>
-    </div>
-	
-	</form> 
-	<button type="button" class="button save-btn" id="savefile" onclick="savefile()">Save File</button>
-	
-	</div>	
-	</body>
-    <!-- Client Code -->
-    <script type="text/javascript">
-	//Debug section
-	var isDebug = ( window.location.href.match(/dev/g) ? true : false );
-	  
-      // Get WebSocket
-      var socket = io();
 
-      // Get DOM elements
-      var _src1 = document.getElementById("input1");
-	  var _src2 = document.getElementById("input2");
-	  var _status = document.getElementById("status");
-	  var _fileform = document.getElementById("holder");
-	  var _container = document.getElementById("container");
+<!-- Popup for connecting room -->
+<div class="modal fade" id="popup" tabindex="-1" role="dialog" aria-labelledby="joinroom-popup" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="joinroom-title">Join A Room</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<form action="#" onsubmit="return getRoom()">
+					<span>Enter room code:</span>
+					<input label="roomCode" type="text" name="roomCode" id="roomCode" placeholder="Code here" style="width:65%"/>
+				</form>
+				<p></p>
+				<div id="reader"></div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" onclick="getRoom()">Join</button>
+			</div>
+		</div>
+	</div>
+</div>
 
-      // Join a channel
-      let room = "test";
-	  let rm = "0";
-      socket.emit("join", room);
-	  document.getElementById("roomindicator").innerHTML = room;
+</body>
 
-		// Listen to Source1 and Source2 input events
-		[_src1,_src2].forEach(function(sauce){ 
-			sauce.addEventListener("change", function (event) {
+<footer>
+	<div class="footer" id="joinroom-button">
+		<button type="button" class="btn btn-light" data-toggle="modal" data-target="#popup">Join Room</button>
+	</div>
+</footer>
 
-				// Prepeare file reader
-				const file = event.target.files[0];
-				if (!file) {
-					return;
-				}
-				var fileReader = new FileReader();
-		
-				// Determine input type 
-				if (file instanceof Blob) {
-					// Check for file size (in kb)
-					fileSize = (file.size / 1024).toFixed(3);
-					// Add line for compressing image data here
-					new Compressor(file, {
-						quality: 0.6,
-						checkOrientation: false,
-						success(result) {
-							// Read file
-							fileReader.readAsDataURL(result);
-						},
-						error(err) {
-						  console.log(err.message);
-						},
-					});
-				}
-				fileReader.onloadend = function (event) {
-					// Send an image event to the socket
-					var image = event.target.result;
-					// Check for connection status
-					if (socket.connected) {
-						emitPhoto(image);
-						_consoleLog(`First try success!`);
-					} else {
-						// reconnect
-						socket.connect();
-						if (socket.connected) {
-							emitPhoto(image);
-							_consoleLog(`Second try success.`);
-						} else { 
-							alert("Connection lost! Will now refresh page.");
-							_consoleLog(`Connection lost!`);
-							window.location.reload();
-							return false;
-						}
-					}
-				
-				};
-				
-				
-			});
-		});	
-	
-	function emitPhoto(image) {
-		socket.emit("recvimage", image, room, (isSuccess) => {
-			if (isSuccess) { _consoleLog('Image sent!'); } else { emitPhoto(image);};
-			});
-	}
-	
-	function savefile() {
-		socket.emit("status","save", room);
-	}
-	
-	function plusroom() {
-	 rm++ ;
-	 joinroom(rm);
-    }	
-	
-	function minusroom() {
-	 rm-- ;
-	 joinroom(rm)
-    }	
-
-	function joinroom(rm) {
-	 let oldroom = room;
-
-	 if (rm >= 6) {
-	   if (rm = 6) {	 
-	     document.getElementById("plusroom").disabled = true;
-		} else { 
-	     rm-- ;
-	     alert("Invalid Room selected.");
-	   } }
-	 
-	 if (rm >= 1 , rm < 6 ) {
-	 document.getElementById("plusroom").disabled = false;
-	 document.getElementById("minusroom").disabled = false;
-	 }
-	 
-	 if (rm <= 1) {
-	  if (rm = 1 ) {
-	   document.getElementById("minusroom").disabled = true;
-	  } else { 
-	   rm++ ;
-	   alert("You had reached the end!");
-	 }  }
-	
-	switch (rm) {
-	  case 1:
-       room = "room1";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 2: 
-	   room = "room2";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 3:
-	   room = "room3";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 4: 
-	   room = "room4";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 5: 
-	   room = "room5";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break;
-	  case 6: 
-	   room = "room6";
-	   socket.emit("leave", oldroom);
-	   socket.emit("join", room);
-	   break; 
-	  default:
-	   room = "test";
-		break;
-		}
-		
-	 document.getElementById("roomindicator").innerHTML = room;
-	 
-    }
-	
-	
-	//Check socket connection upon window.onfocus
-	window.onfocus = () => { 
-		_consoleLog(`Window focused. Checking connection...`);
-		if (!socket.connected) {
-			_consoleLog(`Trying to reconnect...`);
-			try { 
-				socket.connect(); 
-				if (!socket.connected) throw "Reconnect error!";
-			}
-			catch(err) {
-				_consoleLog(`Reconnect failed! Will proceed to force reload.`);
-				//alert(`${err} Will now force reload.`); //This code will cause page to lose focus and thus infinite loop
-				_container.textContent = 'Socket disconnected! Will proceed to force reload.';
-				window.location.reload();
-			}
-			
-		} else {
-			_consoleLog(`Client is connected, falling back.`);
-			checkStatus();
-			}
-	}
-	
-	//AJAX Codes
-	$(".custom-file-input").on("change", function() {
-		var fileName = $(this).val().split("\\").pop();
-		$(this).siblings(".custom-file-label").addClass("selected").html(fileName);
-	});
-	
-	//Below are all socket functions / connections
-	
-	//Listen to "status" event and update _status element 
-	socket.on("status",function(data){
-		_consoleLog(`Received status update.`);
-		_status.textContent = data;
-		_fileform.reset();
-	});
-	
-	// Upon socket disconnection
-	socket.on('disconnect', function(){
-	  // try to reconnect
-	  socket.connect();
-	  _consoleLog(`Trying to reconnect socket.`);
-	});
-	
-	function checkStatus() {
-		socket.emit("client","check",room, (serverIsOnline) => {
-			if (serverIsOnline) { 
-				_consoleLog(`Server side offline!`);
-				_status.textContent = 'Server side offline!'; 
-				_fileform.reset(); 
-				} else {
-				_consoleLog(`An error occurred.`);
-				}
-		});
-		_consoleLog("Querying status..");
-		if (isDebug) {
-				window.document.title = "InstantPhoto - Client(Development)";
-			  }
-	}
-	
-	window.onload = () => { 
-		setTimeout(checkStatus(),3000);
-			}
-			
-			
-	//Default debug Code, do not modify
-	function _consoleLog(stringData) {
-		if(isDebug) {
-			console.log(stringData);
-			} 
-		}
-    </script>
+<!-- Client Code -->
+<script src="./dev.js"></script>
+<script src="./client.js"></script>
 </html>
