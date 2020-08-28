@@ -55,9 +55,15 @@ let server=http.createServer(function(req,res){
 		case '/bootstrap.js':
             fs.readFile(__dirname + '/static/js/bootstrap.min.js', 'utf8', fsCallback);
         break;
+        case '/min/bootstrap.js':
+            fs.readFile(__dirname + '/static/js/bootstrap.min.js', 'utf8', fsCallback);
+            break;
 		case '/compressor.js':
 			fs.readFile(__dirname + '/node_modules/compressorjs/dist/compressor.js', 'utf8', fsCallback);
 		break;
+        case '/min/compressor.js':
+            fs.readFile(__dirname + '/node_modules/compressorjs/dist/compressor.js', 'utf8', fsCallback);
+            break;
         case '/html5-qrcode.min.js':
             fs.readFile(__dirname + '/static/js/html5-qrcode.min.js', 'utf8', fsCallback);
             break;
