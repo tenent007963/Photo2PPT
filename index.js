@@ -55,15 +55,9 @@ let server=http.createServer(function(req,res){
 		case '/bootstrap.js':
             fs.readFile(__dirname + '/static/js/bootstrap.min.js', 'utf8', fsCallback);
         break;
-        case '/min/bootstrap.js':
-            fs.readFile(__dirname + '/static/js/bootstrap.min.js', 'utf8', fsCallback);
-            break;
 		case '/compressor.js':
 			fs.readFile(__dirname + '/node_modules/compressorjs/dist/compressor.js', 'utf8', fsCallback);
 		break;
-        case '/min/compressor.js':
-            fs.readFile(__dirname + '/node_modules/compressorjs/dist/compressor.js', 'utf8', fsCallback);
-            break;
         case '/html5-qrcode.min.js':
             fs.readFile(__dirname + '/static/js/html5-qrcode.min.js', 'utf8', fsCallback);
             break;
@@ -84,27 +78,6 @@ let server=http.createServer(function(req,res){
             break;
         case '/dev.js':
             fs.readFile(__dirname + '/static/js/dev.js', 'utf8', fsCallback);
-            break;
-        case '/min/dev.js':
-            fs.readFile(__dirname + '/static/min/dev.js', 'utf8', fsCallback);
-            break;
-        case '/min/client.js':
-            fs.readFile(__dirname + '/static/min/client.js', 'utf8', fsCallback);
-            break;
-        case '/min/server.js':
-            fs.readFile(__dirname + '/static/min/server.js', 'utf8', fsCallback);
-            break;
-        case '/min/server':
-            fs.readFile(__dirname + '/static/min/server-dev.html', 'utf8', fsCallback);
-            break;
-        case '/min/client':
-            fs.readFile(__dirname + '/static/min/client-dev.html', 'utf8', fsCallback);
-            break;
-        case '/min/server.css':
-            fs.readFile(__dirname + '/static/min/server.css', 'utf8', fsCallback);
-            break;
-        case '/min/client.css':
-            fs.readFile(__dirname + '/static/min/client.css', 'utf8', fsCallback);
             break;
         case '/papertrail':
             fs.readFile(__dirname + '/static/js/papertrail.js', 'utf8', fsCallback);
