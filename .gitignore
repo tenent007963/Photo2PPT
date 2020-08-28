@@ -62,3 +62,7 @@ typings/
 
 # Jetbrains WebStorm IDE files
 .idea/
+
+# Custom files
+start.cmd
+update.cmd
