@@ -2,6 +2,13 @@
 async function _consoleLog(stringData) {
     if(isDebug) {
         console.log(stringData);
-        //TODO: https://help.papertrailapp.com/kb/configuration/configuring-centralized-logging-from-javascript/
+        const data = JSON.stringify({
+            room: room,
+            msg: stringData
+        })
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", 'papertrail', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(data);
     }
 }

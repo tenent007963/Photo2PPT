@@ -639,7 +639,7 @@ function httpGetAsync(theUrl, callback)
     xmlHttp.send(`Dont sleep fker - Morning call from server side of ${room}`);
 }
 
-//To execute every 25 mins
+//To execute every 25 mins for keepalive
 setInterval((function() {
     function loop() {
         socket.emit("server","keepAlive",room);

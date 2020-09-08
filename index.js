@@ -4,6 +4,7 @@ const http=require('http');
 const url=require('url');
 const {Client} = require('pg'); //Postgres
 //const monitorio = require('monitor.io'); // Monitoring each socket connection if possible, ref 'https://drewblaisdell.github.io/monitor.io/'
+const { parse } = require('querystring');
 
 const PORT = process.env.PORT || 3000;
 const dbURL = process.env.DATABASE_URL;
@@ -80,7 +81,10 @@ let server=http.createServer(function(req,res){
             fs.readFile(__dirname + '/static/js/dev.js', 'utf8', fsCallback);
             break;
         case '/papertrail':
-            fs.readFile(__dirname + '/static/js/papertrail.js', 'utf8', fsCallback);
+            collectRequestData(req, result => {
+                console.log(`Response from ${result['room']} with message '${result['msg']}'`);
+            });
+            fsCallback(null,`Confirmation of receiving, timestamp: ${Math.floor(+new Date() / 1000)}`);
             break;
         default:
             /* doc = */ fs.readFile(__dirname + '/static/index.html', 'utf8', fsCallback);
@@ -239,6 +243,26 @@ io.on("connection", function(socket) {
 
 })
 
+function collectRequestData(request, callback) {
+    const CONTENT_TYPE = 'application/json';
+    if(request.headers['content-type'] === CONTENT_TYPE) {
+        let body = '';
+        request.on('data', chunk => {
+            body += chunk.toString();
+        });
+        request.on('end', () => {
+            callback(JSON.parse(body));
+        });
+    }
+    else {
+        callback(null);
+    }
+}
+
+function saveImageTrigger() {
+    //To execute if triggered by socket.emit('save')
+    //Once triggered, check (condition) continuously until (condition) met
+}
 
 console.log("InstantPhoto had started!");
 

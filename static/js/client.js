@@ -229,8 +229,6 @@ function checkStatus() {
     _consoleLog("Querying status..");
     socket.emit("client","check",room, (cb) => {
         let res = cb.serverIsOnline;
-        //_consoleLog(`Raw callback:${cb}, Data:${res},Datatype:${typeof res}.`);
-        _consoleLog(`Raw callback:${cb}, Data:${res}.`);
         if (res === 'true') {
             _consoleLog('Server side online!');
             setOnline();
