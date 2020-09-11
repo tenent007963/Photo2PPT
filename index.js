@@ -19,6 +19,7 @@ client.query('CREATE TABLE IF NOT EXISTS availableroom (room_id CHAR(11) PRIMARY
     //console.log(`Raw result from postgres:`,res);
 });
 
+//https://nodejs.org/en/docs/guides/anatomy-of-an-http-transaction/
 let server=http.createServer(function(req,res){
     let pathname=url.parse(req.url).pathname;
     let fsCallback = function(error, data) {

@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<meta charset="utf-8">
+  <head>
+    <meta charset="utf-8">
 	<meta http-equiv="Cache-control" content="no-cache">
-	<title>InstantPhoto - Server</title>
-	<link rel="icon" href="./favicon">
-	<script src="/socket.io/socket.io.js"></script>
-	<!-- Download.js -->
+    <title>InstantPhoto - Server</title>
+    <link rel="icon" href="./favicon">
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- Download.js -->
 	<script src="//cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.js"></script>
-	<!-- Compressor.js -->
+    <!-- Compressor.js -->
 	<script src="./compressor.js"></script>
 	<!-- JS-Cookie -->
-	<script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap" rel="stylesheet">
-	<!-- Bundle: Easiest to use, supports all browsers -->
-	<script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@2.5.0/dist/pptxgen.bundle.js"></script>
+    <!-- Bundle: Easiest to use, supports all browsers -->
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@2.5.0/dist/pptxgen.bundle.js"></script>
 	<!-- Qrcode-generator -->
 	<script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.js"></script>
 	<!-- Font Awesome -->
@@ -26,73 +26,73 @@
 	<script src="./bootstrap.js"></script>
 	<!-- Custom Style -->
 	<link rel="stylesheet" href="./server.css">
-</head>
-<body>
-<header>
-	<h1>InstantPhoto</h1>
-</header>
+  </head>
+  <body>
+	<header>
+		<h1>InstantPhoto</h1>
+	</header>
 
-<!-- Container -->
-<div class="container" id="init">
-	<h3>Select your role:</h3>
-	<button type="button" class="btn btn-outline-primary btn-lg" onclick="initCS()" id="csMode">CSO</button>
-	<button type="button" class="btn btn-outline-primary btn-lg" onclick="initTech()" id="techMode">Tech</button>
-</div>
-<div class="container-fluid" id="main" style="display:none">
-	<div class="btn-toolbar topbar" role="toolbar" aria-label="Normal Toolbar for CS" id="cs" style="display:none">
-		<button type="button" class="btn btn-light" data-toggle="modal" data-target="#popup">Room Details</button>
-		<button type="button" class="btn btn-light mr-1" id="saveimage" onclick="saveimage()">Save Image : <span id="wannasavemou">No</span></button>
-		<button type="button" class="btn btn-light mr-1" id="togglepptx" onclick="togglepptx()">Create PPTX : <span id="pptxgenjsstatus">Off</span></button>
-		<button type="button" class="btn btn-light mr-1" id="savepptx" onclick="savepptx()" disabled>Save PPTX</button>
-		<form style="float: right;position: relative" action="#" onsubmit="return false;">
+	<!-- Container -->
+	<div class="container" id="init">
+		<h3>Select your role:</h3>
+		<button type="button" class="btn btn-outline-primary btn-lg" onclick="initCS()" id="csMode">CSO</button>
+		<button type="button" class="btn btn-outline-primary btn-lg" onclick="initTech()" id="techMode">Tech</button>
+	</div>
+  	<div class="container-fluid" id="main" style="display:none">
+		<div class="btn-toolbar topbar" role="toolbar" aria-label="Normal Toolbar for CS" id="cs" style="display:none">
+			<button type="button" class="btn btn-light" data-toggle="modal" data-target="#popup">Room Details</button>
+			<button type="button" class="btn btn-light mr-1" id="saveimage" onclick="saveimage()">Save Image : <span id="wannasavemou">No</span></button>
+			<button type="button" class="btn btn-light mr-1" id="togglepptx" onclick="togglepptx()">Create PPTX : <span id="pptxgenjsstatus">Off</span></button>
+			<button type="button" class="btn btn-light mr-1" id="savepptx" onclick="savepptx()" disabled>Save PPTX</button>
+			<form style="float: right;position: relative" action="#" onsubmit="return false;">
 			<input type="file" id="e-warranty" style="display:none !important;"/>
-			<input type="text" name="GSPN" id="GSPNint" placeholder="S/O number:" disabled="disabled"/>
-		</form>
-		<span id="ewanstat" style="position: relative;color: green;display:none">&#10004; E-Warranty Attached &#10004; </span>
-	</div>
-	<div class="btn-toolbar topbar" role="toolbar" aria-label="Normal toolbar for tech" id="tech" style="display:none">
+			<input type="text" name="GSPN" id="GSPNint" placeholder="S/O number:" disabled="disabled"/>	
+			</form>
+			<span id="ewanstat" style="position: relative;color: green;display:none">&#10004; E-Warranty Attached &#10004; </span>
+		</div>
+		<div class="btn-toolbar topbar" role="toolbar" aria-label="Normal toolbar for tech" id="tech" style="display:none">
 
+		</div>
+		<div class="head" id="top"> 
+			<h5 id="head">Waiting input on client side...</h5>
+		</div>
+		<!-- Image output -->
+		<img style="max-width:640px; max-height:480px;" src="" id="download"/>
+	
+		<!-- Preview sidebar -->
+		<div class="preview" id="rightbar">
+		</div>
+	
+		<p class="latency" id="socketlatency">Getting Latency...</p>
 	</div>
-	<div class="head" id="top">
-		<h5 id="head">Waiting input on client side...</h5>
-	</div>
-	<!-- Image output -->
-	<img style="max-width:640px; max-height:480px;" src="" id="download"/>
-
-	<!-- Preview sidebar -->
-	<div class="preview" id="rightbar">
-	</div>
-
-	<p class="latency" id="socketlatency">Getting Latency...</p>
-</div>
-
-<div class="modal fade" id="popup" tabindex="-1" role="dialog" aria-labelledby="roomqr-popup" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-centered" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="popup-title" onclick="devTool()">Room details</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	
+	<div class="modal fade" id="popup" tabindex="-1" role="dialog" aria-labelledby="roomqr-popup" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="popup-title" onclick="devTool()">Room details</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="popup-content modal-body">
-				<p>Current room: <span id="roomindicator"></span></p>
-				<p></p>
-				<div id="roomqr"></div>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-				<button type="button" class="btn btn-primary" id="changeroom" onclick="refreshroom()">Change Room</button>
+					</button>
+				</div>
+				<div class="popup-content modal-body">
+					<p>Current room: <span id="roomindicator"></span></p>
+					<p></p>
+					<div id="roomqr"></div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" id="changeroom" onclick="refreshroom()">Change Room</button>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
 
-<div class="warnings" style="color: red">
-	<span id="pptxnotenabled" style="display:none">Warning : PPTX not enabled!</span>
-	<br />
-	<span id="nosaveimage" style="display:none">Notice : Image not downloaded!</span>
-</div>
+	<div class="warnings" style="color: red">
+		<span id="pptxnotenabled" style="display:none">Warning : PPTX not enabled!</span>
+		<br />
+		<span id="nosaveimage" style="display:none">Notice : Image not downloaded!</span>
+	</div>
 </body>
 
 <footer>
@@ -105,8 +105,8 @@
 		</div>
 	</div>
 </footer>
-<!-- Client Code -->
-<script src="./dev.js"></script>
-<script src="./server.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js" crossorigin="anonymous"></script>
+  <!-- Client Code -->
+  <script src="./dev.js"></script>
+  <script src="./server.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js" crossorigin="anonymous"></script>
 </html>

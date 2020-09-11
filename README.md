@@ -7,8 +7,8 @@ Aim to let users send freshly taken photos to computer easily.
 - Integrated PPTXGenJS function
 - Easily paste clipboard photo using Ctrl+V
 - Simple thumbnail preview for newly added photos 
-- Multiple workspaces for multiuser scenario (WIP)
-- Support hotkeys and remote controlling (WIP)
+- Multiple workspaces for multiuser scenario
+- Support hotkeys
 
 # How to use:
 
