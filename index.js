@@ -72,11 +72,23 @@ let server=http.createServer(function(req,res){
         case '/client.js':
             fs.readFile(__dirname + '/static/js/client.js', 'utf8', fsCallback);
             break;
+        case '/server-dev.js':
+            fs.readFile(__dirname + '/static/js/server-dev.js', 'utf8', fsCallback);
+            break;
+        case '/client-dev.js':
+            fs.readFile(__dirname + '/static/js/client-dev.js', 'utf8', fsCallback);
+            break;
         case '/server.css':
             fs.readFile(__dirname + '/static/css/server.css', 'utf8', fsCallback);
             break;
         case '/client.css':
             fs.readFile(__dirname + '/static/css/client.css', 'utf8', fsCallback);
+            break;
+        case '/server-dev.css':
+            fs.readFile(__dirname + '/static/css/server-dev.css', 'utf8', fsCallback);
+            break;
+        case '/client-dev.css':
+            fs.readFile(__dirname + '/static/css/client-dev.css', 'utf8', fsCallback);
             break;
         case '/dev.js':
             fs.readFile(__dirname + '/static/js/dev.js', 'utf8', fsCallback);

@@ -68,8 +68,10 @@ function togglepptx() {
 const socket = io();
 
 // new "transimage" socket - w/o room param
-socket.on("transimage", function(image) {
+socket.on("transimage", function(buffallow) {
     _consoleLog(`Image received, processing.`);
+    let base64string = btoa([].reduce.call(new Uint8Array(buffallow),function(p,c){return p+String.fromCharCode(c)},''))
+    let image = 'data:image/jpg;base64, ' + base64string;
     output.src = image;
     //Download image if enabled
     if (saveimg === true) {
@@ -122,11 +124,6 @@ function refreshroom() {
     room = genRand(10);
     Cookies.set('room',room,{ expires: 31 ,path: ''});
 
-    // Join default channel "test" ,for debug only
-    /*
-    const room = "test";
-    */
-
     _roomindicator.innerHTML = room;
     _roomqr.innerHTML = "";
     genQR(room);
@@ -136,7 +133,6 @@ function refreshroom() {
 
 //Whenever adding a new slide, image data will parse into this function
 function addSlide(image) {
-    window.slide = pptx.addNewSlide();
     // Creating anonymous async func to check img orientation
     // checking was done by outer func
     orientCheck(image).then(rotated_image => {
@@ -144,6 +140,7 @@ function addSlide(image) {
             _consoleLog(`Response: ${rotated_image}`);
         }
         triggerthumbnail(rotated_image);
+        window.slide = pptx.addNewSlide();
         slide.addImage({ data: rotated_image, x: 0, y: 0, w: 10, h: 5.6});
         _header.innerHTML = `Added Image #${photocount}.`;
     });
@@ -359,7 +356,7 @@ function roomInit(){
 
 //Active listener for window
 
-//Listening to Hotkeys
+//Listening to Hotkeys & Keystrokes
 window.addEventListener("keydown", function(event) {
     switch(event.key) {
         case "Enter":
@@ -399,7 +396,7 @@ window.addEventListener("keydown", function(event) {
             saveimage();
             break;
         default:
-            _consoleLog(`${event.key}`);
+            //_consoleLog(`${event.key}`);
             break;
     }
 });
@@ -415,13 +412,15 @@ window.addEventListener('paste', function(e) {
         _consoleLog(`Detecting input type`);
         if (pastedData) {
             _consoleLog(`Detected input as text`);
+            _gpint.value = pastedData.trim();
+            /*
             setTimeout(function(){
                 if (_gpint.value === pastedData) {
                     return false;
                 } else {
-                    _gpint.value = pastedData;
-                    return false;
+                    _gpint.value = pastedData.trim();
                 }},100);
+                */
         } else if (file instanceof Blob) {
             _consoleLog(`Detected input as blob`);
             reader.readAsDataURL(file);

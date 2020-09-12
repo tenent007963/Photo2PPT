@@ -31,7 +31,7 @@ Just clone this repo and now it's ready to go.
 	A. Auto lock room from host side to prevent 2 servers connecting same room\
 	B. Change sync mode to PDF mode\
 	C. Lock process when retrieving/processing images and unlock to save file\
-	D. Socket.io perform binary-file multi-part upload 
+	D. Show current joined room at client side
  2. Fix bug\
- A. Scan QR from library has unnecessary chars 
+ A. Unable to paste images copied from browser
  3. Make the whole damn code async and simplify the heck out of it

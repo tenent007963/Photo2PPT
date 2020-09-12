@@ -1,0 +1,71 @@
+html,body {
+    height: 100%;
+}
+body {
+    background: #9796f0;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #fbc7d4, #9796f0);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to bottom, #fbc7d4, #9796f0) no-repeat ; /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    margin:0;
+}
+
+.container {
+    margin-top: 10%;
+}
+
+.custom-file-label {
+    text-align: left;
+    font-size: xx-small;
+}
+
+.refresh-btn {
+    color: #887272;
+    transition: all 0.5s;
+    text-align: center;
+}
+.refresh-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    background-color: rgba(255,255,255,0.3);
+    transition: all 0.3s;
+}
+.refresh-btn:hover::before {
+    opacity: 0 ;
+    transform: scale(0.5,0.5);
+}
+.refresh-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    opacity: 0;
+    transition: all 0.3s;
+    border: 1px solid rgba(255,255,255,0.7);
+    transform: scale(1.2,1.2);
+}
+.refresh-btn:hover::after {
+    opacity: 1;
+    transform: scale(1,1);
+}
+
+.save-btn {
+    float:left;
+    width: 100px;
+}
+
+.footer {
+    bottom: 10px;
+    right: 10px;
+    position: absolute;
+}
+
+.offline {
+    color: red;
+}
+
+.online {
+    color: green;
+}
