@@ -141,7 +141,7 @@ function addSlide(image) {
         }
         triggerthumbnail(rotated_image);
         window.slide = pptx.addNewSlide();
-        slide.addImage({ data: rotated_image, x: 0, y: 0, w: 10, h: 5.6});
+        slide.addImage({ data: rotated_image, x: 0, y: 0,sizing:{ type:'contain',w:10,h:5.6}});
         _header.innerHTML = `Added Image #${photocount}.`;
     });
 }
@@ -261,8 +261,8 @@ async function orientCheck(data) {
             ctx.rotate(90 * Math.PI / 180);
             ctx.drawImage(output, cx, cy);
             _consoleLog(`Image rotation complete.`);
-            //return canvas.toDataURL("image/png");
-            canvas.toBlob(function(blobData){ compressImg(blobData);});
+            resolve(canvas.toDataURL("image/png"));
+            //canvas.toBlob((blobData)=>{ compressImg(blobData);});
         }
 
         let compressImg = (imgStream) => {
@@ -278,7 +278,7 @@ async function orientCheck(data) {
                     _consoleLog(err.message);
                 },
             });
-            fileReader.onloadend = function (event) {
+            fileReader.onloadend = (event) => {
                 resolve(event.target.result);
             }
         }
@@ -408,48 +408,25 @@ window.addEventListener('paste', function(e) {
     const reader =  new FileReader();
     pastedData = clipboardData.getData('Text');
 
-    if (pptxenabled) {
-        _consoleLog(`Detecting input type`);
-        if (pastedData) {
-            _consoleLog(`Detected input as text`);
-            _gpint.value = pastedData.trim();
-            /*
-            setTimeout(function(){
-                if (_gpint.value === pastedData) {
-                    return false;
-                } else {
-                    _gpint.value = pastedData.trim();
-                }},100);
-                */
-        } else if (file instanceof Blob) {
-            _consoleLog(`Detected input as blob`);
-            reader.readAsDataURL(file);
-            reader.onloadend = function () {
-                let ewanss = reader.result;
-                addSlide(ewanss);
-                if (saveimg === true) {
-                    download(ewanss, smartFilename(), "application/octet-stream;base64");
-                }
+    if (file instanceof Blob) {
+        reader.readAsDataURL(file);
+        reader.onloadend = function () {
+            if (pptxenabled) {
+                addSlide(reader.result);
             }
-            _ewanatt.style.display = "block";
-        } else {
-            _consoleLog(`Unknown input type, aborting.`);
-            reader.abort();
-        }
-    } else if(saveimg) {
-        if (file instanceof Blob) {
-            reader.readAsDataURL(file);
-            reader.onloadend = function () {
-                let pastedImg = reader.result;
-                download(pastedImg, smartFilename(), "application/octet-stream;base64");
+            if (saveimg) {
+                download(reader.result, smartFilename(), "application/octet-stream;base64");
             }
-        } else {
-            _consoleLog(`Unknown input type, aborting.`);
-            reader.abort();
-        }
+            if(!pptxenabled && !saveimg) {
+                alert("PPTXGenJS not enabled!");
+            }
+        } 
+    } else if (pastedData && pptxenabled) {
+        _gpint.value = pastedData.trim();
     } else {
         alert("PPTXGenJS not enabled!");
     }
+
 });
 
 

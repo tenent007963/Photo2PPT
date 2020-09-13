@@ -155,6 +155,12 @@ Html5Qrcode.getCameras().then(devices => {
 const html5Qrcode = new Html5QrcodeScanner("reader", { fps: 30 });
 html5Qrcode.render(onScanSuccess, onScanFailure);
 
+//This function is to do a clean reload and cookie flushing
+let cleanReload = () => {
+    Cookies.remove('room', { path: '' })
+    window.location.reload();
+}
+
 //Check socket connection upon window.onfocus
 window.onfocus = () => {
     _consoleLog(`Window focused. Checking connection...`);

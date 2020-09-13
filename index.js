@@ -209,6 +209,7 @@ io.on("connection", function(socket) {
     });
 
     async function roomFunc(func, val) {
+        val = val.trim();
         return new Promise((resolve, reject) => {
             switch (func) {
                 case "setOnline":
@@ -277,7 +278,36 @@ function saveImageTrigger() {
     //Once triggered, check (condition) continuously until (condition) met
 }
 
+
+
 console.log("InstantPhoto had started!");
+
+//Set all room to offline upon exit
+process.on('SIGTERM', () => {
+    server.close(() => {
+      console.log('Server terminated');
+    })
+    //Iterate over existing room_id-s
+    client.query('SELECT room_id FROM availableroom;', function(err, result) {
+        done(err);
+  
+        if(err) {
+            //Will truncate all data inside table if failed to get room_id
+            client.query('TRUNCATE TABLE availableroom;');
+            return console.error('Error occured. Error msg:', err);
+        }
+  
+        forEach(result.rows, (row) => {
+          client.query(`UPDATE public.availableroom SET server = 'offline' WHERE room_id='${row.room_id}';`, function(err, result) {
+            done(err);
+  
+            if(err) {
+              return console.error('Unable to reset room, Error msg:', err);
+            }
+          });
+        });
+      });
+    });
 
 /*
 //required only if running on local machine

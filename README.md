@@ -30,8 +30,7 @@ Just clone this repo and now it's ready to go.
  1. Adding more features / plugins\
 	A. Auto lock room from host side to prevent 2 servers connecting same room\
 	B. Change sync mode to PDF mode\
-	C. Lock process when retrieving/processing images and unlock to save file\
-	D. Show current joined room at client side
+	C. Lock process when retrieving/processing images and unlock to save file
  2. Fix bug\
- A. Unable to paste images copied from browser
+ A. orientCheck unable to properly process pasted image\
  3. Make the whole damn code async and simplify the heck out of it
