@@ -24,8 +24,6 @@
 	<!-- Bootstrap dependencies -->
 	<link rel="stylesheet" href="./bootstrap.css">
 	<script src="./bootstrap.js"></script>
-	<!-- Custom Style -->
-	<link rel="stylesheet" href="./server.css">
   </head>
   <body>
 	<header>
@@ -45,7 +43,6 @@
 			<button type="button" class="btn btn-light mr-1" id="togglepptx" onclick="togglepptx()">Create PPTX : <span id="pptxgenjsstatus">Off</span></button>
 			<button type="button" class="btn btn-light mr-1" id="savepptx" onclick="savepptx()" disabled>Save PPTX</button>
 			<form style="float: right;position: relative" action="#" onsubmit="return false;">
-			<input type="file" id="e-warranty" style="display:none !important;"/>
 			<input type="text" name="GSPN" id="GSPNint" placeholder="S/O number:" disabled="disabled"/>	
 			</form>
 			<span id="ewanstat" style="position: relative;color: green;display:none">&#10004; E-Warranty Attached &#10004; </span>
@@ -107,6 +104,5 @@
 </footer>
   <!-- Client Code -->
   <script src="./dev.js"></script>
-  <script src="./server.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js" crossorigin="anonymous"></script>
 </html>

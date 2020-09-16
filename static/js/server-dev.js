@@ -2,10 +2,8 @@
 const _svppt = document.getElementById("savepptx");
 const _gpint = document.getElementById("GSPNint");
 const _pptstat = document.getElementById("pptxgenjsstatus");
-//const _togppt = document.getElementById("togglepptx"); //no longer in use
 const output = document.getElementById("download");
 const _pptxne = document.getElementById("pptxnotenabled");
-const _fileInput = document.getElementById("e-warranty");
 const _imgdown = document.getElementById("wannasavemou");
 const _nsi = document.getElementById("nosaveimage");
 const _ewanatt = document.getElementById("ewanstat");
@@ -42,8 +40,6 @@ function togglepptx() {
         _svppt.disabled = true;
         _gpint.value = "";
         _gpint.disabled = true;
-        _fileInput.value = "";
-        _fileInput.disabled = true;
         _ewanatt.style.display = "none";
         photocount = 0;
         rmtmb();
@@ -55,7 +51,6 @@ function togglepptx() {
         pptxenabled = true;
         _svppt.disabled = false;
         _gpint.disabled = false;
-        _fileInput.disabled = false;
         _pptxne.style.display = "none";
         _pptstat.innerHTML = "On";
         socket.emit("status",`Now adding photo ${photocount+1}`,room);
@@ -73,6 +68,9 @@ socket.on("transimage", function(buffallow) {
     let base64string = btoa([].reduce.call(new Uint8Array(buffallow),function(p,c){return p+String.fromCharCode(c)},''))
     let image = 'data:image/jpg;base64, ' + base64string;
     output.src = image;
+    if(logimgdata){
+        console.log(image);
+    }
     //Download image if enabled
     if (saveimg === true) {
         download(image, smartFilename(), "application/octet-stream;base64");
@@ -137,11 +135,26 @@ function addSlide(image) {
     // checking was done by outer func
     orientCheck(image).then(rotated_image => {
         if(logimgdata) {
-            _consoleLog(`Response: ${rotated_image}`);
+            console.log(`Response: ${rotated_image}`);
         }
+        let imgmeasures = new Image(); 
+        imgmeasures.onload = function() {
+            let ppt_width = 10, ppt_height = 5.6;
+            let img_width = (imgmeasures.width / 96).toFixed(2);
+            let img_height = (imgmeasures.height / 96).toFixed(2);
+            //_consoleLog(`Width: ${width}, Height: ${height}.`)
+            if (ppt_width/ppt_height > img_width/img_height) {
+                var width = ppt_height/img_height*img_width, height = ppt_height;
+            } else if (ppt_width/ppt_height < img_width/img_height) {
+                var width = ppt_width, height = ppt_width/img_width*img_height;
+            } else if (ppt_width/ppt_height == img_width/img_height) {
+                var width = img_width, height= img_height;
+            }
+            window.slide = pptx.addNewSlide();
+            slide.addImage({ data: rotated_image,w:width, h:height, sizing:{ type:'contain',w:10,h:5.6}});
+        }
+        imgmeasures.src = rotated_image;
         triggerthumbnail(rotated_image);
-        window.slide = pptx.addNewSlide();
-        slide.addImage({ data: rotated_image, x: 0, y: 0,sizing:{ type:'contain',w:10,h:5.6}});
         _header.innerHTML = `Added Image #${photocount}.`;
     });
 }
@@ -156,8 +169,6 @@ function savepptx() {
         _svppt.disabled = true;
         _gpint.value = "";
         _gpint.disabled = true;
-        _fileInput.value = "";
-        _fileInput.disabled = true;
         _ewanatt.style.display = "none";
         photocount = 0;
         socket.emit("status",`File saved. Please re-enable PPTXGenJS.`,room)
@@ -175,13 +186,11 @@ function saveimage() {
             saveimg = false;
             _imgdown.innerHTML = "No";
             _nsi.style.display = "block";
-            _fileInput.disabled = true;
             break;
         case false:
             saveimg = true;
             _imgdown.innerHTML = "Yes";
             _nsi.style.display = "none";
-            _fileInput.disabled = false;
             break;
     }}
 
@@ -235,8 +244,6 @@ async function orientCheck(data) {
         let img = new Image();
         img.crossOrigin="anonymous";
         img.src = data;
-        // Create a canvas object.
-        let canvas = document.createElement("canvas");
         // Wait till the image is loaded.
         img.onload = function(){
             if (img.height > img.width) {
@@ -244,10 +251,12 @@ async function orientCheck(data) {
                 rotateImage();
             } else {
                 _consoleLog(`Orientation correct,exit now`);
-                resolve(returnImg());
+                returnImg();
             }
         }
         let rotateImage = () => {
+            // Create a canvas object.
+            let canvas = document.createElement("canvas");
             // Create canvas context.
             let ctx = canvas.getContext("2d");
             // Assign width and height.
@@ -259,10 +268,10 @@ async function orientCheck(data) {
             canvas.setAttribute('width', cw);
             canvas.setAttribute('height', ch);
             ctx.rotate(90 * Math.PI / 180);
-            ctx.drawImage(output, cx, cy);
+            ctx.drawImage(img, cx, cy);
             _consoleLog(`Image rotation complete.`);
-            resolve(canvas.toDataURL("image/png"));
-            //canvas.toBlob((blobData)=>{ compressImg(blobData);});
+            //resolve(canvas.toDataURL("image/png"));
+            canvas.toBlob((blobData)=>{compressImg(blobData)});
         }
 
         let compressImg = (imgStream) => {
@@ -284,7 +293,7 @@ async function orientCheck(data) {
         }
 
         let returnImg = () => {
-            return data;
+            resolve(data);
         }
     });
 }
@@ -401,16 +410,19 @@ window.addEventListener("keydown", function(event) {
     }
 });
 
+//Sample: https://jsfiddle.net/ourcodeworld/hzvfq82b/
 window.addEventListener('paste', function(e) {
     clipboardData = e.clipboardData;
-    _fileInput.files = clipboardData.files;
-    const file = document.querySelector('input[type=file]').files[0];
-    const reader =  new FileReader();
+    let file = clipboardData.files[0];
+    let reader =  new FileReader();
     pastedData = clipboardData.getData('Text');
 
     if (file instanceof Blob) {
         reader.readAsDataURL(file);
         reader.onloadend = function () {
+            if(logimgdata){
+                console.log(reader.result);
+            }
             if (pptxenabled) {
                 addSlide(reader.result);
             }

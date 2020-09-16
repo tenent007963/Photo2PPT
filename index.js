@@ -255,6 +255,56 @@ io.on("connection", function(socket) {
         });
     }
 
+    //re-writing whole structure into proper function object
+    /*
+    async function roomFunc(func, val) {
+        val = val.trim();
+        return new Promise((resolve, reject) => {
+            switch (func) {
+                case "setOnline":
+                    try {
+                        //sample command: INSERT INTO availableroom (room_id, server, client) VALUES ('abCDe12345', 'online', 'N/A');
+                        client.query(`INSERT INTO public.availableroom (room_id, server, client) VALUES ('${val}', 'online', 'N/A');`, (err, res) => {
+                            if (err) {
+                                client.query(`UPDATE public.availableroom SET server = 'online' WHERE room_id='${val}';`, (err, res) => {
+                                    if (err) return reject(console.log(err));
+                                    resolve(res);
+                                });
+                            }
+                            resolve(res);
+                        });
+                    } catch (err) {
+                        reject(err);
+                    }
+                    console.log(`Record of ${val} updated to True.`);
+                    break;
+                case "setOffline":
+                    client.query(`UPDATE public.availableroom SET server = 'offline' WHERE room_id='${val}';`, (err, res) => {
+                        if (err) return reject(console.log(err));
+                        resolve(res);
+                    });
+                    break;
+                case "getStateOfServer":
+                    console.log(`Querying data from postgres for room ${val}.`);
+                    //sample command: SELECT server FROM public.availableroom WHERE room_id='abCDe12345';
+                    client.query(`SELECT server FROM public.availableroom WHERE room_id='${val}';`, (error, result) => {
+                        if (error) reject(console.log(error));
+                        //console.log(`Raw result from postgres:`,result);
+                        try {
+                            let query = result.rows[0].server;
+                            resolve(query.trim());
+                        } catch(err) {
+                            reject(err);
+                        }
+                    });
+                    break;
+                default:
+                    console.log(`Error occurred. Data:${func}, RoomID:${val}`);
+            }
+        });
+    }
+    */
+
 })
 
 function collectRequestData(request, callback) {

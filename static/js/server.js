@@ -2,10 +2,8 @@
 const _svppt = document.getElementById("savepptx");
 const _gpint = document.getElementById("GSPNint");
 const _pptstat = document.getElementById("pptxgenjsstatus");
-//const _togppt = document.getElementById("togglepptx"); //no longer in use
 const output = document.getElementById("download");
 const _pptxne = document.getElementById("pptxnotenabled");
-const _fileInput = document.getElementById("e-warranty");
 const _imgdown = document.getElementById("wannasavemou");
 const _nsi = document.getElementById("nosaveimage");
 const _ewanatt = document.getElementById("ewanstat");
@@ -42,8 +40,6 @@ function togglepptx() {
         _svppt.disabled = true;
         _gpint.value = "";
         _gpint.disabled = true;
-        _fileInput.value = "";
-        _fileInput.disabled = true;
         _ewanatt.style.display = "none";
         photocount = 0;
         rmtmb();
@@ -55,7 +51,6 @@ function togglepptx() {
         pptxenabled = true;
         _svppt.disabled = false;
         _gpint.disabled = false;
-        _fileInput.disabled = false;
         _pptxne.style.display = "none";
         _pptstat.innerHTML = "On";
         socket.emit("status",`Now adding photo ${photocount+1}`,room);
@@ -68,9 +63,14 @@ function togglepptx() {
 const socket = io();
 
 // new "transimage" socket - w/o room param
-socket.on("transimage", function(image) {
+socket.on("transimage", function(buffallow) {
     _consoleLog(`Image received, processing.`);
+    let base64string = btoa([].reduce.call(new Uint8Array(buffallow),function(p,c){return p+String.fromCharCode(c)},''))
+    let image = 'data:image/jpg;base64, ' + base64string;
     output.src = image;
+    if(logimgdata){
+        console.log(image);
+    }
     //Download image if enabled
     if (saveimg === true) {
         download(image, smartFilename(), "application/octet-stream;base64");
@@ -122,11 +122,6 @@ function refreshroom() {
     room = genRand(10);
     Cookies.set('room',room,{ expires: 31 ,path: ''});
 
-    // Join default channel "test" ,for debug only
-    /*
-    const room = "test";
-    */
-
     _roomindicator.innerHTML = room;
     _roomqr.innerHTML = "";
     genQR(room);
@@ -136,15 +131,30 @@ function refreshroom() {
 
 //Whenever adding a new slide, image data will parse into this function
 function addSlide(image) {
-    window.slide = pptx.addNewSlide();
     // Creating anonymous async func to check img orientation
     // checking was done by outer func
     orientCheck(image).then(rotated_image => {
         if(logimgdata) {
-            _consoleLog(`Response: ${rotated_image}`);
+            console.log(`Response: ${rotated_image}`);
         }
+        let imgmeasures = new Image(); 
+        imgmeasures.onload = function() {
+            let ppt_width = 10, ppt_height = 5.6;
+            let img_width = (imgmeasures.width / 96).toFixed(2);
+            let img_height = (imgmeasures.height / 96).toFixed(2);
+            //_consoleLog(`Width: ${width}, Height: ${height}.`)
+            if (ppt_width/ppt_height > img_width/img_height) {
+                var width = ppt_height/img_height*img_width, height = ppt_height;
+            } else if (ppt_width/ppt_height < img_width/img_height) {
+                var width = ppt_width, height = ppt_width/img_width*img_height;
+            } else if (ppt_width/ppt_height == img_width/img_height) {
+                var width = img_width, height= img_height;
+            }
+            window.slide = pptx.addNewSlide();
+            slide.addImage({ data: rotated_image,w:width, h:height, sizing:{ type:'contain',w:10,h:5.6}});
+        }
+        imgmeasures.src = rotated_image;
         triggerthumbnail(rotated_image);
-        slide.addImage({ data: rotated_image, x: 0, y: 0, w: 10, h: 5.6});
         _header.innerHTML = `Added Image #${photocount}.`;
     });
 }
@@ -159,8 +169,6 @@ function savepptx() {
         _svppt.disabled = true;
         _gpint.value = "";
         _gpint.disabled = true;
-        _fileInput.value = "";
-        _fileInput.disabled = true;
         _ewanatt.style.display = "none";
         photocount = 0;
         socket.emit("status",`File saved. Please re-enable PPTXGenJS.`,room)
@@ -178,13 +186,11 @@ function saveimage() {
             saveimg = false;
             _imgdown.innerHTML = "No";
             _nsi.style.display = "block";
-            _fileInput.disabled = true;
             break;
         case false:
             saveimg = true;
             _imgdown.innerHTML = "Yes";
             _nsi.style.display = "none";
-            _fileInput.disabled = false;
             break;
     }}
 
@@ -238,8 +244,6 @@ async function orientCheck(data) {
         let img = new Image();
         img.crossOrigin="anonymous";
         img.src = data;
-        // Create a canvas object.
-        let canvas = document.createElement("canvas");
         // Wait till the image is loaded.
         img.onload = function(){
             if (img.height > img.width) {
@@ -247,10 +251,12 @@ async function orientCheck(data) {
                 rotateImage();
             } else {
                 _consoleLog(`Orientation correct,exit now`);
-                resolve(returnImg());
+                returnImg();
             }
         }
         let rotateImage = () => {
+            // Create a canvas object.
+            let canvas = document.createElement("canvas");
             // Create canvas context.
             let ctx = canvas.getContext("2d");
             // Assign width and height.
@@ -262,10 +268,10 @@ async function orientCheck(data) {
             canvas.setAttribute('width', cw);
             canvas.setAttribute('height', ch);
             ctx.rotate(90 * Math.PI / 180);
-            ctx.drawImage(output, cx, cy);
+            ctx.drawImage(img, cx, cy);
             _consoleLog(`Image rotation complete.`);
-            //return canvas.toDataURL("image/png");
-            canvas.toBlob(function(blobData){ compressImg(blobData);});
+            //resolve(canvas.toDataURL("image/png"));
+            canvas.toBlob((blobData)=>{compressImg(blobData)});
         }
 
         let compressImg = (imgStream) => {
@@ -281,13 +287,13 @@ async function orientCheck(data) {
                     _consoleLog(err.message);
                 },
             });
-            fileReader.onloadend = function (event) {
+            fileReader.onloadend = (event) => {
                 resolve(event.target.result);
             }
         }
 
         let returnImg = () => {
-            return data;
+            resolve(data);
         }
     });
 }
@@ -359,7 +365,7 @@ function roomInit(){
 
 //Active listener for window
 
-//Listening to Hotkeys
+//Listening to Hotkeys & Keystrokes
 window.addEventListener("keydown", function(event) {
     switch(event.key) {
         case "Enter":
@@ -399,58 +405,40 @@ window.addEventListener("keydown", function(event) {
             saveimage();
             break;
         default:
-            _consoleLog(`${event.key}`);
+            //_consoleLog(`${event.key}`);
             break;
     }
 });
 
+//Sample: https://jsfiddle.net/ourcodeworld/hzvfq82b/
 window.addEventListener('paste', function(e) {
     clipboardData = e.clipboardData;
-    _fileInput.files = clipboardData.files;
-    const file = document.querySelector('input[type=file]').files[0];
-    const reader =  new FileReader();
+    let file = clipboardData.files[0];
+    let reader =  new FileReader();
     pastedData = clipboardData.getData('Text');
 
-    if (pptxenabled) {
-        _consoleLog(`Detecting input type`);
-        if (pastedData) {
-            _consoleLog(`Detected input as text`);
-            setTimeout(function(){
-                if (_gpint.value === pastedData) {
-                    return false;
-                } else {
-                    _gpint.value = pastedData;
-                    return false;
-                }},100);
-        } else if (file instanceof Blob) {
-            _consoleLog(`Detected input as blob`);
-            reader.readAsDataURL(file);
-            reader.onloadend = function () {
-                let ewanss = reader.result;
-                addSlide(ewanss);
-                if (saveimg === true) {
-                    download(ewanss, smartFilename(), "application/octet-stream;base64");
-                }
+    if (file instanceof Blob) {
+        reader.readAsDataURL(file);
+        reader.onloadend = function () {
+            if(logimgdata){
+                console.log(reader.result);
             }
-            _ewanatt.style.display = "block";
-        } else {
-            _consoleLog(`Unknown input type, aborting.`);
-            reader.abort();
-        }
-    } else if(saveimg) {
-        if (file instanceof Blob) {
-            reader.readAsDataURL(file);
-            reader.onloadend = function () {
-                let pastedImg = reader.result;
-                download(pastedImg, smartFilename(), "application/octet-stream;base64");
+            if (pptxenabled) {
+                addSlide(reader.result);
             }
-        } else {
-            _consoleLog(`Unknown input type, aborting.`);
-            reader.abort();
-        }
+            if (saveimg) {
+                download(reader.result, smartFilename(), "application/octet-stream;base64");
+            }
+            if(!pptxenabled && !saveimg) {
+                alert("PPTXGenJS not enabled!");
+            }
+        } 
+    } else if (pastedData && pptxenabled) {
+        _gpint.value = pastedData.trim();
     } else {
         alert("PPTXGenJS not enabled!");
     }
+
 });
 
 
