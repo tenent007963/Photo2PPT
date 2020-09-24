@@ -34,17 +34,34 @@ if(isDebug) {
 
     document.getElementsByTagName('head')[0].appendChild(loadStyle);
 } else {
-    var loadScript = document.createElement('script');
-    loadScript.type = "text/javascript";
-    loadScript.src = "server.js";
-    loadScript.async = "true";
+    if (window.location.href.match(/pc/g)) {
+        var loadScript = document.createElement('script');
+        loadScript.type = "text/javascript";
+        loadScript.src = "server.js";
+        loadScript.async = "true";
 
-    document.getElementsByTagName('head')[0].appendChild(loadScript);
+        document.getElementsByTagName('head')[0].appendChild(loadScript);
 
-    // CSS
-    var loadStyle = document.createElement('link');
-    loadStyle.rel = "stylesheet";
-    loadStyle.href = "/client.css";
+        // CSS
+        var loadStyle = document.createElement('link');
+        loadStyle.rel = "stylesheet";
+        loadStyle.href = "/server.css";
 
-    document.getElementsByTagName('head')[0].appendChild(loadStyle);
+        document.getElementsByTagName('head')[0].appendChild(loadStyle);
+    } else if (window.location.href.match(/phone/g)) {
+        var loadScript = document.createElement('script');
+        loadScript.type = "text/javascript";
+        loadScript.src = "client.js";
+        loadScript.async = "true";
+
+        document.getElementsByTagName('head')[0].appendChild(loadScript);
+
+        // CSS
+        var loadStyle = document.createElement('link');
+        loadStyle.rel = "stylesheet";
+        loadStyle.href = "/client.css";
+
+        document.getElementsByTagName('head')[0].appendChild(loadStyle);
+    }
+    console.log('Normal Env.');
 }

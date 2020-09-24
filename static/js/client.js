@@ -11,11 +11,6 @@ let _roomCodeInput = document.getElementById("roomCode");
 let _roomIndicator = document.getElementById("roomindicator");
 
 // Join a channel
-/* Debug code
-let room = "test";
-let rm = "0";
-socket.emit("join", room);
- */
 let room;
 let cameraId;
 
@@ -33,17 +28,19 @@ let cameraId;
         // Determine input type
         if (file instanceof Blob) {
             // Check for file size (in kb)
-            fileSize = (file.size / 1024).toFixed(3);
+            //fileSize = (file.size / 1024).toFixed(3); //not really used
             // Add line for compressing image data here
             new Compressor(file, {
                 quality: 0.6,
                 checkOrientation: false,
                 success(result) {
                     // Read file
-                    fileReader.readAsDataURL(result);
+                    //fileReader.readAsDataURL(result);  //Previously read as DataURL
+                    fileReader.readAsArrayBuffer(result);//Now I want to read as blob data
                 },
                 error(err) {
                     _consoleLog(err.message);
+                    _status.textContent = err.message;
                 },
             });
         }
@@ -117,7 +114,8 @@ function leaveroom(rm){
 
 //Initialize QR Scanner
 function onScanSuccess(qrCodeMessage) {
-    joinroom(qrCodeMessage);
+    let thecode = qrCodeMessage.trim();
+    joinroom(thecode.slice(0,10));
     html5Qrcode.clear().then(ignore => {
         // QR Code scanning is stopped.
     }).catch(err => {
@@ -156,6 +154,12 @@ Html5Qrcode.getCameras().then(devices => {
 
 const html5Qrcode = new Html5QrcodeScanner("reader", { fps: 30 });
 html5Qrcode.render(onScanSuccess, onScanFailure);
+
+//This function is to do a clean reload and cookie flushing
+let cleanReload = () => {
+    Cookies.remove('room', { path: '' })
+    window.location.reload();
+}
 
 //Check socket connection upon window.onfocus
 window.onfocus = () => {

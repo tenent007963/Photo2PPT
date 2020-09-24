@@ -31,5 +31,5 @@ Just clone this repo and now it's ready to go.
 	A. Auto lock room from host side to prevent 2 servers connecting same room\
 	B. Change sync mode to PDF mode\
 	C. Lock process when retrieving/processing images to prevent saving empty slide
+	D. Adding Tech mode
  2. Make the whole damn code async and simplify the heck out of it
- 3. Ultimately replace room query with fab getter and setter

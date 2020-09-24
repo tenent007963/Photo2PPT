@@ -62,43 +62,43 @@ let server=http.createServer(function(req,res){
 		break;
         case '/html5-qrcode.min.js':
             fs.readFile(__dirname + '/static/js/html5-qrcode.min.js', 'utf8', fsCallback);
-            break;
+        break;
         case '/keepalive':
             fs.readFile(__dirname + '/static/keepalive.txt', 'utf8', fsCallback);
-            break;
+        break;
         case '/server.js':
             fs.readFile(__dirname + '/static/js/server.js', 'utf8', fsCallback);
-            break;
+        break;
         case '/client.js':
             fs.readFile(__dirname + '/static/js/client.js', 'utf8', fsCallback);
-            break;
+        break;
         case '/server-dev.js':
             fs.readFile(__dirname + '/static/js/server-dev.js', 'utf8', fsCallback);
-            break;
+        break;
         case '/client-dev.js':
             fs.readFile(__dirname + '/static/js/client-dev.js', 'utf8', fsCallback);
-            break;
+        break;
         case '/server.css':
             fs.readFile(__dirname + '/static/css/server.css', 'utf8', fsCallback);
-            break;
+        break;
         case '/client.css':
             fs.readFile(__dirname + '/static/css/client.css', 'utf8', fsCallback);
-            break;
+        break;
         case '/server-dev.css':
             fs.readFile(__dirname + '/static/css/server-dev.css', 'utf8', fsCallback);
-            break;
+        break;
         case '/client-dev.css':
             fs.readFile(__dirname + '/static/css/client-dev.css', 'utf8', fsCallback);
-            break;
+        break;
         case '/dev.js':
             fs.readFile(__dirname + '/static/js/dev.js', 'utf8', fsCallback);
-            break;
+        break;
         case '/papertrail':
             collectRequestData(req, result => {
                 console.log(`Response from ${result['room']} with message '${result['msg']}'`);
             });
             fsCallback(null,`Confirmation of receiving, timestamp: ${Math.floor(+new Date() / 1000)}`);
-            break;
+        break;
         default:
             /* doc = */ fs.readFile(__dirname + '/static/index.html', 'utf8', fsCallback);
         break;
@@ -118,19 +118,20 @@ io.on("connection", function(socket) {
         switch (data) {
             case "isOnline":
                 console.log(`Received "isOnline" packet, updating ${room} record on host side.`);
-                roomFunc('setOnline', room);
+                // Do room check here to see if duplication exist
+                rooms.setServerOnline(room);
                 // check if connection is dropped, method 1
                 if (socket.disconnected) {
                     console.log(`Server side of ${room} disconnected, updating ${room} record.`);
-                    roomFunc('setOffline', room);
+                    rooms.setServerOffline(room);
                 }
                 socket.on('disconnect', function (reason) {
                     console.log(`Socket for ${room} disconnected, updating ${room} record. Reason:${reason}`);
-                    roomFunc('setOffline', room);
+                    rooms.setServerOffline(room);
                 });
                 break;
             case "keepAlive":
-                roomFunc('setOnline', room);
+                rooms.setServerOnline(room);
                 break;
             default:
                 //Do nothing
@@ -140,6 +141,7 @@ io.on("connection", function(socket) {
 
     // Register "client" events sent by client ONLY
     socket.on("client", (data, room, callback) => {
+        room =  room.trim();
         console.log(`Received request from client side.`);
         if(room === undefined|| room === '') {
             callback({serverIsOnline:'error'});
@@ -149,8 +151,8 @@ io.on("connection", function(socket) {
         switch (data) {
             case "check":
                 console.log(`Determined request type.`);
-                roomFunc('getStateOfServer', room).then(res => {
-                    console.log(`Returned value for ${room}: ${res}.`);
+                rooms.getStateOfServer(room).then(res => {
+                    console.log(`Returned value for ${room}: ${JSON.stringify(res)}.`);
                         if (res === 'online') {
                             console.log(`Parse request to server side of ${room}.`);
                             socket.broadcast.to(room).emit("status", data);
@@ -176,12 +178,14 @@ io.on("connection", function(socket) {
 
     // Handle and broadcast "status" events
     socket.on("status", (data, room) => {
+        room =  room.trim();
         console.log(`Parsing status..`)
         socket.broadcast.to(room).emit("status", data);
     });
 
     // Register "join" events, requested by a connected client
     socket.on("join", function (room) {
+        room =  room.trim();
         // join channel provided by client
         socket.room = room;
         socket.join(room);
@@ -195,7 +199,6 @@ io.on("connection", function(socket) {
 
     //Spare disconnect function to reset room status
     socket.on("disconnect", function (room) {
-        roomFunc('setOffline', room);
         console.log(`Room ${room} disconnected.`);
     })
 
@@ -208,102 +211,40 @@ io.on("connection", function(socket) {
         callback({isSuccess: true});
     });
 
-    async function roomFunc(func, val) {
-        val = val.trim();
-        return new Promise((resolve, reject) => {
-            switch (func) {
-                case "setOnline":
-                    try {
-                        //sample command: INSERT INTO availableroom (room_id, server, client) VALUES ('abCDe12345', 'online', 'N/A');
-                        client.query(`INSERT INTO public.availableroom (room_id, server, client) VALUES ('${val}', 'online', 'N/A');`, (err, res) => {
-                            if (err) {
-                                client.query(`UPDATE public.availableroom SET server = 'online' WHERE room_id='${val}';`, (err, res) => {
-                                    if (err) return reject(console.log(err));
-                                    resolve(res);
-                                });
-                            }
-                            resolve(res);
-                        });
-                    } catch (err) {
-                        reject(err);
-                    }
-                    console.log(`Record of ${val} updated to True.`);
-                    break;
-                case "setOffline":
-                    client.query(`UPDATE public.availableroom SET server = 'offline' WHERE room_id='${val}';`, (err, res) => {
-                        if (err) return reject(console.log(err));
-                        resolve(res);
-                    });
-                    break;
-                case "getStateOfServer":
-                    console.log(`Querying data from postgres for room ${val}.`);
-                    //sample command: SELECT server FROM public.availableroom WHERE room_id='abCDe12345';
-                    client.query(`SELECT server FROM public.availableroom WHERE room_id='${val}';`, (error, result) => {
-                        if (error) reject(console.log(error));
-                        //console.log(`Raw result from postgres:`,result);
-                        try {
-                            let query = result.rows[0].server;
-                            resolve(query.trim());
-                        } catch(err) {
-                            reject(err);
-                        }
-                    });
-                    break;
-                default:
-                    console.log(`Error occurred. Data:${func}, RoomID:${val}`);
-            }
-        });
-    }
-
     //re-writing whole structure into proper function object
-    /*
-    async function roomFunc(func, val) {
-        val = val.trim();
-        return new Promise((resolve, reject) => {
-            switch (func) {
-                case "setOnline":
-                    try {
-                        //sample command: INSERT INTO availableroom (room_id, server, client) VALUES ('abCDe12345', 'online', 'N/A');
-                        client.query(`INSERT INTO public.availableroom (room_id, server, client) VALUES ('${val}', 'online', 'N/A');`, (err, res) => {
-                            if (err) {
-                                client.query(`UPDATE public.availableroom SET server = 'online' WHERE room_id='${val}';`, (err, res) => {
-                                    if (err) return reject(console.log(err));
-                                    resolve(res);
-                                });
-                            }
-                            resolve(res);
+    var rooms = {
+        setServerOnline : async function(val) {
+            try {
+                //sample command: INSERT INTO availableroom (room_id, server, client) VALUES ('abCDe12345', 'online', 'N/A');
+                client.query(`INSERT INTO public.availableroom (room_id, server, client) VALUES ('${val}', 'online', 'N/A');`, (err, res) => {
+                    if (err) {
+                        client.query(`UPDATE public.availableroom SET server = 'online' WHERE room_id='${val}';`, (err, res) => {
+                        if (err) console.log(err);
+                        console.log(res);
                         });
-                    } catch (err) {
-                        reject(err);
                     }
-                    console.log(`Record of ${val} updated to True.`);
-                    break;
-                case "setOffline":
-                    client.query(`UPDATE public.availableroom SET server = 'offline' WHERE room_id='${val}';`, (err, res) => {
-                        if (err) return reject(console.log(err));
-                        resolve(res);
-                    });
-                    break;
-                case "getStateOfServer":
-                    console.log(`Querying data from postgres for room ${val}.`);
-                    //sample command: SELECT server FROM public.availableroom WHERE room_id='abCDe12345';
-                    client.query(`SELECT server FROM public.availableroom WHERE room_id='${val}';`, (error, result) => {
-                        if (error) reject(console.log(error));
-                        //console.log(`Raw result from postgres:`,result);
-                        try {
-                            let query = result.rows[0].server;
-                            resolve(query.trim());
-                        } catch(err) {
-                            reject(err);
-                        }
-                    });
-                    break;
-                default:
-                    console.log(`Error occurred. Data:${func}, RoomID:${val}`);
+                    console.log(res);
+                });
+            } catch (err) {
+                console.log(err);
             }
-        });
+            console.log(`Record of ${val} updated to True.`);
+        },
+        setServerOffline : async function(val) {
+            let query = client.query(`UPDATE public.availableroom SET server = 'offline' WHERE room_id='${val}';`);
+            let result = await query;
+            console.log(`Record of ${val} updated to False, result = ${JSON.stringify(result.rowCount)}`);
+            return await result.rowCount;
+        },
+        getStateOfServer : async function(val) {
+            console.log(`Querying data from postgres for room ${val}.`);
+            //sample command: SELECT server FROM public.availableroom WHERE room_id='abCDe12345';
+            let query = client.query(`SELECT server FROM public.availableroom WHERE room_id='${val}';`);
+            let result = await query;
+            return await result.rows[0].server.trim();
+        }
+
     }
-    */
 
 })
 
