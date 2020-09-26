@@ -220,10 +220,12 @@ io.on("connection", function(socket) {
                     if (err) {
                         client.query(`UPDATE public.availableroom SET server = 'online' WHERE room_id='${val}';`, (err, res) => {
                         if (err) console.log(err);
-                        console.log(JSON.stringify(res.rowCount));
+                        console.log(`Record of ${val} updated to False, result = ${JSON.stringify(res.rowCount)}.`);
                         });
                     }
-                    console.log(JSON.stringify(res.rowCount));
+                    if (res) {
+                        console.log(`Record of ${val} updated to False, result = ${JSON.stringify(res.rowCount)}.`);
+                    }
                 });
             } catch (err) {
                 console.log(err);
