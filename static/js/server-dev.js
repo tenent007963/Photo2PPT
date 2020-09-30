@@ -23,14 +23,14 @@ const _cs = document.getElementById("cs");
 const _tech = document.getElementById("tech");
 
 //Initialize elements
-let pptxenabled = false;
-let saveimg = false;
-let optenb = false;
-let photocount = 0;
-let latencycount = 0;
-let room;
-let logping = false;
-let logimgdata = false;
+var pptxenabled = false;
+var saveimg = false;
+var optenb = false;
+var photocount = 0;
+var latencycount = 0;
+var room;
+var logping = false;
+var logimgdata = false;
 
 //Enable PPTXGenJS...or not?
 function togglepptx() {
@@ -113,20 +113,13 @@ async function genQR(data) {
     qrcode.makeCode(data);
 }
 
-
 //Refresh Room
 function refreshroom() {
+    room = genRand(10);
     if (socket.connected && room) {
         socket.emit("leave", room);
     }
-    room = genRand(10);
-    Cookies.set('room',room,{ expires: 31 ,path: ''});
-
-    _roomindicator.innerHTML = room;
-    _roomqr.innerHTML = "";
-    genQR(room);
-    socket.emit("join", room);
-    socket.emit("server","isOnline",room);
+    roomChk(room);
 }
 
 //Whenever adding a new slide, image data will parse into this function
@@ -313,46 +306,37 @@ function initTech() {
     Cookies.set('mode', 'tech',{ expires: 31,path: ''});
 }
 
-// Room Pre-initialize, load cookies and other presets from last session
+// Window Pre-initialize, load cookies and other presets from last session
 function checkRoomInitialize() {
-    try {
-        //check isDebug environment
-        if (isDebug) {
-            window.document.title = "InstantPhoto - Server(Development)";
-        }
-        //Socket room initialization
-        let getRoom = Cookies.get('room');
-        if (!getRoom) {
-            refreshroom();
-            _consoleLog(`Joining new room`);
-        } else {
-            roomConnect(getRoom);
-            _header.innerHTML = 'Joining old room, room code: ' + getRoom + '.';
-            _consoleLog(`Joining old room, room code: ${getRoom}`)
-        }
-        //Mode checking
-        let getMode = Cookies.get('mode');
-        switch(getMode){
-            case "cs":
-                initCS();
-                _consoleLog(`Init CS Mode.`);
-                break;
-            case "tech":
-                initTech();
-                _consoleLog(`Init Tech Mode.`);
-                break;
-            default:
-                break;
-        }
-        _consoleLog(`Server Preparation done.`);
+    //check isDebug environment
+    if (isDebug) {
+        window.document.title = "InstantPhoto - Server(Development)";
     }
-    catch (err) {
-        _mainContainer.innerHTML = err.message;
-        setTimeout(()=>{location.reload()}, 2500);
+    //Socket room initialization
+    let getRoom = Cookies.get('room');
+    if (!getRoom) {
+        refreshroom();
+    } else {
+        roomChk(getRoom);
     }
+    //Mode checking
+    let getMode = Cookies.get('mode');
+    switch(getMode){
+        case "cs":
+            initCS();
+            _consoleLog(`Init CS Mode.`);
+            break;
+        case "tech":
+            initTech();
+            _consoleLog(`Init Tech Mode.`);
+            break;
+        default:
+            break;
+    }
+    _consoleLog(`Server Preparation done.`);
 }
 
-// Room initialization
+// Window initialization
 function roomInit(){
     _initContainer.style.display = "none";
     _mainContainer.style.display = "block";
@@ -361,7 +345,10 @@ function roomInit(){
     _consoleLog(`Server ready.`);
 }
 
-
+function saveImageTrigger() {
+    //To execute if triggered by save event 
+    //Once triggered, check (condition) continuously until (condition) met
+}
 
 //Active listener for window
 
@@ -534,21 +521,33 @@ function _log(opt) {
 
 // Below are all socket functions / connections
 
+//To check room availability
+async function roomChk(val) {
+    _consoleLog(`Checking room availability...`);
+    socket.emit('roomChk',val,(bc) => { 
+        let res = bc.result;
+        if (res === 'ok') {
+            roomConnect(val);
+            _consoleLog(`Joining local generated room.`)
+        } else {
+            roomConnect(res);
+            _consoleLog(`Joining server provided room.`);
+        }
+    })
+}
+
 //Function to manual call socket connect
 function roomConnect(val) {
-    try {
-        room = val;
-        socket.connect();
-        socket.emit('join', val);
-        genQR(val);
-        socket.emit("server","isOnline",val);
-        _roomindicator.innerHTML = room;
-        _consoleLog(`Old session reconnected.`)
-        return true;
-    } catch(err) {
-        return err;
-    }
+    room = val;
+    socket.emit("server","isOnline",val);
+    _roomqr.innerHTML = "";
+    genQR(val);
+    _roomindicator.innerHTML = val;
+    _header.innerHTML = 'Joining room: ' + val + '.';
+    Cookies.set('room',room,{ expires: 31 ,path: ''});
 }
+
+
 
 // Upon socket disconnection
 socket.on('disconnect', function(){
@@ -593,10 +592,10 @@ socket.on('pong', function(ping) {
     //Prompt if latency over acceptable threshold
     if (ping >= 550) {
         latencycount++;
-        if (latencycount >= 4) {
+        if (latencycount >= 3) {
             _latency.style.color = "red";
         }
-        if (latencycount >= 7) {
+        if (latencycount >= 5) {
             alert('High latency detected, some functions might not working properly.');
         }
     }
@@ -610,7 +609,14 @@ socket.on('pong', function(ping) {
 //Preserve area
 
 // noinspection JSValidateTypes
-window.onload = checkRoomInitialize();
+window.onload = function(){
+    try {
+        checkRoomInitialize()
+    } catch (err) {
+    _mainContainer.innerHTML = err.message;
+    setTimeout(()=>{location.reload()}, 2500);
+    }
+}
 
 //Small cheat code to make sure heroku dyno doesn't go idling when user is connected
 function httpGetAsync(theUrl, callback)
@@ -629,7 +635,7 @@ setInterval((function() {
     function loop() {
         socket.emit("server","keepAlive",room);
         httpGetAsync('/keepalive',function(res){
-            _consoleLog(`Keepalive status from host: ${res}`);
+            console.log(`Keepalive status from host: ${res}`);
         })
     }
     loop();

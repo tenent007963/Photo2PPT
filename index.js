@@ -3,7 +3,6 @@ const fs = require('fs');
 const http=require('http');
 const url=require('url');
 const {Client} = require('pg'); //Postgres
-//const monitorio = require('monitor.io'); // Monitoring each socket connection if possible, ref 'https://drewblaisdell.github.io/monitor.io/'
 const { parse } = require('querystring');
 
 const PORT = process.env.PORT || 3000;
@@ -16,7 +15,7 @@ const client = new Client({
 client.connect();
 client.query('CREATE TABLE IF NOT EXISTS availableroom (room_id CHAR(11) PRIMARY KEY, server CHAR(8), client CHAR(8));', (err, res) => {
     if (err) throw err;
-    //console.log(`Raw result from postgres:`,res);
+    console.log(`Result from postgres:`,res.command);
 });
 
 //https://nodejs.org/en/docs/guides/anatomy-of-an-http-transaction/
@@ -110,28 +109,24 @@ let server=http.createServer(function(req,res){
 const io = require('socket.io').listen(server,{pingInterval: 5000,pingTimeout: 60000,autoConnect: true});
 
 // Register "connection" events to the WebSocket
-io.on("connection", function(socket) {
+io.on("connection", async function(socket) {
 
     // Register "server" events sent by server ONLY
-    socket.on("server", (data, room) => {
+    socket.on("server", (data, room, callback) => {
         // check for sent data
         switch (data) {
             case "isOnline":
                 console.log(`Received "isOnline" packet, updating ${room} record on host side.`);
-                // Do room check here to see if duplication exist
+                socket.room = room;
+                socket.join(room);
                 rooms.setServerOnline(room);
-                // check if connection is dropped, method 1
-                if (socket.disconnected) {
-                    console.log(`Server side of ${room} disconnected, updating ${room} record.`);
-                    rooms.setServerOffline(room);
-                }
                 socket.on('disconnect', function (reason) {
                     console.log(`Socket for ${room} disconnected, updating ${room} record. Reason:${reason}`);
                     rooms.setServerOffline(room);
                 });
                 break;
             case "keepAlive":
-                rooms.setServerOnline(room);
+                rooms.keepServerOnline(room);
                 break;
             default:
                 //Do nothing
@@ -176,6 +171,25 @@ io.on("connection", function(socket) {
         }
     });
 
+    socket.on('roomChk',(room,callback) => {
+                rooms.checkAvailability(room).then(res => {
+                    if (res === 0) {
+                        console.log(`Room ${room} is available.`);
+                        callback({result:'ok'});
+                    } else if (res === 1) {
+                        rooms.getStateOfServer(room).then(res1 => {
+                            if (res1 === 'online') {
+                                console.log(`Room ${room} is not available.`);
+                                callback({result:genRand(9)});
+                            } else {
+                                console.log(`Room ${room} is available.`);
+                                callback({result:'ok'});
+                            }
+                        })
+                    }
+                });
+    })
+
     // Handle and broadcast "status" events
     socket.on("status", (data, room) => {
         room =  room.trim();
@@ -211,44 +225,47 @@ io.on("connection", function(socket) {
         callback({isSuccess: true});
     });
 
-    //re-writing whole structure into proper function object
-    var rooms = {
-        setServerOnline : async function(val) {
-            try {
-                //sample command: INSERT INTO availableroom (room_id, server, client) VALUES ('abCDe12345', 'online', 'N/A');
-                client.query(`INSERT INTO public.availableroom (room_id, server, client) VALUES ('${val}', 'online', 'N/A');`, (err, res) => {
-                    if (err) {
-                        client.query(`UPDATE public.availableroom SET server = 'online' WHERE room_id='${val}';`, (err, res) => {
-                        if (err) console.log(err);
-                        console.log(`Record of ${val} updated to False, result = ${JSON.stringify(res.rowCount)}.`);
-                        });
-                    }
-                    if (res) {
-                        console.log(`Record of ${val} updated to False, result = ${JSON.stringify(res.rowCount)}.`);
-                    }
-                });
-            } catch (err) {
-                console.log(err);
-            }
-            console.log(`Record of ${val} updated to True.`);
-        },
-        setServerOffline : async function(val) {
-            let query = client.query(`UPDATE public.availableroom SET server = 'offline' WHERE room_id='${val}';`);
-            let result = await query;
-            console.log(`Record of ${val} updated to False, result = ${JSON.stringify(result.rowCount)}`);
-            return await result.rowCount;
-        },
-        getStateOfServer : async function(val) {
-            console.log(`Querying data from postgres for room ${val}.`);
-            //sample command: SELECT server FROM public.availableroom WHERE room_id='abCDe12345';
-            let query = client.query(`SELECT server FROM public.availableroom WHERE room_id='${val}';`);
-            let result = await query;
-            return await result.rows[0].server.trim();
-        }
-
-    }
-
 })
+
+//re-writing whole structure into proper function object
+var rooms = {
+    setServerOnline : async function(val) {
+        //sample command: INSERT INTO availableroom (room_id, server, client) VALUES ('abCDe12345', 'online', 'N/A');
+        client.query(`INSERT INTO public.availableroom (room_id, server, client) VALUES ('${val}', 'online', 'N/A');`, (err, res) => {
+            if (err) {
+                rooms.keepServerOnline(val);
+            }
+            if (res) {
+                console.log(`Created record for ${val}, result = ${JSON.stringify(res.rowCount)}.`);
+            }
+        });
+    },
+    keepServerOnline : async function(val) {
+        let query = client.query(`UPDATE public.availableroom SET server = 'online' WHERE room_id='${val}';`);
+        let result = await query;
+        console.log(`Record of ${val} updated to True, result = ${JSON.stringify(result.rowCount)}.`);
+        return await result.rowCount;
+    },
+    setServerOffline : async function(val) {
+        let query = client.query(`UPDATE public.availableroom SET server = 'offline' WHERE room_id='${val}';`);
+        let result = await query;
+        console.log(`Record of ${val} updated to False, result = ${JSON.stringify(result.rowCount)}.`);
+        return await result.rowCount;
+    },
+    getStateOfServer : async function(val) {
+        console.log(`Querying data from postgres for room ${val}.`);
+        //sample command: SELECT server FROM public.availableroom WHERE room_id='abCDe12345';
+        let query = client.query(`SELECT server FROM public.availableroom WHERE room_id='${val}';`);
+        let result = await query;
+        return await result.rows[0].server.trim();
+    },
+    checkAvailability : async function(val) {
+        console.log(`Checking room availability for room ${val}.`);
+        let query = client.query(`SELECT server FROM public.availableroom WHERE room_id='${val}';`);
+        let result = await query;
+        return await result.rowCount;
+    }
+} 
 
 function collectRequestData(request, callback) {
     const CONTENT_TYPE = 'application/json';
@@ -266,12 +283,14 @@ function collectRequestData(request, callback) {
     }
 }
 
-function saveImageTrigger() {
-    //To execute if triggered by socket.emit('save')
-    //Once triggered, check (condition) continuously until (condition) met
+function genRand(len) {
+    const hash = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ12346789";
+    let randomStr = '';
+    for(let i = 0; i < len; i++){
+        randomStr += hash[parseInt(Math.random()*hash.length)];
+    }
+    return randomStr;
 }
-
-
 
 console.log("InstantPhoto had started!");
 
@@ -282,20 +301,18 @@ process.on('SIGTERM', () => {
     })
     //Iterate over existing room_id-s
     client.query('SELECT room_id FROM availableroom;', function(err, result) {
-        done(err);
   
         if(err) {
             //Will truncate all data inside table if failed to get room_id
             client.query('TRUNCATE TABLE availableroom;');
-            return console.error('Error occured. Error msg:', err);
+            console.error('Error occured. Error msg:', err);
         }
   
         forEach(result.rows, (row) => {
           client.query(`UPDATE public.availableroom SET server = 'offline' WHERE room_id='${row.room_id}';`, function(err, result) {
-            done(err);
-  
+            console.log(result);
             if(err) {
-              return console.error('Unable to reset room, Error msg:', err);
+              console.error('Unable to reset room, Error msg:', err);
             }
           });
         });
