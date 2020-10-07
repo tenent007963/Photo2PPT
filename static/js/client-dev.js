@@ -190,6 +190,35 @@ window.onfocus = () => {
     }
 }
 
+function fadeOutEffect(target) {
+    var fadeTarget = document.getElementById(target);
+    var fadeEffect = setInterval(function () {
+        if (!fadeTarget.style.opacity) {
+            fadeTarget.style.opacity = 1;
+        }
+        if (fadeTarget.style.opacity > 0) {
+            fadeTarget.style.opacity -= 0.1;
+        } else {
+            clearInterval(fadeEffect);
+            fadeTarget.style.display = "none";
+        }
+    }, 20);
+}
+
+function fadeInEffect(target) {
+    var fadeTarget = document.getElementById(target);
+    var ment = 1;
+    var fadeEffect = setInterval(function () {
+        if (ment < 11) {
+            fadeTarget.style.opacity = (ment / 10) ;
+            ment++;
+        } else {
+            clearInterval(fadeEffect);
+        }
+    }, 40);
+}
+
+
 //AJAX Codes
 $(".custom-file-input").on("change", function() {
     let fileName = $(this).val().split("\\").pop();
@@ -256,6 +285,7 @@ function checkStatus() {
 }
 
 window.onload = () => {
+    fadeOutEffect("loading");
     if (isDebug) {
         window.document.title = "InstantPhoto - Client(Development)";
     }
@@ -266,4 +296,5 @@ window.onload = () => {
         joinroom(getRoom);
         _consoleLog(`Joining old room, room code: ${getRoom}`)
     }
+    fadeInEffect("contents");
 }

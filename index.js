@@ -41,11 +41,8 @@ let server=http.createServer(function(req,res){
 		case '/phone':
             fs.readFile(__dirname + '/static/client-source.html', 'utf8', fsCallback);
         break;
-		case '/pdf':
-            fs.readFile(__dirname + '/static/pdf.html', 'utf8', fsCallback);
-        break;
-		case '/favicon':
-            fs.readFile(__dirname + '/static/favicon.ico', 'utf8', fsCallback);
+		case '/favicon.ico':
+            fs.readFile(__dirname + '/static/favicon.ico', fsCallback);
         break;
 		case '/jquery.js':
             fs.readFile(__dirname + '/static/js/jquery-3.5.1.min.js', 'utf8', fsCallback);

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
 	<meta http-equiv="Cache-control" content="no-cache">
     <title>InstantPhoto - Server</title>
-    <link rel="icon" href="./favicon">
+    <link rel="icon" href="./favicon.ico">
     <script src="/socket.io/socket.io.js"></script>
     <!-- Download.js -->
 	<script src="//cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.js"></script>
@@ -43,12 +43,12 @@
 			<button type="button" class="btn btn-light mr-1" id="togglepptx" onclick="togglepptx()">Create PPTX : <span id="pptxgenjsstatus">Off</span></button>
 			<button type="button" class="btn btn-light mr-1" id="savepptx" onclick="savepptx()" disabled>Save PPTX</button>
 			<form style="float: right;position: relative" action="#" onsubmit="return false;">
-			<input type="text" name="GSPN" id="GSPNint" placeholder="S/O number:" disabled="disabled"/>	
+			<input type="text" name="GSPN" id="GSPNint" placeholder="S/O number:" onpaste="return false;" disabled="disabled"/>	
 			</form>
 			<span id="ewanstat" style="position: relative;color: green;display:none">&#10004; E-Warranty Attached &#10004; </span>
 		</div>
 		<div class="btn-toolbar topbar" role="toolbar" aria-label="Normal toolbar for tech" id="tech" style="display:none">
-
+			<!-- Tech mode toolbar -->
 		</div>
 		<div class="head" id="top"> 
 			<h5 id="head">Waiting input on client side...</h5>

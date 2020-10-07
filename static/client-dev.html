@@ -5,7 +5,7 @@
 	<meta content="no-cache, no-store, must-revalidate" http-equiv="Cache-Control">
 	<meta name="viewport" content="initial-scale=1.5,maximum-scale=3,user-scalable=no"/>
     <title>InstantPhoto - Client</title>
-    <link rel="icon" href="./favicon">
+    <link rel="icon" href="./favicon.ico">
     <script src="/socket.io/socket.io.js"></script>
 	<script src="/compressor.js"></script>
 	<script src="./jquery.js"></script>
@@ -25,17 +25,21 @@
 			</div>
 		</div>
 	</header>
-  
-    <!-- File input -->
+
+    <!-- Main Container -->
 	<div class="container" id="container">
+		<!-- Loading Animation-->
+		<svg id="loading" class="loader row-fluid align-items-center justify-content-start" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+			<circle class="internal-circle" cx="60" cy="60" r="30"></circle>
+			<circle class="external-circle" cx="60" cy="60" r="50"></circle>
+		  </svg>
 		
-		<div class="row-fluid align-items-center justify-content-start">
+		<!--Main Contents-->
+		<div style="opacity:0;" id="contents" class="row-fluid align-items-center justify-content-start">
 			<div class="col">
 				<h5 id="croom">Status: <span id="roomindicator" class="offline">&#x25cf; Offline</span></h5>
 				<h5 id="status">Waiting to join room...</h5>
 			</div>
-		</div>	
-		<div class="row-fluid align-items-center justify-content-start">
 			<div class="col">
 				<form class="md-form" id="holder" name="upload">
 					<div class="custom-file mb-3">

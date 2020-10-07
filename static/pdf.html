@@ -1,64 +1,109 @@
-
 <!DOCTYPE html>
-<html>
+<head><title>Oops! Not found</title></head>
+<body style="text-align: center;"><span>This area is incomplete. You will be redirected to home page.</span></body>
+<script>setTimeout(function(){
+  window.location.href = './';
+}, 5000);</script>
+<!-- INCOMPLETE CODE : WILL CONTINUE WHEN I'M FREE -->
+<!--
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <title>InstantPhoto - PDF Mode</title>
     <script src="/socket.io/socket.io.js"></script>
-    <!-- jsPDF -->
+	  <link rel="stylesheet" href="./bootstrap.css">
+    <script src="./bootstrap.js"></script>
+	  <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.0.0/jspdf.es.min.js"></script>
   </head>
   <body>
+    <div class="container" id="main">
+      <div class="container-fluid" id="toolbar">
+        <button type="button" class="btn" id="togglepdf" onclick="togglePDF()">New file</button> 
+        <button type="button" class="btn" id='savepdf' onclick="savePDF()" disabled="disabled">Save</button>
+        <input type="text" name="filename" id="filename" placeholder="Save As:" onpaste="return false;" disabled="disabled"/>
+        <button type="button" class="btn btn-light" data-toggle="modal" data-target="#popup">Room Details</button>
+      </div>
 
-    <!-- File input and image output -->
-    <input type="file" id="input" autofocus>
-    <img src="" id="output">
+      <div class="container-fluid" id="content">
+        <img style="max-width:640px; max-height:480px;" src="" id="output">
+        <div class="container-fluid" id="preview">
+          <embed class="pdfobject" id="pdfpreview" src="" type="application/pdf" style="overflow: auto;width:100%;height:100%;"></embed>
+          </div>
+      </div>
+      
+      <div class="modal fade" id="popup" tabindex="-1" role="dialog" aria-labelledby="roomqr-popup" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="popup-title">Room details</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="popup-content modal-body">
+              <p>Current room: <span id="roomindicator"></span></p>
+              <p></p>
+              <div id="roomqr"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" id="changeroom" onclick="refreshroom()">Change Room</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    <!-- Client Code -->
+      </div>
+    </div>
+
+  </body>
 
     <script type="text/javascript">
-    //https://github.com/MrRio/jsPDF
+    //Define all document elements
+    const _output = document.getElementById("output");
+    const _togglepdfbutton = document.getElementById("togglepdf");
+    const _savepdfbutton = document.getElementById("savepdf");
+    const _filename = document.getElementById("filename");
+    const _preview = document.getElementById("pdfpreview");
+    const _roomqr = document.getElementById("roomqr");
+    const _roomindicator = document.getElementById("roomindicator");
+
+    //Declare variables
+    var pdfenabled = false;
+    var photocount = 0;
+    var room;
+
       // Get WebSocket
       var socket = io();
 
-      // Get DOM elements
-      var input = document.getElementById("input");
-      var output = document.getElementById("output");
+      //http://raw.githack.com/MrRio/jsPDF/master/docs/module-addImage.html#~addImage
+      //http://raw.githack.com/MrRio/jsPDF/master/
+      function togglePDF(){
+        if(!pdfenabled){
+          window.doc = new jsPDF();
+          pdfenabled = true;
+          _savepdfbutton.disabled = false;
+          _filename.disabled = false;
 
-      // Join a channel
-      var room = "sync";
-      socket.emit("join", room);
+        } else {
 
-      // Listen to file input events
-      document.getElementById("input").addEventListener("change", function (event) {
-
-        // Prepeare file reader
-        var file = event.target.files[0];
-        var fileReader = new FileReader();
-
-        fileReader.onloadend = function (event) {
-          // Send an image event to the socket
-          var image = event.target.result
-          output.src = image;
-          socket.emit("image", image, room);
-        };
-
-        // Read file
-        fileReader.readAsDataURL(file);
-      })
-
-      //
-      import { jsPDF } from "jspdf";
-
-      // Default export is a4 paper, portrait, using millimeters for units
-      const doc = new jsPDF();
-
-      doc.text("Hello world!", 10, 10);
-      doc.save("a4.pdf");
+          photocount = 0;
+          pdfenabled = false;
+        }
+      }
+      
+      function savePDF(){
+        doc.save("a4.pdf");
+        pdfenabled = false;
+      }
+      
 
       socket.on("image", function (image) {
-        output.src = image;
+        _output.src = image;
+        if (pdfenabled){
+          doc.addImage(image,x,y,w,d,"fast",90);
+        }
       });
-    </script>
-  </body>
+    </script>-->
 </html>
