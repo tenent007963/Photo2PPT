@@ -28,7 +28,5 @@ Just clone this repo and now it's ready to go.
 
 # To-Do:
  1. Adding more features / plugins\
-	A. Lock process when retrieving/processing images to prevent saving empty slide\
 	B. Adding Tech mode\
-	C. Loading screen for Phone side
  2. Make the whole damn code async and simplify the heck out of it
