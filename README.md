@@ -28,5 +28,7 @@ Just clone this repo and now it's ready to go.
 
 # To-Do:
  1. Adding more features / plugins\
+	A. Fix bugs\
 	B. Adding Tech mode\
+	C. Deboucer-like function to do save file check and room check
  2. Make the whole damn code async and simplify the heck out of it

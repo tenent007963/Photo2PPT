@@ -109,7 +109,9 @@ const io = require('socket.io').listen(server,{pingInterval: 5000,pingTimeout: 6
 io.on("connection", async function(socket) {
 
     // Register "server" events sent by server ONLY
-    socket.on("server", (data, room, callback) => {
+    socket.on("server", (data, srcroom, callback) => {
+        room = strTrimming(srcroom);
+        if (room)
         // check for sent data
         switch (data) {
             case "isOnline":
@@ -118,6 +120,10 @@ io.on("connection", async function(socket) {
                 socket.join(room);
                 rooms.setServerOnline(room);
                 socket.on('disconnect', function (reason) {
+                    //This code have bug, sample:
+                    // Socket for transport close disconnected, updating transport close record. Reason:transport close
+                    // Record of transport close updated to False, result = 0.
+                    //Tried to fix via code block @ line #218
                     console.log(`Socket for ${room} disconnected, updating ${room} record. Reason:${reason}`);
                     rooms.setServerOffline(room);
                 });
@@ -132,8 +138,8 @@ io.on("connection", async function(socket) {
     });
 
     // Register "client" events sent by client ONLY
-    socket.on("client", (data, room, callback) => {
-        room =  room.trim();
+    socket.on("client", (data, srcroom, callback) => {
+        room = strTrimming(srcroom);
         console.log(`Received request from client side.`);
         if(room === undefined|| room === '') {
             callback({serverIsOnline:'error'});
@@ -168,7 +174,8 @@ io.on("connection", async function(socket) {
         }
     });
 
-    socket.on('roomChk',(room,callback) => {
+    socket.on('roomChk',(srcroom,callback) => {
+        room = strTrimming(srcroom);
                 rooms.checkAvailability(room).then(res => {
                     if (res === 0) {
                         console.log(`Room ${room} is available.`);
@@ -188,33 +195,37 @@ io.on("connection", async function(socket) {
     })
 
     // Handle and broadcast "status" events
-    socket.on("status", (data, room) => {
-        room =  room.trim();
+    socket.on("status", (data, srcroom) => {
+        room = strTrimming(srcroom);
         console.log(`Parsing status..`)
         socket.broadcast.to(room).emit("status", data);
     });
 
     // Register "join" events, requested by a connected client
-    socket.on("join", function (room) {
-        room =  room.trim();
+    socket.on("join", function (srcroom) {
         // join channel provided by client
+        room = strTrimming(srcroom);
         socket.room = room;
         socket.join(room);
     });
 
     // Register "leave" events, sent by phone side
-    socket.on("leave", function (room) {
+    socket.on("leave", function (srcroom) {
+        room = strTrimming(srcroom);
         // leave the current room
         socket.leave(room);
     });
 
     //Spare disconnect function to reset room status
-    socket.on("disconnect", function (room) {
+    socket.on("disconnect", function (srcroom) {
+        room = strTrimming(srcroom) || socket.room;
+        rooms.setServerOffline(room);
         console.log(`Room ${room} disconnected.`);
     })
 
     // Register "recvimage" events, a newer function sent by the client
-    socket.on("recvimage", (data, room, callback) => {
+    socket.on("recvimage", (data, srcroom, callback) => {
+        room = strTrimming(srcroom);
         // Broadcast the "transimage" event to all server side in the room
         socket.broadcast.to(room).emit("transimage", data);
         // Return success msg
@@ -224,7 +235,6 @@ io.on("connection", async function(socket) {
 
 })
 
-//re-writing whole structure into proper function object
 var rooms = {
     setServerOnline : async function(val) {
         //sample command: INSERT INTO availableroom (room_id, server, client) VALUES ('abCDe12345', 'online', 'N/A');
@@ -289,14 +299,26 @@ function genRand(len) {
     return randomStr;
 }
 
+function strTrimming(x){
+    return x == undefined ? '' : x.trim();
+}
+
 console.log("InstantPhoto had started!");
 
 //Set all room to offline upon exit
 process.on('SIGTERM', () => {
-    server.close(() => {
-      console.log('Server terminated');
-    })
+    console.log(`Shutting down server...`)
+    client.query('TRUNCATE TABLE availableroom;').then(msg=>{
+        console.log(`Successfully cleared table, result: ${msg}.`);
+    }).finally(()=>{
+        server.close(() => {
+            console.log('Server terminated');
+        })
+    });
+});
+    // Dont do this anymore, truncate will be more easier
     //Iterate over existing room_id-s
+    /*
     client.query('SELECT room_id FROM availableroom;', function(err, result) {
   
         if(err) {
@@ -304,6 +326,8 @@ process.on('SIGTERM', () => {
             client.query('TRUNCATE TABLE availableroom;');
             console.error('Error occured. Error msg:', err);
         }
+
+        try {
   
         forEach(result.rows, (row) => {
           client.query(`UPDATE public.availableroom SET server = 'offline' WHERE room_id='${row.room_id}';`, function(err, result) {
@@ -313,8 +337,15 @@ process.on('SIGTERM', () => {
             }
           });
         });
+
+        } catch(err) {
+        //Will truncate all data inside table if error happened
+        client.query('TRUNCATE TABLE availableroom;');
+        console.error('Error occured. Error msg:', err);
+    }
       });
     });
+*/
 
 /*
 //required only if running on local machine

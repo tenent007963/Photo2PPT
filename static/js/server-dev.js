@@ -346,6 +346,7 @@ function roomInit(){
 }
 
 function saveImageTrigger() {
+    // #TODO
     //To execute if triggered by save event 
     //Once triggered, check (condition) continuously until (condition) met
 }
