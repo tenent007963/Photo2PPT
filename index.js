@@ -48,7 +48,7 @@ let server=http.createServer(function(req,res){
             fs.readFile(__dirname + '/static/js/jquery-3.5.1.min.js', 'utf8', fsCallback);
         break;
 		case '/bootstrap.css':
-             fs.readFile(__dirname + '/static/css/bootstrap.min.css', 'utf8', fsCallback);
+            fs.readFile(__dirname + '/static/css/bootstrap.min.css', 'utf8', fsCallback);
         break;
 		case '/bootstrap.js':
             fs.readFile(__dirname + '/static/js/bootstrap.min.js', 'utf8', fsCallback);
@@ -217,11 +217,14 @@ io.on("connection", async function(socket) {
     });
 
     //Spare disconnect function to reset room status
-    socket.on("disconnect", function (srcroom) {
-        room = strTrimming(srcroom) || socket.room;
+    //Do not use, will cause the status check malfunc due to same transport with server/client
+    /*
+    socket.on("disconnect", function (reason) {
+        room = socket.room;
         rooms.setServerOffline(room);
-        console.log(`Room ${room} disconnected.`);
+        console.log(`Room ${room} disconnected, reason: ${reason}.`);
     })
+    */
 
     // Register "recvimage" events, a newer function sent by the client
     socket.on("recvimage", (data, srcroom, callback) => {

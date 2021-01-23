@@ -1,6 +1,7 @@
 //Define all document elements
 const _svppt = document.getElementById("savepptx");
-const _gpint = document.getElementById("GSPNint");
+const _gpint = document.getElementById("GSPNintCS");
+const _gpint1 = document.getElementById("GSPNintTech")
 const _pptstat = document.getElementById("pptxgenjsstatus");
 const output = document.getElementById("download");
 const _pptxne = document.getElementById("pptxnotenabled");
@@ -21,8 +22,12 @@ const _imgdata = document.getElementById("imgdata");
 const _bottombar = document.getElementById("bottombar");
 const _cs = document.getElementById("cs");
 const _tech = document.getElementById("tech");
+const _photo = document.getElementById("photoFile");
+//const _prefix = document.getElementById("prefix");
+const _cPrefix = document.getElementById("currentPrefix");
+const dropZone = document.body; //This line is for image file dropping
 
-//Initialize elements
+//Preset status
 let pptxenabled = false;
 let saveimg = false;
 let optenb = false;
@@ -31,6 +36,11 @@ let latencycount = 0;
 let room;
 let logping = false;
 let logimgdata = false;
+let gpintFocus = false;
+
+//Pre-init elements
+let mode;
+let prefix = '';
 
 //Enable PPTXGenJS...or not?
 function togglepptx() {
@@ -80,7 +90,9 @@ socket.on("transimage", function(buffallow) {
     if (pptxenabled === true) {
         addSlide(image);
     } else {
-        _pptxne.style.display = "block";
+        if (mode === 'cs') {
+            _pptxne.style.display = "block";
+        }
     }
 });
 
@@ -94,22 +106,48 @@ function genRand(len) {
     return randomStr;
 }
 
+//Toggle file prefix, in tech mode only
+let togglePrefix = () => {
+    switch(prefix) {
+        case '':
+            prefix = 'wrt_';
+            _cPrefix.innerHTML = 'wrt_';
+            break;
+        case 'wrt_':
+            prefix = 'batt_';
+            _cPrefix.innerHTML = 'batt_';
+            break;
+        case 'batt_':
+            prefix = '';
+            _cPrefix.innerHTML = 'N/A';
+            break;
+        default:
+            prefix = '';
+            _cPrefix.innerHTML = 'N/A';
+            break;
+    }
+}
+
 //Newer filename function to determine filename
 function smartFilename() {
-    let filename = _gpint.value;
-    if (filename) {
-        return filename.trim();
+    if (_gpint.value) {
+        let name = _gpint.value + '.jpg';
+        return name.trim();
+    } else if(_gpint1.value) {
+        let name = prefix + _gpint1.value + '.jpg';
+        return name.trim();
     } else {
         const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         const stringLength = 10;
         function pickRandom() {	return possible[Math.floor(Math.random() * possible.length)]; }
         let randomString = Array.apply(null, Array(stringLength)).map(pickRandom).join('');
-        return randomString;
+        let randName = prefix + randomString + '.jpg';
+        return randName;
     }
 }
 
 async function genQR(data) {
-    const qrcode = new QRCode("roomqr");
+    const qrcode = new QRCode("roomqr",{width: 250,height: 250,});
     qrcode.makeCode(data);
 }
 
@@ -303,6 +341,7 @@ async function orientCheck(data) {
 function initCS() {
     roomInit();
     _cs.style.display= "flex";
+    mode = 'cs';
     Cookies.set('mode', 'cs',{ expires: 31 ,path: ''});
 }
 
@@ -310,6 +349,8 @@ function initCS() {
 function initTech() {
     roomInit();
     _tech.style.display= "flex";
+    mode = 'tech';
+    saveimg = true;
     Cookies.set('mode', 'tech',{ expires: 31,path: ''});
 }
 
@@ -348,7 +389,7 @@ function checkRoomInitialize() {
     }
     catch (err) {
         _mainContainer.innerHTML = err.message;
-        setTimeout(()=>{location.reload()}, 2500);
+        setTimeout(()=>{location.reload(true)}, 2500);
     }
 }
 
@@ -361,7 +402,11 @@ function roomInit(){
     _consoleLog(`Server ready.`);
 }
 
-
+//Switch between CSO and Tech mode
+let changemode = () => {
+    Cookies.remove('mode');
+    location.reload(true);
+}
 
 //Active listener for window
 
@@ -417,7 +462,8 @@ window.addEventListener('paste', function(e) {
     let reader =  new FileReader();
     pastedData = clipboardData.getData('Text');
 
-    if (file instanceof Blob) {
+    //if (file instanceof Blob) {
+    if (file) {
         reader.readAsDataURL(file);
         reader.onloadend = function () {
             if(logimgdata){
@@ -432,15 +478,89 @@ window.addEventListener('paste', function(e) {
             if(!pptxenabled && !saveimg) {
                 alert("PPTXGenJS not enabled!");
             }
+            return true;
         } 
-    } else if (pastedData && pptxenabled) {
-        _gpint.value = pastedData.trim();
-    } else {
-        alert("PPTXGenJS not enabled!");
     }
+    if (!gpintFocus) {
+        if (pastedData && pptxenabled) {
+            _gpint.value = pastedData.trim();
+            return true;
+        }
+    } 
+    if(mode = 'tech') {
+        _gpint1.value = pastedData.trim();
+        return true;
+    }
+
+    alert("Operation not supported!");
 
 });
 
+//To fix duplicate entry when direct paste in _gpint
+[_gpint,_gpint1].forEach(function(e){
+    e.onfocus = function() {
+        gpintFocus = true;
+    }
+    e.onblur = function() {
+        gpintFocus = false;
+    }
+})
+
+
+//Dropzone : Drop the beat(?)
+if (dropZone) {
+    _consoleLog("Drop action ok.")
+    const hoverClassName = "hover";
+
+    // Handle drag* events to handle style
+    // Add the css you want when the class "hover" is present
+    dropZone.addEventListener("dragenter", function (e) {
+        e.preventDefault();
+        dropZone.classList.add(hoverClassName);
+    });
+
+    dropZone.addEventListener("dragover", function (e) {
+        e.preventDefault();
+        dropZone.classList.add(hoverClassName);
+    });
+
+    dropZone.addEventListener("dragleave", function (e) {
+        e.preventDefault();
+        dropZone.classList.remove(hoverClassName);
+    });
+
+    // This is the most important event, the event that gives access to files
+    dropZone.addEventListener("drop", function (e) {
+        e.preventDefault();
+        dropZone.classList.remove(hoverClassName);
+        _consoleLog('File dropped.')
+        const files = Array.from(e.dataTransfer.files);
+        _consoleLog(files);
+        if (files.length > 0) {
+            //const data = new FormData();
+            for (const file of files) {
+                //data.append('file', file);
+                let reader =  new FileReader();
+                reader.readAsDataURL(file);
+                reader.onloadend = function () {
+                    if(logimgdata){
+                        console.log(reader.result);
+                    }
+                    if (pptxenabled) {
+                        addSlide(reader.result);
+                    }
+                    if (saveimg) {
+                        download(reader.result, smartFilename(), "application/octet-stream;base64");
+                    }
+                    if(!pptxenabled && !saveimg) {
+                        alert("PPTXGenJS not enabled!");
+                    }
+                } 
+            }
+            
+        }
+    });
+}
 
 //Below are all functions that are used in dev mode
 
@@ -451,8 +571,8 @@ function devTool() {
     }
     xyz++;
     if(xyz===11){
-        let passcode = prompt("Please enter passcode for the development section:", "WritePasswordHere");
-        let passphrase = prompt("Please enter passphrase for verification:", "WritePassphraseHere");
+        const passcode = prompt("Please enter passcode for the development section:", "WritePasswordHere");
+        const passphrase = prompt("Please enter passphrase for verification:", "WritePassphraseHere");
         if (passcode === null || passcode === "") {
             _consoleLog("User cancelled the prompt.");
             return false;
@@ -461,15 +581,15 @@ function devTool() {
             return false;
         } else {
             const enckey = 'U2FsdGVkX18iazBzCd0Chor8UE+OucOwE3Tlc3yL2wg='; //Pre-enc key
-            let decKey = CryptoJS.AES.decrypt(enckey, passphrase).toString; //Static dec key from pre-enc key
-            let inputkey = CryptoJS.AES.encrypt(passcode, passphrase); //Enc key from user input
-            let inputKeyDec = CryptoJS.AES.decrypt(inputkey, passphrase).toString; //Static dec key from user input
+            const decKey = CryptoJS.AES.decrypt(enckey, passphrase).toString; //Static dec key from pre-enc key
+            const inputkey = CryptoJS.AES.encrypt(passcode, passphrase); //Enc key from user input
+            const inputKeyDec = CryptoJS.AES.decrypt(inputkey, passphrase).toString; //Static dec key from user input
             // decrypted.toString(CryptoJS.enc.Utf8)
             if (decKey === inputKeyDec) { //Verify both static dec key
                 _bottombar.style.display="block";
                 _consoleLog("Activated.");
                 return true;
-            } else if(decKey !== inputKeyDec) {
+            } else if(decKey != inputKeyDec) {
                 _consoleLog(`decKey=${decKey},inputKeyDec=${inputKeyDec}, incorrect key.`);
                 return false;
             } else {
@@ -569,8 +689,12 @@ socket.on("status",(data) => {
             $('#popup').modal('hide');
             if (pptxenabled) {
                 socket.emit("status",`Now adding photo ${photocount+1}`,room);
-            } else {
+            } 
+            if (mode === 'cs') {
                 socket.emit("status",`PptxGenJS not enabled!`,room);
+            } 
+            if (mode === 'tech') {
+                socket.emit("status",`Tech mode`,room);
             }
             break;
         case "save":
