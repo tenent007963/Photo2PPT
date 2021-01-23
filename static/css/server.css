@@ -24,6 +24,7 @@ header h1 {
     text-align: left;
     background-size: 800% 800%;
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     font-size: 35px;
     animation: rainbow 20s infinite;
