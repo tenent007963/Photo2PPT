@@ -81,6 +81,7 @@ function savefile() {
 
 //Retrieving room code from input
 function getRoom() {
+    //event.preventDefault();
     let str = _roomCodeInput.value.trim();
     _consoleLog(`Value from input: ${str}.`);
     joinroom(str);
@@ -112,10 +113,12 @@ function leaveroom(rm){
     _status.textContent = 'Disconnected from room ' + rm + '.';
 }
 
-//Initialize QR Scanner
+//Initialize QR Scanner Elements
 function onScanSuccess(qrCodeMessage) {
     let thecode = qrCodeMessage.trim();
-    joinroom(thecode.slice(0,9));
+    let thecodeofcode = thecode.slice(0,9);
+    joinroom(thecodeofcode);
+    _consoleLog(`The code:`,thecodeofcode);
     html5Qrcode.stop().then(ignore => {
         // QR Code scanning is stopped.
     }).catch(err => {
@@ -129,16 +132,6 @@ function onScanFailure(error) {
     _consoleLog(`QR error = ${error}`);
 }
 
-let setOnline = () => {
-    _roomIndicator.innerHTML = "&#x25cf; Online";
-    _roomIndicator.className = "online";
-}
-
-let setOffline = () => {
-    _roomIndicator.innerHTML = "&#x25cf; Offline";
-    _roomIndicator.className = "offline";
-}
-
 //previously Html5QrcodeScanner for preset scanner interface
 const html5Qrcode = new Html5Qrcode("reader");
 //html5Qrcode.render(onScanSuccess, onScanFailure);
@@ -150,13 +143,27 @@ Html5Qrcode.getCameras().then(devices => {
      * { id: "id", label: "label" }
      */
     if (devices && devices.length) {
-        let cameraId = devices[0].id;
-        html5Qrcode.start(cameraId, { fps: 30 },onScanSuccess, onScanFailure).catch(err => { _consoleLog(err)});
+        cameraId = devices[1].id;
     }
 }).catch(err => {
     _consoleLog(err);
 });
 
+$("#startScan").on("click", function(){
+    html5Qrcode.start(cameraId, { fps: 30 },onScanSuccess, onScanFailure).catch(err => { _consoleLog(err)});
+});
+
+
+//Status styling code
+let setOnline = () => {
+    _roomIndicator.innerHTML = "&#x25cf; Online";
+    _roomIndicator.className = "online";
+}
+
+let setOffline = () => {
+    _roomIndicator.innerHTML = "&#x25cf; Offline";
+    _roomIndicator.className = "offline";
+}
 
 //This function is to do a clean reload and cookie flushing
 let cleanReload = () => {
