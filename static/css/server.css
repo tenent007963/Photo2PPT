@@ -99,7 +99,7 @@ header h1 {
     position: absolute;
 }
 
-#roomqr {
+.modal .modelcontent .popup-content #roomqr {
     display: block;
     padding : 15px;
     background-color: #BDBDBD;
