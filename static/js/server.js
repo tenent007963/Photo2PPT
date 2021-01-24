@@ -23,7 +23,8 @@ const _bottombar = document.getElementById("bottombar");
 const _cs = document.getElementById("cs");
 const _tech = document.getElementById("tech");
 const _photo = document.getElementById("photoFile");
-//const _prefix = document.getElementById("prefix");
+const _prompt = document.getElementById("prompt"); //Future purpose
+const _dPrompt = document.getElementById("dropZone-prompt");
 const _cPrefix = document.getElementById("currentPrefix");
 const dropZone = document.body; //This line is for image file dropping
 
@@ -83,7 +84,7 @@ socket.on("transimage", function(buffallow) {
     }
     //Download image if enabled
     if (saveimg === true) {
-        download(image, smartFilename(), "application/octet-stream;base64");
+        imageDl(image);
     } else {
         _nsi.style.display = "block"
     }
@@ -131,19 +132,25 @@ let togglePrefix = () => {
 //Newer filename function to determine filename
 function smartFilename() {
     if (_gpint.value) {
-        let name = _gpint.value + '.jpg';
+        let name = _gpint.value;
         return name.trim();
     } else if(_gpint1.value) {
-        let name = prefix + _gpint1.value + '.jpg';
+        let name = prefix + _gpint1.value;
         return name.trim();
     } else {
         const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         const stringLength = 10;
         function pickRandom() {	return possible[Math.floor(Math.random() * possible.length)]; }
         let randomString = Array.apply(null, Array(stringLength)).map(pickRandom).join('');
-        let randName = prefix + randomString + '.jpg';
+        let randName = prefix + randomString;
         return randName;
     }
+}
+
+//Download image function, to fix file naming problem
+function imageDl(data) {
+    let name = smartFilename() + '.jpg';
+    download(data, name, "application/octet-stream;base64");
 }
 
 async function genQR(data) {
@@ -342,7 +349,7 @@ function initCS() {
     roomInit();
     _cs.style.display= "flex";
     mode = 'cs';
-    Cookies.set('mode', 'cs',{ expires: 31 ,path: ''});
+    Cookies.set('mode', 'cs',{ expires: 7 ,path: ''});
 }
 
 //Tech mode
@@ -351,7 +358,7 @@ function initTech() {
     _tech.style.display= "flex";
     mode = 'tech';
     saveimg = true;
-    Cookies.set('mode', 'tech',{ expires: 31,path: ''});
+    Cookies.set('mode', 'tech',{ expires: 7,path: ''});
 }
 
 // Room Pre-initialize, load cookies and other presets from last session
@@ -473,7 +480,7 @@ window.addEventListener('paste', function(e) {
                 addSlide(reader.result);
             }
             if (saveimg) {
-                download(reader.result, smartFilename(), "application/octet-stream;base64");
+                imageDl(reader.result);
             }
             if(!pptxenabled && !saveimg) {
                 alert("PPTXGenJS not enabled!");
@@ -517,22 +524,30 @@ if (dropZone) {
     dropZone.addEventListener("dragenter", function (e) {
         e.preventDefault();
         dropZone.classList.add(hoverClassName);
+        _dPrompt.classList.add('fadeShow');
+        _dPrompt.classList.remove('fadeHide');
     });
 
     dropZone.addEventListener("dragover", function (e) {
         e.preventDefault();
         dropZone.classList.add(hoverClassName);
+        _dPrompt.classList.add('fadeShow');
+        _dPrompt.classList.remove('fadeHide');
     });
 
     dropZone.addEventListener("dragleave", function (e) {
         e.preventDefault();
         dropZone.classList.remove(hoverClassName);
+        _dPrompt.classList.add('fadeHide');
+        _dPrompt.classList.remove('fadeShow');
     });
 
     // This is the most important event, the event that gives access to files
     dropZone.addEventListener("drop", function (e) {
         e.preventDefault();
         dropZone.classList.remove(hoverClassName);
+        _dPrompt.classList.add('fadeHide');
+        _dPrompt.classList.remove('fadeShow');
         _consoleLog('File dropped.')
         const files = Array.from(e.dataTransfer.files);
         _consoleLog(files);
@@ -550,7 +565,7 @@ if (dropZone) {
                         addSlide(reader.result);
                     }
                     if (saveimg) {
-                        download(reader.result, smartFilename(), "application/octet-stream;base64");
+                        imageDl(reader.result);
                     }
                     if(!pptxenabled && !saveimg) {
                         alert("PPTXGenJS not enabled!");
