@@ -151,7 +151,7 @@ Html5Qrcode.getCameras().then(devices => {
      */
     if (devices && devices.length) {
         let cameraId = devices[0].id;
-        html5Qrcode.start(cameraId, { fps: 30, qrbox: 250 },onScanSuccess, onScanFailure).catch(err => { _consoleLog(err)});
+        html5Qrcode.start(cameraId, { fps: 30 },onScanSuccess, onScanFailure).catch(err => { _consoleLog(err)});
     }
 }).catch(err => {
     _consoleLog(err);
