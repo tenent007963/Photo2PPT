@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
 	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Expires" content="-1">
     <title>InstantPhoto - Server</title>
     <link rel="icon" href="./favicon.ico">
     <script src="/socket.io/socket.io.js"></script>
@@ -27,7 +28,7 @@
   </head>
   <body>
 	<header>
-		<h1>InstantPhoto</h1>
+		<h1 onclick="changemode()">InstantPhoto</a></h1>
 	</header>
 
 	<!-- Container -->
@@ -43,24 +44,39 @@
 			<button type="button" class="btn btn-light mr-1" id="togglepptx" onclick="togglepptx()">Create PPTX : <span id="pptxgenjsstatus">Off</span></button>
 			<button type="button" class="btn btn-light mr-1" id="savepptx" onclick="savepptx()" disabled>Save PPTX</button>
 			<form style="float: right;position: relative" action="#" onsubmit="return false;">
-			<input type="text" name="GSPN" id="GSPNint" placeholder="S/O number:" onpaste="return false;" disabled="disabled"/>	
+				<input type="text" name="GSPN" id="GSPNintCS" placeholder="S/O number:" disabled="disabled"/>	
 			</form>
 			<span id="ewanstat" style="position: relative;color: green;display:none">&#10004; E-Warranty Attached &#10004; </span>
 		</div>
+
 		<div class="btn-toolbar topbar" role="toolbar" aria-label="Normal toolbar for tech" id="tech" style="display:none">
-			<!-- Tech mode toolbar -->
+			<button type="button" class="btn btn-light" data-toggle="modal" data-target="#popup">Room Details</button>
+			<form style="float: right;position: relative" action="#" onsubmit="return false;">
+				<input type="text" name="GSPN" id="GSPNintTech" placeholder="S/O number:"/>
+			</form>
+			<button type="button" class="btn btn-light mr-1" id="togglePrefix" onclick="togglePrefix()">Prefix: <span id="currentPrefix">N/A</span></button>
 		</div>
+
 		<div class="head" id="top"> 
 			<h5 id="head">Waiting input on client side...</h5>
 		</div>
 		<!-- Image output -->
-		<img style="max-width:640px; max-height:480px;" src="" id="download"/>
+		<img style="max-width:640px; max-height:320px;" src="" id="download"/>
 	
 		<!-- Preview sidebar -->
 		<div class="preview" id="rightbar">
 		</div>
 	
 		<p class="latency" id="socketlatency">Getting Latency...</p>
+	</div>
+
+	<div class="dropzone-prompt fadeHide" id="dropZone-prompt" style="z-index:5;">
+			<div class="modal-content">
+				<div class="popup-content modal-body promt-body">
+					<h2>Drop Your File(s)</h2>
+				</div>
+			</div>
+		
 	</div>
 	
 	<div class="modal fade" id="popup" tabindex="-1" role="dialog" aria-labelledby="roomqr-popup" aria-hidden="true">
@@ -75,7 +91,7 @@
 				<div class="popup-content modal-body">
 					<p>Current room: <span id="roomindicator"></span></p>
 					<p></p>
-					<div id="roomqr"></div>
+					<div class="roomqr" id="roomqr"></div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -83,6 +99,17 @@
 				</div>
 			</div>
 		</div>
+	</div>
+
+	<!-- Future purpose -->
+	<div class="modal fade" id="prompt" tabindex="-1" role="dialog" aria-labelledby="prompt-popup" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="popup-content modal-body promt-body">
+					<h2 class="message">[Message here]</h2>
+				</div>
+			</div>
+		</div> 
 	</div>
 
 	<div class="warnings" style="color: red">

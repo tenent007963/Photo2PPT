@@ -1,6 +1,7 @@
 //Define all document elements
 const _svppt = document.getElementById("savepptx");
-const _gpint = document.getElementById("GSPNint");
+const _gpint = document.getElementById("GSPNintCS");
+const _gpint1 = document.getElementById("GSPNintTech")
 const _pptstat = document.getElementById("pptxgenjsstatus");
 const output = document.getElementById("download");
 const _pptxne = document.getElementById("pptxnotenabled");
@@ -21,16 +22,26 @@ const _imgdata = document.getElementById("imgdata");
 const _bottombar = document.getElementById("bottombar");
 const _cs = document.getElementById("cs");
 const _tech = document.getElementById("tech");
+const _photo = document.getElementById("photoFile");
+const _prompt = document.getElementById("prompt"); //Future purpose
+const _dPrompt = document.getElementById("dropZone-prompt");
+const _cPrefix = document.getElementById("currentPrefix");
+const dropZone = document.body; //This line is for image file dropping
 
-//Initialize elements
-var pptxenabled = false;
-var saveimg = false;
-var optenb = false;
-var photocount = 0;
-var latencycount = 0;
-var room;
-var logping = false;
-var logimgdata = false;
+//Preset status
+let pptxenabled = false;
+let saveimg = false;
+let optenb = false;
+let photocount = 0;
+let latencycount = 0;
+let room;
+let logping = false;
+let logimgdata = false;
+let gpintFocus = false;
+
+//Pre-init elements
+let mode;
+let prefix = '';
 
 //Enable PPTXGenJS...or not?
 function togglepptx() {
@@ -73,14 +84,16 @@ socket.on("transimage", function(buffallow) {
     }
     //Download image if enabled
     if (saveimg === true) {
-        download(image, smartFilename(), "application/octet-stream;base64");
+        imageDl(image);
     } else {
         _nsi.style.display = "block"
     }
     if (pptxenabled === true) {
         addSlide(image);
     } else {
-        _pptxne.style.display = "block";
+        if (mode === 'cs') {
+            _pptxne.style.display = "block";
+        }
     }
 });
 
@@ -94,32 +107,71 @@ function genRand(len) {
     return randomStr;
 }
 
+//Toggle file prefix, in tech mode only
+let togglePrefix = () => {
+    switch(prefix) {
+        case '':
+            prefix = 'wrt_';
+            _cPrefix.innerHTML = 'wrt_';
+            break;
+        case 'wrt_':
+            prefix = 'batt_';
+            _cPrefix.innerHTML = 'batt_';
+            break;
+        case 'batt_':
+            prefix = '';
+            _cPrefix.innerHTML = 'N/A';
+            break;
+        default:
+            prefix = '';
+            _cPrefix.innerHTML = 'N/A';
+            break;
+    }
+}
+
 //Newer filename function to determine filename
 function smartFilename() {
-    let filename = _gpint.value;
-    if (filename) {
-        return filename.trim();
+    if (_gpint.value) {
+        let name = _gpint.value;
+        return name.trim();
+    } else if(_gpint1.value) {
+        let name = prefix + _gpint1.value;
+        return name.trim();
     } else {
         const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         const stringLength = 10;
         function pickRandom() {	return possible[Math.floor(Math.random() * possible.length)]; }
         let randomString = Array.apply(null, Array(stringLength)).map(pickRandom).join('');
-        return randomString;
+        let randName = prefix + randomString;
+        return randName;
     }
+}
+
+//Download image function, to fix file naming problem
+function imageDl(data) {
+    let name = smartFilename() + '.jpg';
+    download(data, name, "application/octet-stream;base64");
 }
 
 async function genQR(data) {
-    const qrcode = new QRCode("roomqr");
+    const qrcode = new QRCode("roomqr",{width: 250,height: 250,});
     qrcode.makeCode(data);
 }
 
+
 //Refresh Room
 function refreshroom() {
-    room = genRand(10);
     if (socket.connected && room) {
         socket.emit("leave", room);
     }
-    roomChk(room);
+    room = genRand(10);
+    Cookies.set('room',room,{ expires: 31 ,path: ''});
+
+    _roomindicator.innerHTML = room;
+    _roomqr.innerHTML = "";
+    genQR(room);
+    socket.emit("join", room);
+    socket.emit("server","isOnline",room);
 }
 
 //Whenever adding a new slide, image data will parse into this function
@@ -296,47 +348,59 @@ async function orientCheck(data) {
 function initCS() {
     roomInit();
     _cs.style.display= "flex";
-    Cookies.set('mode', 'cs',{ expires: 31 ,path: ''});
+    mode = 'cs';
+    Cookies.set('mode', 'cs',{ expires: 7 ,path: ''});
 }
 
 //Tech mode
 function initTech() {
     roomInit();
     _tech.style.display= "flex";
-    Cookies.set('mode', 'tech',{ expires: 31,path: ''});
+    mode = 'tech';
+    saveimg = true;
+    Cookies.set('mode', 'tech',{ expires: 7,path: ''});
 }
 
-// Window Pre-initialize, load cookies and other presets from last session
+// Room Pre-initialize, load cookies and other presets from last session
 function checkRoomInitialize() {
-    //check isDebug environment
-    if (isDebug) {
-        window.document.title = "InstantPhoto - Server(Development)";
+    try {
+        //check isDebug environment
+        if (isDebug) {
+            window.document.title = "InstantPhoto - Server(Development)";
+        }
+        //Socket room initialization
+        let getRoom = Cookies.get('room');
+        if (!getRoom) {
+            refreshroom();
+            _consoleLog(`Joining new room`);
+        } else {
+            roomConnect(getRoom);
+            _header.innerHTML = 'Joining old room, room code: ' + getRoom + '.';
+            _consoleLog(`Joining old room, room code: ${getRoom}`)
+        }
+        //Mode checking
+        let getMode = Cookies.get('mode');
+        switch(getMode){
+            case "cs":
+                initCS();
+                _consoleLog(`Init CS Mode.`);
+                break;
+            case "tech":
+                initTech();
+                _consoleLog(`Init Tech Mode.`);
+                break;
+            default:
+                break;
+        }
+        _consoleLog(`Server Preparation done.`);
     }
-    //Socket room initialization
-    let getRoom = Cookies.get('room');
-    if (!getRoom) {
-        refreshroom();
-    } else {
-        roomChk(getRoom);
+    catch (err) {
+        _mainContainer.innerHTML = err.message;
+        setTimeout(()=>{location.reload(true)}, 2500);
     }
-    //Mode checking
-    let getMode = Cookies.get('mode');
-    switch(getMode){
-        case "cs":
-            initCS();
-            _consoleLog(`Init CS Mode.`);
-            break;
-        case "tech":
-            initTech();
-            _consoleLog(`Init Tech Mode.`);
-            break;
-        default:
-            break;
-    }
-    _consoleLog(`Server Preparation done.`);
 }
 
-// Window initialization
+// Room initialization
 function roomInit(){
     _initContainer.style.display = "none";
     _mainContainer.style.display = "block";
@@ -345,10 +409,10 @@ function roomInit(){
     _consoleLog(`Server ready.`);
 }
 
-function saveImageTrigger() {
-    // #TODO
-    //To execute if triggered by save event 
-    //Once triggered, check (condition) continuously until (condition) met
+//Switch between CSO and Tech mode
+let changemode = () => {
+    Cookies.remove('mode');
+    location.reload(true);
 }
 
 //Active listener for window
@@ -405,7 +469,8 @@ window.addEventListener('paste', function(e) {
     let reader =  new FileReader();
     pastedData = clipboardData.getData('Text');
 
-    if (file instanceof Blob) {
+    //if (file instanceof Blob) {
+    if (file) {
         reader.readAsDataURL(file);
         reader.onloadend = function () {
             if(logimgdata){
@@ -415,20 +480,102 @@ window.addEventListener('paste', function(e) {
                 addSlide(reader.result);
             }
             if (saveimg) {
-                download(reader.result, smartFilename(), "application/octet-stream;base64");
+                imageDl(reader.result);
             }
             if(!pptxenabled && !saveimg) {
                 alert("PPTXGenJS not enabled!");
             }
+            return true;
         } 
-    } else if (pastedData && pptxenabled) {
-        _gpint.value = pastedData.trim();
-    } else {
-        alert("PPTXGenJS not enabled!");
     }
+    if (!gpintFocus) {
+        if (pastedData && pptxenabled) {
+            _gpint.value = pastedData.trim();
+            return true;
+        }
+    } 
+    if(mode = 'tech') {
+        _gpint1.value = pastedData.trim();
+        return true;
+    }
+
+    alert("Operation not supported!");
 
 });
 
+//To fix duplicate entry when direct paste in _gpint
+[_gpint,_gpint1].forEach(function(e){
+    e.onfocus = function() {
+        gpintFocus = true;
+    }
+    e.onblur = function() {
+        gpintFocus = false;
+    }
+})
+
+
+//Dropzone : Drop the beat(?)
+if (dropZone) {
+    _consoleLog("Drop action ok.")
+    const hoverClassName = "hover";
+
+    // Handle drag* events to handle style
+    // Add the css you want when the class "hover" is present
+    dropZone.addEventListener("dragenter", function (e) {
+        e.preventDefault();
+        dropZone.classList.add(hoverClassName);
+        _dPrompt.classList.add('fadeShow');
+        _dPrompt.classList.remove('fadeHide');
+    });
+
+    dropZone.addEventListener("dragover", function (e) {
+        e.preventDefault();
+        dropZone.classList.add(hoverClassName);
+        _dPrompt.classList.add('fadeShow');
+        _dPrompt.classList.remove('fadeHide');
+    });
+
+    dropZone.addEventListener("dragleave", function (e) {
+        e.preventDefault();
+        dropZone.classList.remove(hoverClassName);
+        _dPrompt.classList.add('fadeHide');
+        _dPrompt.classList.remove('fadeShow');
+    });
+
+    // This is the most important event, the event that gives access to files
+    dropZone.addEventListener("drop", function (e) {
+        e.preventDefault();
+        dropZone.classList.remove(hoverClassName);
+        _dPrompt.classList.add('fadeHide');
+        _dPrompt.classList.remove('fadeShow');
+        _consoleLog('File dropped.')
+        const files = Array.from(e.dataTransfer.files);
+        _consoleLog(files);
+        if (files.length > 0) {
+            //const data = new FormData();
+            for (const file of files) {
+                //data.append('file', file);
+                let reader =  new FileReader();
+                reader.readAsDataURL(file);
+                reader.onloadend = function () {
+                    if(logimgdata){
+                        console.log(reader.result);
+                    }
+                    if (pptxenabled) {
+                        addSlide(reader.result);
+                    }
+                    if (saveimg) {
+                        imageDl(reader.result);
+                    }
+                    if(!pptxenabled && !saveimg) {
+                        alert("PPTXGenJS not enabled!");
+                    }
+                } 
+            }
+            
+        }
+    });
+}
 
 //Below are all functions that are used in dev mode
 
@@ -439,8 +586,8 @@ function devTool() {
     }
     xyz++;
     if(xyz===11){
-        let passcode = prompt("Please enter passcode for the development section:", "WritePasswordHere");
-        let passphrase = prompt("Please enter passphrase for verification:", "WritePassphraseHere");
+        const passcode = prompt("Please enter passcode for the development section:", "WritePasswordHere");
+        const passphrase = prompt("Please enter passphrase for verification:", "WritePassphraseHere");
         if (passcode === null || passcode === "") {
             _consoleLog("User cancelled the prompt.");
             return false;
@@ -449,15 +596,15 @@ function devTool() {
             return false;
         } else {
             const enckey = 'U2FsdGVkX18iazBzCd0Chor8UE+OucOwE3Tlc3yL2wg='; //Pre-enc key
-            let decKey = CryptoJS.AES.decrypt(enckey, passphrase).toString; //Static dec key from pre-enc key
-            let inputkey = CryptoJS.AES.encrypt(passcode, passphrase); //Enc key from user input
-            let inputKeyDec = CryptoJS.AES.decrypt(inputkey, passphrase).toString; //Static dec key from user input
+            const decKey = CryptoJS.AES.decrypt(enckey, passphrase).toString; //Static dec key from pre-enc key
+            const inputkey = CryptoJS.AES.encrypt(passcode, passphrase); //Enc key from user input
+            const inputKeyDec = CryptoJS.AES.decrypt(inputkey, passphrase).toString; //Static dec key from user input
             // decrypted.toString(CryptoJS.enc.Utf8)
             if (decKey === inputKeyDec) { //Verify both static dec key
                 _bottombar.style.display="block";
                 _consoleLog("Activated.");
                 return true;
-            } else if(decKey !== inputKeyDec) {
+            } else if(decKey != inputKeyDec) {
                 _consoleLog(`decKey=${decKey},inputKeyDec=${inputKeyDec}, incorrect key.`);
                 return false;
             } else {
@@ -522,33 +669,21 @@ function _log(opt) {
 
 // Below are all socket functions / connections
 
-//To check room availability
-async function roomChk(val) {
-    _consoleLog(`Checking room availability...`);
-    socket.emit('roomChk',val,(bc) => { 
-        let res = bc.result;
-        if (res === 'ok') {
-            roomConnect(val);
-            _consoleLog(`Joining local generated room.`)
-        } else {
-            roomConnect(res);
-            _consoleLog(`Joining server provided room.`);
-        }
-    })
-}
-
 //Function to manual call socket connect
 function roomConnect(val) {
-    room = val;
-    socket.emit("server","isOnline",val);
-    _roomqr.innerHTML = "";
-    genQR(val);
-    _roomindicator.innerHTML = val;
-    _header.innerHTML = 'Joining room: ' + val + '.';
-    Cookies.set('room',room,{ expires: 31 ,path: ''});
+    try {
+        room = val;
+        socket.connect();
+        socket.emit('join', val);
+        genQR(val);
+        socket.emit("server","isOnline",val);
+        _roomindicator.innerHTML = room;
+        _consoleLog(`Old session reconnected.`)
+        return true;
+    } catch(err) {
+        return err;
+    }
 }
-
-
 
 // Upon socket disconnection
 socket.on('disconnect', function(){
@@ -569,8 +704,12 @@ socket.on("status",(data) => {
             $('#popup').modal('hide');
             if (pptxenabled) {
                 socket.emit("status",`Now adding photo ${photocount+1}`,room);
-            } else {
+            } 
+            if (mode === 'cs') {
                 socket.emit("status",`PptxGenJS not enabled!`,room);
+            } 
+            if (mode === 'tech') {
+                socket.emit("status",`Tech mode`,room);
             }
             break;
         case "save":
@@ -593,10 +732,10 @@ socket.on('pong', function(ping) {
     //Prompt if latency over acceptable threshold
     if (ping >= 550) {
         latencycount++;
-        if (latencycount >= 3) {
+        if (latencycount >= 4) {
             _latency.style.color = "red";
         }
-        if (latencycount >= 5) {
+        if (latencycount >= 7) {
             alert('High latency detected, some functions might not working properly.');
         }
     }
@@ -610,14 +749,7 @@ socket.on('pong', function(ping) {
 //Preserve area
 
 // noinspection JSValidateTypes
-window.onload = function(){
-    try {
-        checkRoomInitialize()
-    } catch (err) {
-    _mainContainer.innerHTML = err.message;
-    setTimeout(()=>{location.reload()}, 2500);
-    }
-}
+window.onload = checkRoomInitialize();
 
 //Small cheat code to make sure heroku dyno doesn't go idling when user is connected
 function httpGetAsync(theUrl, callback)
@@ -636,7 +768,7 @@ setInterval((function() {
     function loop() {
         socket.emit("server","keepAlive",room);
         httpGetAsync('/keepalive',function(res){
-            console.log(`Keepalive status from host: ${res}`);
+            _consoleLog(`Keepalive status from host: ${res}`);
         })
     }
     loop();
