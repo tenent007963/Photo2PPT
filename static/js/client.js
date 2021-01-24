@@ -116,10 +116,10 @@ function leaveroom(rm){
 function onScanSuccess(qrCodeMessage) {
     let thecode = qrCodeMessage.trim();
     joinroom(thecode.slice(0,10));
-    html5Qrcode.clear().then(ignore => {
+    html5Qrcode.stop().then(ignore => {
         // QR Code scanning is stopped.
     }).catch(err => {
-        html5Qrcode.stop();
+        html5Qrcode.clear();
         _consoleLog(err);
     });
 }
@@ -139,6 +139,10 @@ let setOffline = () => {
     _roomIndicator.className = "offline";
 }
 
+//previously Html5QrcodeScanner for preset scanner interface
+const html5Qrcode = new Html5Qrcode("reader");
+//html5Qrcode.render(onScanSuccess, onScanFailure);
+
 // This method will trigger user permissions
 Html5Qrcode.getCameras().then(devices => {
     /**
@@ -146,14 +150,13 @@ Html5Qrcode.getCameras().then(devices => {
      * { id: "id", label: "label" }
      */
     if (devices && devices.length) {
-        cameraId = devices[2].id;
+        let cameraId = devices[1].id;
+        html5Qrcode.start(cameraId, { fps: 30, qrbox: 250 },onScanSuccess, onScanFailure).catch(err => { _consoleLog(err)});
     }
 }).catch(err => {
-    _consoleLog(err)
+    _consoleLog(err);
 });
 
-const html5Qrcode = new Html5QrcodeScanner("reader", { fps: 30 });
-html5Qrcode.render(onScanSuccess, onScanFailure);
 
 //This function is to do a clean reload and cookie flushing
 let cleanReload = () => {
