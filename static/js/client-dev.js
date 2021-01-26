@@ -133,8 +133,9 @@ function onScanFailure(error) {
 }
 
 //previously Html5QrcodeScanner for preset scanner interface
-const html5Qrcode = new Html5Qrcode("reader");
-//html5Qrcode.render(onScanSuccess, onScanFailure);
+//set to Html5Qrcode and comment out html5Qrcode for pro mode
+const html5Qrcode = new Html5QrcodeScanner("reader");
+html5Qrcode.render(onScanSuccess, onScanFailure);
 
 // This method will trigger user permissions
 Html5Qrcode.getCameras().then(devices => {
@@ -149,10 +150,11 @@ Html5Qrcode.getCameras().then(devices => {
     _consoleLog(err);
 });
 
-$("#startScan").on("click", function(){
-    html5Qrcode.start(cameraId, { fps: 30 },onScanSuccess, onScanFailure).catch(err => { _consoleLog(err)});
-});
 
+$("#startScan").on("click", function(){
+    //html5Qrcode.start(cameraId, { fps: 30 },onScanSuccess, onScanFailure).catch(err => { _consoleLog(err)});
+    html5Qrcode.render(onScanSuccess, onScanFailure);
+});
 
 //Status styling code
 let setOnline = () => {
