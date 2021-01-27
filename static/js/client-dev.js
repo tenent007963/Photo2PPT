@@ -9,6 +9,7 @@ let _fileform = document.getElementById("holder");
 let _container = document.getElementById("container");
 let _roomCodeInput = document.getElementById("roomCode");
 let _roomIndicator = document.getElementById("roomindicator");
+let _scanbutton = document.getElementById("startScan");
 
 // Join a channel
 let room;
@@ -118,6 +119,7 @@ function onScanSuccess(qrCodeMessage) {
     let thecode = qrCodeMessage.trim();
     let thecodeofcode = thecode.slice(0,9);
     joinroom(thecodeofcode);
+    _scanbutton.style.display = "block";
     _consoleLog(`The code:`,thecodeofcode);
     html5Qrcode.stop().then(ignore => {
         // QR Code scanning is stopped.
@@ -154,6 +156,7 @@ Html5Qrcode.getCameras().then(devices => {
 $("#startScan").on("click", function(){
     //html5Qrcode.start(cameraId, { fps: 30 },onScanSuccess, onScanFailure).catch(err => { _consoleLog(err)});
     html5Qrcode.render(onScanSuccess, onScanFailure);
+    _scanbutton.style.display = 'none';
 });
 
 //Status styling code

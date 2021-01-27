@@ -40,7 +40,7 @@ let logimgdata = false;
 let gpintFocus = false;
 
 //Pre-init elements
-let mode;
+let mode = '';
 let prefix = '';
 
 //Enable PPTXGenJS...or not?
@@ -349,6 +349,7 @@ function initCS() {
     roomInit();
     _cs.style.display= "flex";
     mode = 'cs';
+    Cookies.remove('mode'); //reset cookie
     Cookies.set('mode', 'cs',{ expires: 7 ,path: ''});
 }
 
@@ -358,6 +359,7 @@ function initTech() {
     _tech.style.display= "flex";
     mode = 'tech';
     saveimg = true;
+    Cookies.remove('mode'); //reset cookie
     Cookies.set('mode', 'tech',{ expires: 7,path: ''});
 }
 
@@ -412,6 +414,7 @@ function roomInit(){
 //Switch between CSO and Tech mode
 let changemode = () => {
     Cookies.remove('mode');
+    mode = '';
     location.reload(true);
 }
 
@@ -705,20 +708,23 @@ socket.on("status",(data) => {
             if (pptxenabled) {
                 socket.emit("status",`Now adding photo ${photocount+1}`,room);
             } 
-            if (mode === 'cs') {
+            if (!pptxenabled && mode === 'cs') {
                 socket.emit("status",`PptxGenJS not enabled!`,room);
             } 
-            if (mode === 'tech') {
+            if (!pptxenabled && mode === 'tech') {
                 socket.emit("status",`Tech mode`,room);
             }
             break;
         case "save":
             if (pptxenabled) {
                 savepptx();
+            } else {
+                alert("There's no active file!");
             }
             break;
         default:
             _consoleLog(`Request dropped!`);
+            socket.emit("status",`Unknown state, please refresh page.`,room);
             break;
     }
 });

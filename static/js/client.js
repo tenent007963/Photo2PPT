@@ -9,6 +9,7 @@ let _fileform = document.getElementById("holder");
 let _container = document.getElementById("container");
 let _roomCodeInput = document.getElementById("roomCode");
 let _roomIndicator = document.getElementById("roomindicator");
+let _scanbutton = document.getElementById("startScan");
 
 // Join a channel
 let room;
@@ -81,6 +82,7 @@ function savefile() {
 
 //Retrieving room code from input
 function getRoom() {
+    //event.preventDefault();
     let str = _roomCodeInput.value.trim();
     _consoleLog(`Value from input: ${str}.`);
     joinroom(str);
@@ -112,14 +114,17 @@ function leaveroom(rm){
     _status.textContent = 'Disconnected from room ' + rm + '.';
 }
 
-//Initialize QR Scanner
+//Initialize QR Scanner Elements
 function onScanSuccess(qrCodeMessage) {
     let thecode = qrCodeMessage.trim();
-    joinroom(thecode.slice(0,10));
-    html5Qrcode.clear().then(ignore => {
+    let thecodeofcode = thecode.slice(0,9);
+    joinroom(thecodeofcode);
+    _scanbutton.style.display = "block";
+    _consoleLog(`The code:`,thecodeofcode);
+    html5Qrcode.stop().then(ignore => {
         // QR Code scanning is stopped.
     }).catch(err => {
-        html5Qrcode.stop();
+        html5Qrcode.clear();
         _consoleLog(err);
     });
 }
@@ -129,6 +134,32 @@ function onScanFailure(error) {
     _consoleLog(`QR error = ${error}`);
 }
 
+//previously Html5QrcodeScanner for preset scanner interface
+//set to Html5Qrcode and comment out html5Qrcode for pro mode
+const html5Qrcode = new Html5QrcodeScanner("reader");
+html5Qrcode.render(onScanSuccess, onScanFailure);
+
+// This method will trigger user permissions
+Html5Qrcode.getCameras().then(devices => {
+    /**
+     * devices would be an array of objects of type:
+     * { id: "id", label: "label" }
+     */
+    if (devices && devices.length) {
+        cameraId = devices[1].id;
+    }
+}).catch(err => {
+    _consoleLog(err);
+});
+
+
+$("#startScan").on("click", function(){
+    //html5Qrcode.start(cameraId, { fps: 30 },onScanSuccess, onScanFailure).catch(err => { _consoleLog(err)});
+    html5Qrcode.render(onScanSuccess, onScanFailure);
+    _scanbutton.style.display = 'none';
+});
+
+//Status styling code
 let setOnline = () => {
     _roomIndicator.innerHTML = "&#x25cf; Online";
     _roomIndicator.className = "online";
@@ -138,22 +169,6 @@ let setOffline = () => {
     _roomIndicator.innerHTML = "&#x25cf; Offline";
     _roomIndicator.className = "offline";
 }
-
-// This method will trigger user permissions
-Html5Qrcode.getCameras().then(devices => {
-    /**
-     * devices would be an array of objects of type:
-     * { id: "id", label: "label" }
-     */
-    if (devices && devices.length) {
-        cameraId = devices[2].id;
-    }
-}).catch(err => {
-    _consoleLog(err)
-});
-
-const html5Qrcode = new Html5QrcodeScanner("reader", { fps: 30 });
-html5Qrcode.render(onScanSuccess, onScanFailure);
 
 //This function is to do a clean reload and cookie flushing
 let cleanReload = () => {
@@ -189,35 +204,6 @@ window.onfocus = () => {
         checkStatus();
     }
 }
-
-function fadeOutEffect(target) {
-    var fadeTarget = document.getElementById(target);
-    var fadeEffect = setInterval(function () {
-        if (!fadeTarget.style.opacity) {
-            fadeTarget.style.opacity = 1;
-        }
-        if (fadeTarget.style.opacity > 0) {
-            fadeTarget.style.opacity -= 0.1;
-        } else {
-            clearInterval(fadeEffect);
-            fadeTarget.style.display = "none";
-        }
-    }, 20);
-}
-
-function fadeInEffect(target) {
-    var fadeTarget = document.getElementById(target);
-    var ment = 1;
-    var fadeEffect = setInterval(function () {
-        if (ment < 11) {
-            fadeTarget.style.opacity = (ment / 10) ;
-            ment++;
-        } else {
-            clearInterval(fadeEffect);
-        }
-    }, 40);
-}
-
 
 //AJAX Codes
 $(".custom-file-input").on("change", function() {
@@ -285,7 +271,6 @@ function checkStatus() {
 }
 
 window.onload = () => {
-    fadeOutEffect("loading");
     if (isDebug) {
         window.document.title = "InstantPhoto - Client(Development)";
     }
@@ -296,5 +281,4 @@ window.onload = () => {
         joinroom(getRoom);
         _consoleLog(`Joining old room, room code: ${getRoom}`)
     }
-    fadeInEffect("contents");
 }
