@@ -82,7 +82,7 @@ function savefile() {
 
 //Retrieving room code from input
 function getRoom() {
-    //event.preventDefault();
+    event.preventDefault();
     let str = _roomCodeInput.value.trim();
     _consoleLog(`Value from input: ${str}.`);
     joinroom(str);
