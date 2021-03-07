@@ -278,6 +278,7 @@ var rooms = {
 } 
 
 function collectRequestData(request, callback) {
+    console.log('Processing raw data from client...');
     const CONTENT_TYPE = 'application/json';
     if(request.headers['content-type'] === CONTENT_TYPE) {
         let body = '';

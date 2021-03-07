@@ -149,7 +149,8 @@ function smartFilename() {
 
 //Download image function, to fix file naming problem
 function imageDl(data) {
-    let name = smartFilename() + '.jpg';
+    //let name = smartFilename() + '.jpg'; //Need to auto detect correct file format for marsh
+    //#TODO
     download(data, name, "application/octet-stream;base64");
 }
 
@@ -699,8 +700,10 @@ socket.on('disconnect', function(){
 });
 
 // Return server image status to client upon call
+//Need to re-check logic due to add in Tech mode
+//#TODO
 socket.on("status",(data) => {
-    _consoleLog(`Received parsed request from host`)
+    _consoleLog(`Received parsed request from host`);
     switch(data) {
         case "check":
             _consoleLog(`Sending status..`);
@@ -708,11 +711,17 @@ socket.on("status",(data) => {
             if (pptxenabled) {
                 socket.emit("status",`Now adding photo ${photocount+1}`,room);
             } 
-            if (!pptxenabled && mode === 'cs') {
+            if (!pptxenabled || !saveimg && mode === 'cs') {
                 socket.emit("status",`PptxGenJS not enabled!`,room);
             } 
-            if (!pptxenabled && mode === 'tech') {
+            if (!pptxenabled && saveimg && mode === 'tech') {
                 socket.emit("status",`Tech mode`,room);
+            }
+            if (!pptxenabled || !saveimg && !mode) {
+                socket.emit("status",`Room initializing`,room);
+            }
+            if (!pptxenabled || !saveimg) {
+                socket.emit("status",`Waiting for user input...`,room);
             }
             break;
         case "save":
@@ -724,7 +733,7 @@ socket.on("status",(data) => {
             break;
         default:
             _consoleLog(`Request dropped!`);
-            socket.emit("status",`Unknown state, please refresh page.`,room);
+            socket.emit("status",`Unknown error, please refresh page.`,room);
             break;
     }
 });
