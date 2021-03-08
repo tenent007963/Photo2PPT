@@ -2,7 +2,8 @@
   "name": "instaphoto",
   "description": "Phone Snap, PC get.",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "release": "node preProd.js"
   },
   "main": "index.js",
   "license": "ISC",
@@ -18,7 +19,7 @@
     "qrcode": "^1.4.4",
     "socket.io": "^2.4.0"
   },
-  "version": "2.5.0",
+  "version": "2.6.0",
   "devDependencies": {},
   "repository": {
     "type": "git",

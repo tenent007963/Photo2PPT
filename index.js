@@ -33,13 +33,13 @@ let server=http.createServer(function(req,res){
             fs.readFile(__dirname + '/static/server-dev.html', 'utf8', fsCallback);
         break;
 		case '/pc':
-            fs.readFile(__dirname + '/static/server-source.html', 'utf8', fsCallback);
+            fs.readFile(__dirname + '/static/server.html', 'utf8', fsCallback);
         break;
 		case '/client-dev':
             fs.readFile(__dirname + '/static/client-dev.html', 'utf8', fsCallback);
         break;
 		case '/phone':
-            fs.readFile(__dirname + '/static/client-source.html', 'utf8', fsCallback);
+            fs.readFile(__dirname + '/static/client.html', 'utf8', fsCallback);
         break;
 		case '/favicon.ico':
             fs.readFile(__dirname + '/static/favicon.ico', fsCallback);

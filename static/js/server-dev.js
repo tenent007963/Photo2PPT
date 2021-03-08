@@ -280,6 +280,10 @@ function resizeImageToSpecificWidth(max, imgur, cb) {
 // Note: ES6 is required or else code will report error
 // Reference: https://jsfiddle.net/tenent007963/sfta0725/1/
 async function orientCheck(data) {
+    //Convert base64 into blob for compression
+    const base64 = await fetch(data);
+    const blob = await base64.blob();
+
     return promise = new Promise(resolve => {
         _consoleLog(`Checking image orientation`);
         let img = new Image();
@@ -292,7 +296,8 @@ async function orientCheck(data) {
                 rotateImage();
             } else {
                 _consoleLog(`Orientation correct,exit now`);
-                returnImg();
+                //returnImg();
+                compressImg(blob); //To compress image
             }
         }
         let rotateImage = () => {

@@ -7,7 +7,6 @@ const output = document.getElementById("download");
 const _pptxne = document.getElementById("pptxnotenabled");
 const _imgdown = document.getElementById("wannasavemou");
 const _nsi = document.getElementById("nosaveimage");
-const _ewanatt = document.getElementById("ewanstat");
 const _btncoint = document.getElementById("btn-container");
 const _moreopt = document.getElementById("moreopt");
 const _latency = document.getElementById("socketlatency");
@@ -51,7 +50,6 @@ function togglepptx() {
         _svppt.disabled = true;
         _gpint.value = "";
         _gpint.disabled = true;
-        _ewanatt.style.display = "none";
         photocount = 0;
         rmtmb();
         socket.emit("status",`PptxGenJS not enabled!`,room);
@@ -149,8 +147,7 @@ function smartFilename() {
 
 //Download image function, to fix file naming problem
 function imageDl(data) {
-    let name = smartFilename() + '.jpg';
-    download(data, name, "application/octet-stream;base64");
+    download(data, smartFilename(), data.type);
 }
 
 async function genQR(data) {
@@ -214,7 +211,6 @@ function savepptx() {
         _svppt.disabled = true;
         _gpint.value = "";
         _gpint.disabled = true;
-        _ewanatt.style.display = "none";
         photocount = 0;
         socket.emit("status",`File saved. Please re-enable PPTXGenJS.`,room)
         rmtmb();
@@ -284,6 +280,10 @@ function resizeImageToSpecificWidth(max, imgur, cb) {
 // Note: ES6 is required or else code will report error
 // Reference: https://jsfiddle.net/tenent007963/sfta0725/1/
 async function orientCheck(data) {
+    //Convert base64 into blob for compression
+    const base64 = await fetch(data);
+    const blob = await base64.blob();
+
     return promise = new Promise(resolve => {
         _consoleLog(`Checking image orientation`);
         let img = new Image();
@@ -296,7 +296,8 @@ async function orientCheck(data) {
                 rotateImage();
             } else {
                 _consoleLog(`Orientation correct,exit now`);
-                returnImg();
+                //returnImg();
+                compressImg(blob); //To compress image
             }
         }
         let rotateImage = () => {
@@ -348,19 +349,21 @@ async function orientCheck(data) {
 function initCS() {
     roomInit();
     _cs.style.display= "flex";
-    mode = 'cs';
+    mode = "cs";
     Cookies.remove('mode'); //reset cookie
     Cookies.set('mode', 'cs',{ expires: 7 ,path: ''});
+    return 0;
 }
 
 //Tech mode
 function initTech() {
     roomInit();
     _tech.style.display= "flex";
-    mode = 'tech';
+    mode = "tech";
     saveimg = true;
     Cookies.remove('mode'); //reset cookie
     Cookies.set('mode', 'tech',{ expires: 7,path: ''});
+    return 0;
 }
 
 // Room Pre-initialize, load cookies and other presets from last session
@@ -381,7 +384,7 @@ function checkRoomInitialize() {
             _consoleLog(`Joining old room, room code: ${getRoom}`)
         }
         //Mode checking
-        let getMode = Cookies.get('mode');
+        let getMode = Cookies.get('mode') || null;
         switch(getMode){
             case "cs":
                 initCS();
@@ -398,7 +401,7 @@ function checkRoomInitialize() {
     }
     catch (err) {
         _mainContainer.innerHTML = err.message;
-        setTimeout(()=>{location.reload(true)}, 2500);
+        setTimeout(()=>{location.reload(true)}, 2000);
     }
 }
 
@@ -409,6 +412,7 @@ function roomInit(){
     //Display roomqr popup
     $('#popup').modal('show');
     _consoleLog(`Server ready.`);
+    return 0;
 }
 
 //Switch between CSO and Tech mode
@@ -416,6 +420,7 @@ let changemode = () => {
     Cookies.remove('mode');
     mode = '';
     location.reload(true);
+    return 0;
 }
 
 //Active listener for window
@@ -700,19 +705,36 @@ socket.on('disconnect', function(){
 
 // Return server image status to client upon call
 socket.on("status",(data) => {
-    _consoleLog(`Received parsed request from host`)
+    _consoleLog(`Received parsed request from host`);
     switch(data) {
         case "check":
             _consoleLog(`Sending status..`);
             $('#popup').modal('hide');
-            if (pptxenabled) {
-                socket.emit("status",`Now adding photo ${photocount+1}`,room);
-            } 
-            if (!pptxenabled && mode === 'cs') {
-                socket.emit("status",`PptxGenJS not enabled!`,room);
-            } 
-            if (!pptxenabled && mode === 'tech') {
-                socket.emit("status",`Tech mode`,room);
+            switch (mode) {
+                case "cs":
+                    if (pptxenabled) {
+                        socket.emit("status",`Now adding photo ${photocount+1}`,room);
+                        return 0;
+                    } else if (!pptxenabled && saveimg) {
+                        socket.emit("status",`Saving photos only.`,room);
+                        return 0;
+                    } else {
+                        socket.emit("status",`PptxGenJS not enabled!`,room);
+                        return 0;
+                    }
+                    break;
+                case "tech":
+                    if (saveimg){
+                        socket.emit("status",`Tech mode`,room);
+                        return 0;
+                    } 
+                    break;
+                default:
+                    socket.emit("status",`Waiting for user input...`,room);
+                    break;
+            }
+            if (!pptxenabled && !saveimg && !mode) {
+                socket.emit("status",`Room initializing`,room);
             }
             break;
         case "save":
@@ -724,7 +746,7 @@ socket.on("status",(data) => {
             break;
         default:
             _consoleLog(`Request dropped!`);
-            socket.emit("status",`Unknown state, please refresh page.`,room);
+            socket.emit("status",`Unknown error, please refresh page.`,room);
             break;
     }
 });
