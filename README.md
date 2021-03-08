@@ -16,17 +16,17 @@ Customized platform to create required attachment files in a simple manner.
 
 # How to use:
 
-Local Environment: \
- 1. Clone this repo : `git clone tenent007963/InstaPhoto` \
- 2. Run `npm install` for dependencies installations\
- 3. Install postgres from https://www.postgresql.org/download/ and setup postgres database\
- 4. Define DATABASE_URL eg.  `$env:DATABASE_URL = "postgres://postgres:postgres@localhost:5432/postgres"`\
+Local Environment: 
+ 1. Clone this repo : `git clone tenent007963/InstaPhoto` 
+ 2. Run `npm install` for dependencies installations
+ 3. Install postgres from https://www.postgresql.org/download/ and setup postgres database
+ 4. Define DATABASE_URL eg.  `$env:DATABASE_URL = "postgres://postgres:postgres@localhost:5432/postgres"`
  5. Start with `npm start` in console
 
-On Heroku: \
- 1. Clone this repo\
- 2. Install Heroku Postgres add-on\
- 3. Start up the dyno app\
+On Heroku: 
+ 1. Clone this repo
+ 2. Install Heroku Postgres add-on
+ 3. Start up the dyno app
 
 
 # Hotkeys:
@@ -34,7 +34,7 @@ On Heroku: \
 `x`: Enable / Create PPT file\
 `Ctrl + Shift + z`: Disable / Discard PPT file\
 `` ` ``: Toggle SaveImage\
-`Enter`: Save PPT file (if enabled)\
+`Enter`: Save PPT file (if enabled)
 
 
 # To-Do:
