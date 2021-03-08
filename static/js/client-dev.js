@@ -61,7 +61,7 @@ let room;
                 _consoleLog(`First try success!`);
             } else {
                 // reconnect
-                socket.connect(); //method1
+                socket.socket.connect(); //method1
                 socket.emit("join",room);
                 if (socket.connected) {
                     emitPhoto(image);
@@ -240,6 +240,7 @@ socket.on('disconnect', function(){
     _consoleLog(`Trying to reconnect socket.`);
     socket.on('connect_error',function(reason) {
         setOffline();
+        socket.disconnect();
         _status.textContent = reason;
         window.location.reload();
     });

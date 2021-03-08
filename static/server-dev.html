@@ -35,7 +35,7 @@
 	<div class="container" id="init">
 		<h3>Select your role:</h3>
 		<button type="button" class="btn btn-outline-primary btn-lg" onclick="initCS()" id="csMode">CSO</button>
-		<button type="button" class="btn btn-outline-primary btn-lg" onclick="initTech()" id="techMode">Tech</button>
+		<button type="button" class="btn btn-outline-primary btn-lg" onclick="initTech()" id="techMode">Engineer</button>
 	</div>
   	<div class="container-fluid" id="main" style="display:none">
 		<div class="btn-toolbar topbar" role="toolbar" aria-label="Normal Toolbar for CS" id="cs" style="display:none">
@@ -43,10 +43,9 @@
 			<button type="button" class="btn btn-light mr-1" id="saveimage" onclick="saveimage()">Save Image : <span id="wannasavemou">No</span></button>
 			<button type="button" class="btn btn-light mr-1" id="togglepptx" onclick="togglepptx()">Create PPTX : <span id="pptxgenjsstatus">Off</span></button>
 			<button type="button" class="btn btn-light mr-1" id="savepptx" onclick="savepptx()" disabled>Save PPTX</button>
-			<form style="float: right;position: relative" action="#" onsubmit="return false;">
+			<form style="float: right;position: relative;margin: 3px;" action="#" onsubmit="return false;">
 				<input type="text" name="GSPN" id="GSPNintCS" placeholder="S/O number:" disabled="disabled"/>	
 			</form>
-			<span id="ewanstat" style="position: relative;color: green;display:none">&#10004; E-Warranty Attached &#10004; </span>
 		</div>
 
 		<div class="btn-toolbar topbar" role="toolbar" aria-label="Normal toolbar for tech" id="tech" style="display:none">
@@ -114,7 +113,7 @@
 
 	<div class="warnings" style="color: red">
 		<span id="pptxnotenabled" style="display:none">Warning : PPTX not enabled!</span>
-		<br />
+		<span></span>
 		<span id="nosaveimage" style="display:none">Notice : Image not downloaded!</span>
 	</div>
 </body>
