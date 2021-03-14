@@ -11,11 +11,11 @@ const dbURL = process.env.DATABASE_URL;
 //Init postgres connection & setup
 const client = new Client({
     connectionString: dbURL,
-    ssl:true,
+    ssl:{rejectUnauthorized: false},
 });
 client.connect();
 client.query('CREATE TABLE IF NOT EXISTS availableroom (room_id CHAR(11) PRIMARY KEY, server CHAR(8), client CHAR(8));', (err, res) => {
-    if (err) throw err;
+    if (err) console.log(`Operating in headless mode, Postgres error:`,err);
     console.log(`Result from postgres:`,res.command);
 });
 
