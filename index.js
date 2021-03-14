@@ -10,7 +10,8 @@ const dbURL = process.env.DATABASE_URL;
 
 //Init postgres connection & setup
 const client = new Client({
-    connectionString: dbURL
+    connectionString: dbURL,
+    ssl:true,
 });
 client.connect();
 client.query('CREATE TABLE IF NOT EXISTS availableroom (room_id CHAR(11) PRIMARY KEY, server CHAR(8), client CHAR(8));', (err, res) => {
