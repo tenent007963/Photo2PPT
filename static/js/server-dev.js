@@ -522,7 +522,7 @@ window.addEventListener('paste', function(e) {
 })
 
 
-//Dropzone : Drop the beat(?)
+//Dropzone : Drop the beat
 if (dropZone) {
     _consoleLog("Drop action ok.")
     const hoverClassName = "hover";
@@ -752,7 +752,7 @@ socket.on("status",(data) => {
 });
 
 // Latency checking
-socket.on('pong', function(ping) {
+socket.on('pong', (ping) => {
     _latency.textContent = ping + 'ms';
     if(logping) {
         _consoleLog(`Received Pong: ${ping}`);

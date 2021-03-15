@@ -1,13 +1,5 @@
 // Get WebSocket
-const socket = io({
-    reconnection: true,
-    reconnectionAttempts: Infinity,
-    reconnectionDelay: 1000,
-    reconnectionDelayMax: 5000,
-    randomizationFactor: 0.5,
-    timeout: 200000,
-    autoConnect: true,
-  });
+const socket = io();
 
 // Get DOM elements
 let _src1 = document.getElementById("input1");
@@ -61,17 +53,17 @@ let room;
                 _consoleLog(`First try success!`);
             } else {
                 // reconnect
-                socket.socket.connect(); //method1
+                socket.connect(); //method1
                 socket.emit("join",room);
-                if (socket.connected) {
+                socket.on('connect', () => {
                     emitPhoto(image);
                     _consoleLog(`Second try success.`);
-                } else {
+                });
+                socket.on('reconnect_failed', () => {
                     alert("Connection lost! Will now refresh page.");
                     _consoleLog(`Connection lost!`);
                     window.location.reload();
-                    return false;
-                }
+                });
             }
         };
     });
@@ -119,13 +111,14 @@ function leaveroom(rm){
     socket.emit("leave",rm);
     setOffline();
     _status.textContent = 'Disconnected from room ' + rm + '.';
+    return 0;
 }
 
 //Initialize QR Scanner Elements
 
 function onScanSuccess(qrCodeMessage) {
     let thecode = qrCodeMessage.trim();
-    let thecodeofcode = thecode.slice(0,9);
+    let thecodeofcode = thecode.slice(0,10);
     joinroom(thecodeofcode);
     _scanbutton.style.display = "block";
     _consoleLog(`The code:`,thecodeofcode);
@@ -193,9 +186,9 @@ window.onfocus = () => {
         _consoleLog(`Trying to reconnect...`);
         setOffline();
         try {
-            socket.socket.connect();
+            socket.open();
             socket.emit("join",room);
-            socket.on('connect_error',function(reason) {
+            socket.on('reconnect_failed',function(reason) {
                 _status.textContent = reason;
                 window.location.reload();
             });
@@ -205,7 +198,7 @@ window.onfocus = () => {
         catch(err) {
             _consoleLog(`Reconnect failed! Will proceed to force reload.`);
             //alert(`${err} Will now force reload.`); //This code will cause page to lose focus and thus infinite loop
-            _container.textContent = 'Socket disconnected! Will proceed to force reload.';
+            _container.textContent = 'Reconnecting failed! Will proceed to force reload.';
             window.location.reload();
         }
 
@@ -233,12 +226,14 @@ socket.on("status",function(data){
 });
 
 // Upon socket disconnection
-socket.on('disconnect', function(){
+socket.on('disconnect', reason => {
+    _consoleLog(`Socket disconnected, reason:`, reason);
     // try to reconnect
-    socket.socket.connect();
+    socket.open();
+    //socket.connect();
     socket.emit("join",room);
     _consoleLog(`Trying to reconnect socket.`);
-    socket.on('connect_error',function(reason) {
+    socket.on('reconnect_failed',function(reason) {
         setOffline();
         socket.disconnect();
         _status.textContent = reason;
@@ -246,11 +241,13 @@ socket.on('disconnect', function(){
     });
 });
 
+/*
 socket.on('reconnect_error',function(reason){
     setOffline();
     _status.textContent = reason;
     window.location.reload();
 })
+*/
 
 function checkStatus() {
     _consoleLog("Querying status..");
