@@ -12,7 +12,7 @@ let _roomIndicator = document.getElementById("roomindicator");
 let _scanbutton = document.getElementById("startScan");
 
 // Join a channel
-let room;
+let room, lastResult, countResults = 0;
 
 // Listen to Source1 and Source2 input events
 [_src1,_src2].forEach(function(sauce){
@@ -59,7 +59,7 @@ let room;
                     emitPhoto(image);
                     _consoleLog(`Second try success.`);
                 });
-                socket.on('reconnect_failed', () => {
+                socket.on('reconnect_error', () => {
                     alert("Connection lost! Will now refresh page.");
                     _consoleLog(`Connection lost!`);
                     window.location.reload();
@@ -94,9 +94,9 @@ function joinroom(rm) {
         _status.textContent = 'Error: No room code!';
         _consoleLog(`Error: No room code!`);
         $('#popup').modal('show');
-        return false;
-    }
-    if(socket.connected && room) {
+        return 0;
+    } 
+    if(socket.connected && room != rm) {
         leaveroom(room);
     }
     Cookies.set('room',rm,{ expires: 31 ,path: ''});
@@ -117,44 +117,30 @@ function leaveroom(rm){
 //Initialize QR Scanner Elements
 
 function onScanSuccess(qrCodeMessage) {
-    let thecode = qrCodeMessage.trim();
-    let thecodeofcode = thecode.slice(0,10);
-    joinroom(thecodeofcode);
-    _scanbutton.style.display = "block";
-    _consoleLog(`The code:`,thecodeofcode);
-    html5QrcodeScanner.stop().then(ignore => {
-        // QR Code scanning is stopped.
-    }).catch(err => {
+    if (qrCodeMessage !== lastResult) {
+		++countResults;
+		lastResult = qrCodeMessage;
+	}
+    if (qrCodeMessage === lastResult) {
+        countResults = 0;
+        let thecode = qrCodeMessage.trim();
+        let thecodeofcode = thecode.slice(0,10);
+        joinroom(thecodeofcode);
+        _consoleLog(`The code:`,thecodeofcode);
         html5QrcodeScanner.clear();
-        _consoleLog(err);
-    });
+        _scanbutton.style.display = "block";
+    }
 }
 
 function onScanFailure(error) {
     // handle scan failure, usually better to ignore and keep scanning
-    _consoleLog(`QR error = ${error}`);
+    //_consoleLog(`QR error = ${error}`);
+    console.log(`QR error = ${error}`);
 }
 
 //set to Html5Qrcode and comment out html5QrcodeScanner for pro mode
-let html5QrcodeScanner = new Html5QrcodeScanner(
-	"reader", { fps: 25});
+let html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 25});
 html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-
-// This method will trigger user permissions
-/*
-Html5Qrcode.getCameras().then(devices => {
-    /**
-     * devices would be an array of objects of type:
-     * { id: "id", label: "label" }
-     *-/
-    if (devices && devices.length) {
-        cameraId = devices[1].id;
-    }
-}).catch(err => {
-    _consoleLog(err);
-});
-*/
-
 
 $("#startScan").on("click", function(){
     //html5Qrcode.start(cameraId, { fps: 30 },onScanSuccess, onScanFailure).catch(err => { _consoleLog(err)});
@@ -188,7 +174,7 @@ window.onfocus = () => {
         try {
             socket.open();
             socket.emit("join",room);
-            socket.on('reconnect_failed',function(reason) {
+            socket.on('reconnect_error',function(reason) {
                 _status.textContent = reason;
                 window.location.reload();
             });
@@ -233,9 +219,8 @@ socket.on('disconnect', reason => {
     //socket.connect();
     socket.emit("join",room);
     _consoleLog(`Trying to reconnect socket.`);
-    socket.on('reconnect_failed',function(reason) {
+    socket.on('reconnect_error',function(reason) {
         setOffline();
-        socket.disconnect();
         _status.textContent = reason;
         window.location.reload();
     });
