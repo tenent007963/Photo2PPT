@@ -125,8 +125,8 @@ function onScanSuccess(qrCodeMessage) {
         countResults = 0;
         let thecode = qrCodeMessage.trim();
         let thecodeofcode = thecode.slice(0,10);
+        _consoleLog(`The code: ${thecodeofcode}`);
         joinroom(thecodeofcode);
-        _consoleLog(`The code:`,thecodeofcode);
         html5QrcodeScanner.clear();
         _scanbutton.style.display = "block";
     }
@@ -213,7 +213,7 @@ socket.on("status",function(data){
 
 // Upon socket disconnection
 socket.on('disconnect', reason => {
-    _consoleLog(`Socket disconnected, reason:`, reason);
+    _consoleLog(`Socket disconnected, reason: ${reason}`);
     // try to reconnect
     socket.open();
     //socket.connect();

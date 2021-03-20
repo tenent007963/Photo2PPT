@@ -151,7 +151,7 @@ function imageDl(data) {
 }
 
 async function genQR(data) {
-    const qrcode = new QRCode("roomqr",{width: 250,height: 250,});
+    const qrcode = new QRCode("roomqr",{width: 330,height: 330,});
     qrcode.makeCode(data);
 }
 
