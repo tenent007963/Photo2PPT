@@ -33,6 +33,10 @@ if(isDebug) {
     loadStyle.href = window.location.pathname + ".css";
 
     document.getElementsByTagName('head')[0].appendChild(loadStyle);
+
+    //Enabled for Socket.io debug
+    localStorage.debug = '*';
+
 } else {
     if (window.location.href.match(/pc/g)) {
         var loadScript = document.createElement('script');

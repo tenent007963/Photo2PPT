@@ -53,9 +53,9 @@ let room, lastResult, countResults = 0;
                 _consoleLog(`First try success!`);
             } else {
                 // reconnect
-                socket.connect(); //method1
-                socket.emit("join",room);
+                socket.socket.connect(); //method1
                 socket.on('connect', () => {
+                    socket.emit("join",room);
                     emitPhoto(image);
                     _consoleLog(`Second try success.`);
                 });
@@ -123,10 +123,9 @@ function onScanSuccess(qrCodeMessage) {
 	}
     if (qrCodeMessage === lastResult) {
         countResults = 0;
-        let thecode = qrCodeMessage.trim();
-        let thecodeofcode = thecode.slice(0,10);
-        _consoleLog(`The code: ${thecodeofcode}`);
-        joinroom(thecodeofcode);
+        let thecode = qrCodeMessage.slice(0,10);
+        _consoleLog(`The code: ${thecode}`);
+        joinroom(thecode);
         html5QrcodeScanner.clear();
         _scanbutton.style.display = "block";
     }
@@ -169,25 +168,13 @@ let cleanReload = () => {
 window.onfocus = () => {
     _consoleLog(`Window focused. Checking connection...`);
     if (!socket.connected) {
-        _consoleLog(`Trying to reconnect...`);
+        _consoleLog(`Passive check, disconnected.`);
         setOffline();
-        try {
-            socket.open();
-            socket.emit("join",room);
-            socket.on('reconnect_error',function(reason) {
-                _status.textContent = reason;
-                window.location.reload();
-            });
-            _consoleLog(`Client reconnected.`);
-            checkStatus();
-        }
-        catch(err) {
-            _consoleLog(`Reconnect failed! Will proceed to force reload.`);
-            //alert(`${err} Will now force reload.`); //This code will cause page to lose focus and thus infinite loop
-            _container.textContent = 'Reconnecting failed! Will proceed to force reload.';
-            window.location.reload();
-        }
-
+        if (socket.socket.connecting === false) {
+            // use a connect() or reconnect() here if you want
+            _consoleLog(`Passive check, reconnecting`);
+            socket.socket.connect();
+            }
     } else {
         _consoleLog(`Client is connected, falling back.`);
         checkStatus();
@@ -215,25 +202,34 @@ socket.on("status",function(data){
 socket.on('disconnect', reason => {
     _consoleLog(`Socket disconnected, reason: ${reason}`);
     // try to reconnect
+    //socket.socket.connect();
     socket.open();
-    //socket.connect();
-    socket.emit("join",room);
     _consoleLog(`Trying to reconnect socket.`);
-    socket.on('reconnect_error',function(reason) {
-        setOffline();
-        _status.textContent = reason;
-        window.location.reload();
-    });
 });
 
-/*
+socket.on('connect',() => {
+    _consoleLog(`Reconnecting room.`);
+    socket.emit("join",room);
+    setOnline();
+    checkStatus();
+})
+
 socket.on('reconnect_error',function(reason){
+    _consoleLog(`Reconnect error.`);
     setOffline();
     _status.textContent = reason;
     window.location.reload();
 })
-*/
 
+socket.on('error',(reason) => {
+    _consoleLog(`An error occured.`);
+    setOffline();
+    _status.textContent = 'An error occured:' + reason;
+    window.location.reload();
+});
+
+// "check" to instruct server send check msg to PC and revert back
+// "cb" to check callback from server
 function checkStatus() {
     _consoleLog("Querying status..");
     socket.emit("client","check",room, (cb) => {
