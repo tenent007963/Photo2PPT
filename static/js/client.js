@@ -123,7 +123,8 @@ function onScanSuccess(qrCodeMessage) {
 	}
     if (qrCodeMessage === lastResult) {
         countResults = 0;
-        let thecode = qrCodeMessage.slice(0,10);
+        //let thecode = qrCodeMessage.slice(0,11);
+        let thecode = qrCodeMessage.trim();
         _consoleLog(`The code: ${thecode}`);
         joinroom(thecode);
         html5QrcodeScanner.clear();

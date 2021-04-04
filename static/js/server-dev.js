@@ -418,8 +418,8 @@ function roomInit(){
 
 //Switch between CSO and Tech mode
 let changemode = () => {
-    Cookies.remove('mode');
     mode = '';
+    Cookies.remove('mode');
     location.reload(true);
     return 0;
 }
