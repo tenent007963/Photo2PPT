@@ -350,7 +350,7 @@ function initCS() {
     roomInit();
     _cs.style.display= "flex";
     mode = "cs";
-    Cookies.remove('mode'); //reset cookie
+    //Cookies.remove('mode'); //reset cookie
     Cookies.set('mode', 'cs',{ expires: 7 ,path: ''});
     return 0;
 }
@@ -361,7 +361,7 @@ function initTech() {
     _tech.style.display= "flex";
     mode = "tech";
     saveimg = true;
-    Cookies.remove('mode'); //reset cookie
+    //Cookies.remove('mode'); //reset cookie
     Cookies.set('mode', 'tech',{ expires: 7,path: ''});
     return 0;
 }
@@ -395,6 +395,7 @@ function checkRoomInitialize() {
                 _consoleLog(`Init Tech Mode.`);
                 break;
             default:
+                return null;
                 break;
         }
         _consoleLog(`Server Preparation done.`);

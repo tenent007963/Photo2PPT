@@ -1,13 +1,5 @@
 // Get WebSocket
-const socket = io({
-    reconnection: true,
-    reconnectionAttempts: Infinity,
-    reconnectionDelay: 1000,
-    reconnectionDelayMax: 5000,
-    randomizationFactor: 0.5,
-    timeout: 200000,
-    autoConnect: true,
-  });
+const socket = io();
 
 // Get DOM elements
 let _src1 = document.getElementById("input1");
@@ -20,7 +12,7 @@ let _roomIndicator = document.getElementById("roomindicator");
 let _scanbutton = document.getElementById("startScan");
 
 // Join a channel
-let room;
+let room, lastResult, countResults = 0;
 
 // Listen to Source1 and Source2 input events
 [_src1,_src2].forEach(function(sauce){
@@ -62,16 +54,16 @@ let room;
             } else {
                 // reconnect
                 socket.socket.connect(); //method1
-                socket.emit("join",room);
-                if (socket.connected) {
+                socket.on('connect', () => {
+                    socket.emit("join",room);
                     emitPhoto(image);
                     _consoleLog(`Second try success.`);
-                } else {
+                });
+                socket.on('reconnect_error', () => {
                     alert("Connection lost! Will now refresh page.");
                     _consoleLog(`Connection lost!`);
                     window.location.reload();
-                    return false;
-                }
+                });
             }
         };
     });
@@ -102,9 +94,9 @@ function joinroom(rm) {
         _status.textContent = 'Error: No room code!';
         _consoleLog(`Error: No room code!`);
         $('#popup').modal('show');
-        return false;
-    }
-    if(socket.connected && room) {
+        return 0;
+    } 
+    if(socket.connected && room != rm) {
         leaveroom(room);
     }
     Cookies.set('room',rm,{ expires: 31 ,path: ''});
@@ -119,49 +111,35 @@ function leaveroom(rm){
     socket.emit("leave",rm);
     setOffline();
     _status.textContent = 'Disconnected from room ' + rm + '.';
+    return 0;
 }
 
 //Initialize QR Scanner Elements
 
 function onScanSuccess(qrCodeMessage) {
-    let thecode = qrCodeMessage.trim();
-    let thecodeofcode = thecode.slice(0,9);
-    joinroom(thecodeofcode);
-    _scanbutton.style.display = "block";
-    _consoleLog(`The code:`,thecodeofcode);
-    html5QrcodeScanner.stop().then(ignore => {
-        // QR Code scanning is stopped.
-    }).catch(err => {
+    if (qrCodeMessage !== lastResult) {
+		++countResults;
+		lastResult = qrCodeMessage;
+	}
+    if (qrCodeMessage === lastResult) {
+        countResults = 0;
+        let thecode = qrCodeMessage.slice(0,10);
+        _consoleLog(`The code: ${thecode}`);
+        joinroom(thecode);
         html5QrcodeScanner.clear();
-        _consoleLog(err);
-    });
+        _scanbutton.style.display = "block";
+    }
 }
 
 function onScanFailure(error) {
     // handle scan failure, usually better to ignore and keep scanning
-    _consoleLog(`QR error = ${error}`);
+    //_consoleLog(`QR error = ${error}`);
+    console.log(`QR error = ${error}`);
 }
 
 //set to Html5Qrcode and comment out html5QrcodeScanner for pro mode
-let html5QrcodeScanner = new Html5QrcodeScanner(
-	"reader", { fps: 25});
+let html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 25});
 html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-
-// This method will trigger user permissions
-/*
-Html5Qrcode.getCameras().then(devices => {
-    /**
-     * devices would be an array of objects of type:
-     * { id: "id", label: "label" }
-     *-/
-    if (devices && devices.length) {
-        cameraId = devices[1].id;
-    }
-}).catch(err => {
-    _consoleLog(err);
-});
-*/
-
 
 $("#startScan").on("click", function(){
     //html5Qrcode.start(cameraId, { fps: 30 },onScanSuccess, onScanFailure).catch(err => { _consoleLog(err)});
@@ -190,25 +168,13 @@ let cleanReload = () => {
 window.onfocus = () => {
     _consoleLog(`Window focused. Checking connection...`);
     if (!socket.connected) {
-        _consoleLog(`Trying to reconnect...`);
+        _consoleLog(`Passive check, disconnected.`);
         setOffline();
-        try {
+        if (socket.socket.connecting === false) {
+            // use a connect() or reconnect() here if you want
+            _consoleLog(`Passive check, reconnecting`);
             socket.socket.connect();
-            socket.emit("join",room);
-            socket.on('connect_error',function(reason) {
-                _status.textContent = reason;
-                window.location.reload();
-            });
-            _consoleLog(`Client reconnected.`);
-            checkStatus();
-        }
-        catch(err) {
-            _consoleLog(`Reconnect failed! Will proceed to force reload.`);
-            //alert(`${err} Will now force reload.`); //This code will cause page to lose focus and thus infinite loop
-            _container.textContent = 'Socket disconnected! Will proceed to force reload.';
-            window.location.reload();
-        }
-
+            }
     } else {
         _consoleLog(`Client is connected, falling back.`);
         checkStatus();
@@ -233,25 +199,37 @@ socket.on("status",function(data){
 });
 
 // Upon socket disconnection
-socket.on('disconnect', function(){
+socket.on('disconnect', reason => {
+    _consoleLog(`Socket disconnected, reason: ${reason}`);
     // try to reconnect
-    socket.socket.connect();
-    socket.emit("join",room);
+    //socket.socket.connect();
+    socket.open();
     _consoleLog(`Trying to reconnect socket.`);
-    socket.on('connect_error',function(reason) {
-        setOffline();
-        socket.disconnect();
-        _status.textContent = reason;
-        window.location.reload();
-    });
 });
 
+socket.on('connect',() => {
+    _consoleLog(`Reconnecting room.`);
+    socket.emit("join",room);
+    setOnline();
+    checkStatus();
+})
+
 socket.on('reconnect_error',function(reason){
+    _consoleLog(`Reconnect error.`);
     setOffline();
     _status.textContent = reason;
     window.location.reload();
 })
 
+socket.on('error',(reason) => {
+    _consoleLog(`An error occured.`);
+    setOffline();
+    _status.textContent = 'An error occured:' + reason;
+    window.location.reload();
+});
+
+// "check" to instruct server send check msg to PC and revert back
+// "cb" to check callback from server
 function checkStatus() {
     _consoleLog("Querying status..");
     socket.emit("client","check",room, (cb) => {

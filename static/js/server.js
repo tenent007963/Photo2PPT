@@ -151,7 +151,7 @@ function imageDl(data) {
 }
 
 async function genQR(data) {
-    const qrcode = new QRCode("roomqr",{width: 250,height: 250,});
+    const qrcode = new QRCode("roomqr",{width: 330,height: 330,});
     qrcode.makeCode(data);
 }
 
@@ -350,7 +350,7 @@ function initCS() {
     roomInit();
     _cs.style.display= "flex";
     mode = "cs";
-    Cookies.remove('mode'); //reset cookie
+    //Cookies.remove('mode'); //reset cookie
     Cookies.set('mode', 'cs',{ expires: 7 ,path: ''});
     return 0;
 }
@@ -361,7 +361,7 @@ function initTech() {
     _tech.style.display= "flex";
     mode = "tech";
     saveimg = true;
-    Cookies.remove('mode'); //reset cookie
+    //Cookies.remove('mode'); //reset cookie
     Cookies.set('mode', 'tech',{ expires: 7,path: ''});
     return 0;
 }
@@ -395,6 +395,7 @@ function checkRoomInitialize() {
                 _consoleLog(`Init Tech Mode.`);
                 break;
             default:
+                return null;
                 break;
         }
         _consoleLog(`Server Preparation done.`);
@@ -522,7 +523,7 @@ window.addEventListener('paste', function(e) {
 })
 
 
-//Dropzone : Drop the beat(?)
+//Dropzone : Drop the beat
 if (dropZone) {
     _consoleLog("Drop action ok.")
     const hoverClassName = "hover";
@@ -752,7 +753,7 @@ socket.on("status",(data) => {
 });
 
 // Latency checking
-socket.on('pong', function(ping) {
+socket.on('pong', (ping) => {
     _latency.textContent = ping + 'ms';
     if(logping) {
         _consoleLog(`Received Pong: ${ping}`);
