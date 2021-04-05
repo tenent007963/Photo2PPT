@@ -89,6 +89,7 @@ function getRoom() {
 
 //Join room
 function joinroom(rm) {
+    $('#popup').modal('hide');
     _consoleLog(`Connecting to room ${rm}.`);
     if(rm === undefined || rm === '') {
         _status.textContent = 'Error: No room code!';
@@ -100,10 +101,10 @@ function joinroom(rm) {
         leaveroom(room);
     }
     Cookies.set('room',rm,{ expires: 31 ,path: ''});
-    room = rm;
     socket.emit("join",rm);
+    room = rm;
     checkStatus();
-    $('#popup').modal('hide');
+    return 0;
 }
 
 //Leave room
@@ -129,6 +130,7 @@ function onScanSuccess(qrCodeMessage) {
         joinroom(thecode);
         html5QrcodeScanner.clear();
         _scanbutton.style.display = "block";
+        return 0;
     }
 }
 
@@ -250,7 +252,10 @@ function checkStatus() {
             _status.textContent = 'Incorrect room details.';
             _fileform.reset();
             $('#popup').modal('show');
+            window.room = '';
             _consoleLog(`Incorrect room details.`);
+            window.location.reload();
+            return false;
         } else {
             _status.textContent = 'An error occurred. Will proceed with force refresh.';
             window.location.reload();

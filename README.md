@@ -14,7 +14,7 @@ Customized platform to create required attachment files in a simple manner.
 - Dual mode (CSO / Engineer)
 
 
-# How to use:
+# How to deploy:
 
 Local Environment: 
  1. Clone this repo : `git clone tenent007963/InstaPhoto` 
@@ -27,6 +27,14 @@ On Heroku:
  1. Clone this repo
  2. Install Heroku Postgres add-on
  3. Start up the dyno app
+
+
+# How to use:
+
+1. Goto https://instaphoto.gq on PC and phone
+2. On PC, select `PC - SIDE`, then select your role
+3. On phone, select `PHONE - SIDE`, wait for the page load and popup a QR scanner
+4. Use the built in QR scanner to scan the QR code that shows on PC
 
 
 # Hotkeys:

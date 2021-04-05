@@ -39,7 +39,7 @@ let logimgdata = false;
 let gpintFocus = false;
 
 //Pre-init elements
-let mode = '';
+let instaMode = '';
 let prefix = '';
 
 //Enable PPTXGenJS...or not?
@@ -89,7 +89,7 @@ socket.on("transimage", function(buffallow) {
     if (pptxenabled === true) {
         addSlide(image);
     } else {
-        if (mode === 'cs') {
+        if (instaMode === 'cs') {
             _pptxne.style.display = "block";
         }
     }
@@ -349,9 +349,9 @@ async function orientCheck(data) {
 function initCS() {
     roomInit();
     _cs.style.display= "flex";
-    mode = "cs";
-    //Cookies.remove('mode'); //reset cookie
-    Cookies.set('mode', 'cs',{ expires: 7 ,path: ''});
+    window.instaMode = "cs";
+    //Cookies.remove('instaMode'); //reset cookie
+    Cookies.set('instaMode', 'cs',{ expires: 7 ,path: ''});
     return 0;
 }
 
@@ -359,10 +359,10 @@ function initCS() {
 function initTech() {
     roomInit();
     _tech.style.display= "flex";
-    mode = "tech";
+    window.instaMode = "tech";
     saveimg = true;
-    //Cookies.remove('mode'); //reset cookie
-    Cookies.set('mode', 'tech',{ expires: 7,path: ''});
+    //Cookies.remove('instaMode'); //reset cookie
+    Cookies.set('instaMode', 'tech',{ expires: 7,path: ''});
     return 0;
 }
 
@@ -383,8 +383,8 @@ function checkRoomInitialize() {
             _header.innerHTML = 'Joining old room, room code: ' + getRoom + '.';
             _consoleLog(`Joining old room, room code: ${getRoom}`)
         }
-        //Mode checking
-        let getMode = Cookies.get('mode') || null;
+        //instaMode checking
+        let getMode = Cookies.get('instaMode') || null;
         switch(getMode){
             case "cs":
                 initCS();
@@ -418,8 +418,8 @@ function roomInit(){
 
 //Switch between CSO and Tech mode
 let changemode = () => {
-    mode = '';
-    Cookies.remove('mode');
+    global.instaMode = '';
+    Cookies.remove('instaMode');
     location.reload(true);
     return 0;
 }
@@ -503,7 +503,7 @@ window.addEventListener('paste', function(e) {
             return true;
         }
     } 
-    if(mode = 'tech') {
+    if(instaMode = 'tech') {
         _gpint1.value = pastedData.trim();
         return true;
     }
@@ -709,9 +709,9 @@ socket.on("status",(data) => {
     _consoleLog(`Received parsed request from host`);
     switch(data) {
         case "check":
-            _consoleLog(`Sending status..`);
+            _consoleLog(`Checking status..`);
             $('#popup').modal('hide');
-            switch (mode) {
+            switch (instaMode) {
                 case "cs":
                     if (pptxenabled) {
                         socket.emit("status",`Now adding photo ${photocount+1}`,room);
@@ -734,7 +734,7 @@ socket.on("status",(data) => {
                     socket.emit("status",`Waiting for user input...`,room);
                     break;
             }
-            if (!pptxenabled && !saveimg && !mode) {
+            if (!pptxenabled && !saveimg && !instaMode) {
                 socket.emit("status",`Room initializing`,room);
             }
             break;
