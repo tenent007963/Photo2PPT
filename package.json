@@ -12,7 +12,7 @@
     "express": "^4.17.1",
     "image-compressor.js": "^1.1.4",
     "ip": "^1.1.5",
-    "jspdf": "^2.0.0",
+    "jspdf": "^2.3.1",
     "opn": "^6.0.0",
     "pg": "^8.3.0",
     "pptxgenjs": "^2.6.0",
