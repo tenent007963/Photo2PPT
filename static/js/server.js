@@ -349,7 +349,7 @@ async function orientCheck(data) {
 function initCS() {
     roomInit();
     _cs.style.display= "flex";
-    window.instaMode = "cs";
+    instaMode = "cs";
     //Cookies.remove('instaMode'); //reset cookie
     Cookies.set('instaMode', 'cs',{ expires: 7 ,path: ''});
     return 0;
@@ -359,7 +359,7 @@ function initCS() {
 function initTech() {
     roomInit();
     _tech.style.display= "flex";
-    window.instaMode = "tech";
+    instaMode = "tech";
     saveimg = true;
     //Cookies.remove('instaMode'); //reset cookie
     Cookies.set('instaMode', 'tech',{ expires: 7,path: ''});
