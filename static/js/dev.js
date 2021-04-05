@@ -1,5 +1,6 @@
 //Debug section
 let isDebug = ( !!window.location.href.match(/dev/g) );
+var versionUpdate = (new Date()).getTime();
 
 //Default debug Code, do not modify
 async function _consoleLog(stringData) {
@@ -16,13 +17,14 @@ async function _consoleLog(stringData) {
     }
 }
 
+
 //Loading dependencies depends on env
 //https://gist.github.com/adikahorvath/8707925
 if(isDebug) {
     // js
     var loadScript = document.createElement('script');
     loadScript.type = "text/javascript";
-    loadScript.src = window.location.pathname + ".js";
+    loadScript.src = window.location.pathname + ".js?v=" + versionUpdate;
     loadScript.async = "true";
 
     document.getElementsByTagName('head')[0].appendChild(loadScript);
@@ -30,7 +32,7 @@ if(isDebug) {
     // CSS
     var loadStyle = document.createElement('link');
     loadStyle.rel = "stylesheet";
-    loadStyle.href = window.location.pathname + ".css";
+    loadStyle.href = window.location.pathname + ".css?v=" + versionUpdate;
 
     document.getElementsByTagName('head')[0].appendChild(loadStyle);
 
@@ -41,7 +43,7 @@ if(isDebug) {
     if (window.location.href.match(/pc/g)) {
         var loadScript = document.createElement('script');
         loadScript.type = "text/javascript";
-        loadScript.src = "server.js";
+        loadScript.src = "server.js?v=" + versionUpdate;
         loadScript.async = "true";
 
         document.getElementsByTagName('head')[0].appendChild(loadScript);
@@ -49,13 +51,13 @@ if(isDebug) {
         // CSS
         var loadStyle = document.createElement('link');
         loadStyle.rel = "stylesheet";
-        loadStyle.href = "/server.css";
+        loadStyle.href = "/server.css?v=" + versionUpdate;
 
         document.getElementsByTagName('head')[0].appendChild(loadStyle);
     } else if (window.location.href.match(/phone/g)) {
         var loadScript = document.createElement('script');
         loadScript.type = "text/javascript";
-        loadScript.src = "client.js";
+        loadScript.src = "client.js?v=" + versionUpdate;
         loadScript.async = "true";
 
         document.getElementsByTagName('head')[0].appendChild(loadScript);
@@ -63,7 +65,7 @@ if(isDebug) {
         // CSS
         var loadStyle = document.createElement('link');
         loadStyle.rel = "stylesheet";
-        loadStyle.href = "/client.css";
+        loadStyle.href = "/client.css?v=" + versionUpdate;
 
         document.getElementsByTagName('head')[0].appendChild(loadStyle);
     }

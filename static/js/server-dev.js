@@ -741,8 +741,10 @@ socket.on("status",(data) => {
         case "save":
             if (pptxenabled) {
                 savepptx();
-            } else {
+            } else if(!pptxenabled && instaMode == 'cs') {
                 alert("There's no active file!");
+            } else {
+                alert('Operation not supported!');
             }
             break;
         default:
