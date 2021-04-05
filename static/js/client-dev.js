@@ -254,7 +254,6 @@ function checkStatus() {
             $('#popup').modal('show');
             window.room = '';
             _consoleLog(`Incorrect room details.`);
-            window.location.reload();
             return false;
         } else {
             _status.textContent = 'An error occurred. Will proceed with force refresh.';

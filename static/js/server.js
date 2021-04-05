@@ -418,7 +418,7 @@ function roomInit(){
 
 //Switch between CSO and Tech mode
 let changemode = () => {
-    global.instaMode = '';
+    instaMode = '';
     Cookies.remove('instaMode');
     location.reload(true);
     return 0;
@@ -503,7 +503,7 @@ window.addEventListener('paste', function(e) {
             return true;
         }
     } 
-    if(instaMode = 'tech') {
+    if(instaMode == 'tech') {
         _gpint1.value = pastedData.trim();
         return true;
     }
