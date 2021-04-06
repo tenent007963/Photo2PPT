@@ -10,6 +10,7 @@ let _container = document.getElementById("container");
 let _roomCodeInput = document.getElementById("roomCode");
 let _roomIndicator = document.getElementById("roomindicator");
 let _scanbutton = document.getElementById("startScan");
+let _saveButton = document.getElementById("savefile");
 
 // Join a channel
 let room, lastResult, countResults = 0;
@@ -199,6 +200,11 @@ socket.on("status",function(data){
     _status.textContent = data;
     _fileform.reset();
     setOnline();
+    if (data == 'Tech mode') {
+        _saveButton.disabled = true;
+    } else {
+        _saveButton.disabled = false;
+    }
 });
 
 // Upon socket disconnection

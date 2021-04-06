@@ -19,7 +19,7 @@
     "qrcode": "^1.4.4",
     "socket.io": "^2.4.0"
   },
-  "version": "3.0.3",
+  "version": "3.0.4",
   "devDependencies": {},
   "repository": {
     "type": "git",
