@@ -474,11 +474,15 @@ window.addEventListener("keydown", function(event) {
 //Sample: https://jsfiddle.net/ourcodeworld/hzvfq82b/
 window.addEventListener('paste', function(e) {
     clipboardData = e.clipboardData;
+    
+    // Get image file
     let file = clipboardData.files[0];
     let reader =  new FileReader();
-    pastedData = clipboardData.getData('Text');
+    
+    // Get text string
+    pastedString = clipboardData.getData('Text');
 
-    //if (file instanceof Blob) {
+    // Processing image
     if (file) {
         reader.readAsDataURL(file);
         reader.onloadend = function () {
@@ -497,22 +501,22 @@ window.addEventListener('paste', function(e) {
             return true;
         } 
     }
-    if (!gpintFocus) {
-        if (pastedData && pptxenabled) {
+
+    // Processing text string
+    if (pastedString) {
+        if(!gpintFocus && pptxenabled) {
             _gpint.value = pastedData.trim();
-            return true;
         }
-    } 
-    if(instaMode == 'tech') {
-        _gpint1.value = pastedData.trim();
-        return true;
+        if(instaMode == 'tech') {
+            _gpint1.value = pastedData.trim();
+        }
     }
 
-    alert("Operation not supported!");
+    //alert("Operation not supported!"); //Discarded due to support majority of content types
 
 });
 
-//To fix duplicate entry when direct paste in _gpint
+//To fix duplicate entry when direct paste in _gpint(s)
 [_gpint,_gpint1].forEach(function(e){
     e.onfocus = function() {
         gpintFocus = true;

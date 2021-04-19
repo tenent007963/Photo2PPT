@@ -104,7 +104,7 @@ let server=http.createServer(function(req,res){
 }).listen(PORT);
 
 // Initialize Socket.io and its variables
-const io = require('socket.io').listen(server,{pingInterval: 5000,pingTimeout: 60000,autoConnect: true});
+const io = require('socket.io').listen(server,{pingInterval: 5000,pingTimeout: 90000000});
 
 // Register "connection" events to the WebSocket
 io.on("connection", async function(socket) {
@@ -316,50 +316,9 @@ process.on('SIGTERM', () => {
     client.query('TRUNCATE TABLE availableroom;').then(msg=>{
         console.log(`Successfully cleared table, result: ${msg}.`);
     }).finally(()=>{
+        io.close();
         server.close(() => {
             console.log('Server terminated');
         })
     });
 });
-    // Dont do this anymore, truncate will be more easier
-    //Iterate over existing room_id-s
-    /*
-    client.query('SELECT room_id FROM availableroom;', function(err, result) {
-  
-        if(err) {
-            //Will truncate all data inside table if failed to get room_id
-            client.query('TRUNCATE TABLE availableroom;');
-            console.error('Error occured. Error msg:', err);
-        }
-
-        try {
-  
-        forEach(result.rows, (row) => {
-          client.query(`UPDATE public.availableroom SET server = 'offline' WHERE room_id='${row.room_id}';`, function(err, result) {
-            console.log(result);
-            if(err) {
-              console.error('Unable to reset room, Error msg:', err);
-            }
-          });
-        });
-
-        } catch(err) {
-        //Will truncate all data inside table if error happened
-        client.query('TRUNCATE TABLE availableroom;');
-        console.error('Error occured. Error msg:', err);
-    }
-      });
-    });
-*/
-
-/*
-//required only if running on local machine
-var os = require( 'os' );
-var networkInterfaces = os.networkInterfaces( );
-var arr = networkInterfaces['Ethernet']
-var ip = arr[1].address;
-console.log("Server IP:",ip);
-*/
-//var opn = require('opn');
-// specify the app to open in 
-//opn('http://localhost/pc', {app: 'chrome'});

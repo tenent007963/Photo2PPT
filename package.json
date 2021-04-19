@@ -11,16 +11,13 @@
     "compressorjs": "^1.0.6",
     "express": "^4.17.1",
     "image-compressor.js": "^1.1.4",
-    "ip": "^1.1.5",
     "jspdf": "^2.3.1",
-    "opn": "^6.0.0",
     "pg": "^8.3.0",
     "pptxgenjs": "^2.6.0",
     "qrcode": "^1.4.4",
     "socket.io": "^2.4.0"
   },
-  "version": "3.0.4",
-  "devDependencies": {},
+  "version": "3.0.5",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tenent007963/InstaPhoto.git"

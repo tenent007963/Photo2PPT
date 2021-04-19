@@ -1,5 +1,10 @@
 // Get WebSocket
-const socket = io();
+const socket = io({
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 1000,
+    autoConnect: false
+});
 
 // Get DOM elements
 let _src1 = document.getElementById("input1");
@@ -54,7 +59,7 @@ let room, lastResult, countResults = 0;
                 _consoleLog(`First try success!`);
             } else {
                 // reconnect
-                socket.socket.connect(); //method1
+                socket.open(); //method1
                 socket.on('connect', () => {
                     socket.emit("join",room);
                     emitPhoto(image);
@@ -90,12 +95,10 @@ function getRoom() {
 
 //Join room
 function joinroom(rm) {
-    $('#popup').modal('hide');
     _consoleLog(`Connecting to room ${rm}.`);
     if(rm === undefined || rm === '') {
         _status.textContent = 'Error: No room code!';
         _consoleLog(`Error: No room code!`);
-        $('#popup').modal('show');
         return 0;
     } 
     if(socket.connected && room != rm) {
@@ -125,19 +128,18 @@ function onScanSuccess(qrCodeMessage) {
 	}
     if (qrCodeMessage === lastResult) {
         countResults = 0;
+        html5QrcodeScanner.clear();
         //let thecode = qrCodeMessage.slice(0,11);
         let thecode = qrCodeMessage.trim();
         _consoleLog(`The code: ${thecode}`);
         joinroom(thecode);
-        html5QrcodeScanner.clear();
         _scanbutton.style.display = "block";
-        return 0;
+        $('#popup').modal('hide');
     }
 }
 
 function onScanFailure(error) {
     // handle scan failure, usually better to ignore and keep scanning
-    //_consoleLog(`QR error = ${error}`);
     console.log(`QR error = ${error}`);
 }
 
@@ -146,7 +148,6 @@ let html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 25});
 html5QrcodeScanner.render(onScanSuccess, onScanFailure);
 
 $("#startScan").on("click", function(){
-    //html5Qrcode.start(cameraId, { fps: 30 },onScanSuccess, onScanFailure).catch(err => { _consoleLog(err)});
     html5QrcodeScanner.render(onScanSuccess, onScanFailure);
     _scanbutton.style.display = 'none';
 });
@@ -171,17 +172,22 @@ let cleanReload = () => {
 //Check socket connection upon window.onfocus
 window.onfocus = () => {
     _consoleLog(`Window focused. Checking connection...`);
-    if (!socket.connected) {
-        _consoleLog(`Passive check, disconnected.`);
-        setOffline();
-        if (socket.socket.connecting === false) {
-            // use a connect() or reconnect() here if you want
-            _consoleLog(`Passive check, reconnecting`);
-            socket.socket.connect();
-            }
-    } else {
+    if (socket.connected) {
         _consoleLog(`Client is connected, falling back.`);
         checkStatus();
+    } else {
+        _consoleLog(`Passive check, socket disconnected.`);
+        setOffline();
+        _consoleLog(`Passive reconnecting...`);
+        socket.open();
+        socket.on('connect', () => {
+            socket.emit("join",room);
+            _consoleLog('Passive reconnect success.');
+        })
+        socket.on('disconnect', ()=> {
+            _status.textContent = 'Passsive reconnect failed.';
+            window.location.reload();
+        })
     }
 }
 
@@ -208,10 +214,10 @@ socket.on("status",function(data){
 });
 
 // Upon socket disconnection
+// 2021/04/19 I honestly don't think this section doing anything, going to comment it and keep observing
+/*
 socket.on('disconnect', reason => {
     _consoleLog(`Socket disconnected, reason: ${reason}`);
-    // try to reconnect
-    //socket.socket.connect();
     socket.open();
     _consoleLog(`Trying to reconnect socket.`);
 });
@@ -236,6 +242,7 @@ socket.on('error',(reason) => {
     _status.textContent = 'An error occured:' + reason;
     window.location.reload();
 });
+*/
 
 // "check" to instruct server send check msg to PC and revert back
 // "cb" to check callback from server
@@ -244,6 +251,7 @@ function checkStatus() {
     socket.emit("client","check",room, (cb) => {
         let res = cb.serverIsOnline;
         if (res === 'true') {
+            $('#popup').modal('hide');
             _consoleLog('Server side online!');
             setOnline();
             _fileform.reset();
@@ -270,6 +278,7 @@ function checkStatus() {
     });
 }
 
+// Do env check and get prev room code on load
 window.onload = () => {
     if (isDebug) {
         window.document.title = "InstantPhoto - Client(Development)";
