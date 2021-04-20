@@ -11,7 +11,7 @@ Customized platform to create required attachment files in a simple manner.
 - Support hotkeys
 - Support drag-n-drop image files
 - Predefined common file name prefix to easily label image files
-- Dual mode (CSO / Engineer)
+- Dual mode (CSO / Tech)
 
 
 # How to deploy:
@@ -36,6 +36,9 @@ On Heroku:
 3. On phone, select `PHONE - SIDE`, wait for the page to load up a QR scanner
 4. Use the QR scanner to scan the QR code that shows on PC
 
+[CSO Mode demo video](https://youtu.be/rvji88DFuSM)
+[Tech Mode demo video](https://youtu.be/9MBMMFiP4mQ)
+
 
 # Hotkeys:
 
@@ -46,4 +49,4 @@ On Heroku:
 
 
 # To-Do:
- 1. Make the whole damn code async and simplify the heck out of it
+ 0. Make the whole damn code async and simplify the heck out of it
