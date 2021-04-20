@@ -21,6 +21,9 @@ async function _consoleLog(stringData) {
 //Loading dependencies depends on env
 //https://gist.github.com/adikahorvath/8707925
 if(isDebug) {
+    //Enabled for Socket.io debug
+    localStorage.debug = '*';
+
     // js
     var loadScript = document.createElement('script');
     loadScript.type = "text/javascript";
@@ -35,10 +38,6 @@ if(isDebug) {
     loadStyle.href = window.location.pathname + ".css?v=" + versionUpdate;
 
     document.getElementsByTagName('head')[0].appendChild(loadStyle);
-
-    //Enabled for Socket.io debug
-    localStorage.debug = '*';
-
 } else {
     if (window.location.href.match(/pc/g)) {
         var loadScript = document.createElement('script');

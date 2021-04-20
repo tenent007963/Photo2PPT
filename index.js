@@ -203,11 +203,12 @@ io.on("connection", async function(socket) {
     });
 
     // Register "join" events, requested by a connected client
-    socket.on("join", function (srcroom) {
+    socket.on("join", (srcroom,callback) => {
         // join channel provided by client
         room = strTrimming(srcroom);
         socket.room = room;
         socket.join(room);
+        callback({result:'ok'});
     });
 
     // Register "leave" events, sent by phone side

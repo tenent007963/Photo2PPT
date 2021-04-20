@@ -75,7 +75,7 @@ const socket = io();
 socket.on("transimage", function(buffallow) {
     _consoleLog(`Image received, processing.`);
     let base64string = btoa([].reduce.call(new Uint8Array(buffallow),function(p,c){return p+String.fromCharCode(c)},''))
-    let image = 'data:image/jpg;base64, ' + base64string;
+    let image = 'data:image/jpg;base64,' + base64string;
     output.src = image;
     if(logimgdata){
         console.log(image);
@@ -145,9 +145,13 @@ function smartFilename() {
     }
 }
 
-//Download image function, to fix file naming problem
+// Download image function, to fix file naming problem
 function imageDl(data) {
-    download(data, smartFilename(), data.type);
+    let mimeType = data.match(/[^:]\w+\/[\w-+\d.]+(?=;|,)/)[0] || 'image/jpg';
+    let fileExt = data.match(/[^:/]\w+(?=;|,)/)[0] || 'jpg';
+    let fileName = smartFilename() + '.' + fileExt;
+    download(data, fileName, mimeType);
+    _consoleLog(fileName, fileExt, mimeType);
 }
 
 async function genQR(data) {
@@ -167,8 +171,11 @@ function refreshroom() {
     _roomindicator.innerHTML = room;
     _roomqr.innerHTML = "";
     genQR(room);
-    socket.emit("join", room);
-    socket.emit("server","isOnline",room);
+    socket.emit("join", room, (callback)=> {
+        if (callback.result == 'ok'){
+            socket.emit("server","isOnline",room);
+        }
+    });
 }
 
 //Whenever adding a new slide, image data will parse into this function
@@ -474,11 +481,15 @@ window.addEventListener("keydown", function(event) {
 //Sample: https://jsfiddle.net/ourcodeworld/hzvfq82b/
 window.addEventListener('paste', function(e) {
     clipboardData = e.clipboardData;
+    
+    // Get image file
     let file = clipboardData.files[0];
     let reader =  new FileReader();
-    pastedData = clipboardData.getData('Text');
+    
+    // Get text string
+    pastedString = clipboardData.getData('Text');
 
-    //if (file instanceof Blob) {
+    // Process image to base64 string
     if (file) {
         reader.readAsDataURL(file);
         reader.onloadend = function () {
@@ -497,22 +508,22 @@ window.addEventListener('paste', function(e) {
             return true;
         } 
     }
-    if (!gpintFocus) {
-        if (pastedData && pptxenabled) {
+
+    // Processing text string
+    if (pastedString) {
+        if(!gpintFocus && pptxenabled) {
             _gpint.value = pastedData.trim();
-            return true;
         }
-    } 
-    if(instaMode == 'tech') {
-        _gpint1.value = pastedData.trim();
-        return true;
+        if(instaMode == 'tech') {
+            _gpint1.value = pastedData.trim();
+        }
     }
 
-    alert("Operation not supported!");
+    //alert("Operation not supported!"); //Discarded due to support majority of content types
 
 });
 
-//To fix duplicate entry when direct paste in _gpint
+//To fix duplicate entry when direct paste in _gpint(s)
 [_gpint,_gpint1].forEach(function(e){
     e.onfocus = function() {
         gpintFocus = true;
@@ -682,10 +693,13 @@ function _log(opt) {
 function roomConnect(val) {
     try {
         room = val;
-        socket.connect();
-        socket.emit('join', val);
-        genQR(val);
-        socket.emit("server","isOnline",val);
+        socket.open();
+        socket.emit('join', val, (callback)=> {
+            if (callback.result == 'ok'){
+                socket.emit("server","isOnline",room);
+                genQR(val);
+            }
+        });
         _roomindicator.innerHTML = room;
         _consoleLog(`Old session reconnected.`)
         return true;

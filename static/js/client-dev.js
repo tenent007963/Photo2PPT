@@ -61,8 +61,7 @@ let room, lastResult, countResults = 0;
                 // reconnect
                 socket.open(); //method1
                 socket.on('connect', () => {
-                    socket.emit("join",room);
-                    emitPhoto(image);
+                    joinroom(room).then(emitPhoto(image));
                     _consoleLog(`Second try success.`);
                 });
                 socket.on('reconnect_error', () => {
@@ -94,25 +93,30 @@ function getRoom() {
 }
 
 //Join room
-function joinroom(rm) {
+async function joinroom(rm) {
+    socket.open()
     _consoleLog(`Connecting to room ${rm}.`);
-    if(rm === undefined || rm === '') {
+    if(rm == undefined || rm == '') {
         _status.textContent = 'Error: No room code!';
         _consoleLog(`Error: No room code!`);
-        return 0;
+        throw 'Error: No room code!';
     } 
     if(socket.connected && room != rm) {
         leaveroom(room);
     }
+    socket.emit("join",rm, (callback)=> {
+        if (callback.result === 'ok'){
+            checkStatus();
+            _consoleLog(`Join room success!`)
+        }
+    });
     Cookies.set('room',rm,{ expires: 31 ,path: ''});
-    socket.emit("join",rm);
     room = rm;
-    checkStatus();
     return 0;
 }
 
 //Leave room
-function leaveroom(rm){
+async function leaveroom(rm){
     socket.emit("leave",rm);
     setOffline();
     _status.textContent = 'Disconnected from room ' + rm + '.';
@@ -156,11 +160,13 @@ $("#startScan").on("click", function(){
 let setOnline = () => {
     _roomIndicator.innerHTML = "&#x25cf; Online";
     _roomIndicator.className = "online";
+    $('#popup').modal('hide');
 }
 
 let setOffline = () => {
     _roomIndicator.innerHTML = "&#x25cf; Offline";
     _roomIndicator.className = "offline";
+    $('#popup').modal('show');
 }
 
 //This function is to do a clean reload and cookie flushing
@@ -181,8 +187,9 @@ window.onfocus = () => {
         _consoleLog(`Passive reconnecting...`);
         socket.open();
         socket.on('connect', () => {
-            socket.emit("join",room);
+            joinroom(room);
             _consoleLog('Passive reconnect success.');
+            checkStatus();
         })
         socket.on('disconnect', ()=> {
             _status.textContent = 'Passsive reconnect failed.';
@@ -251,10 +258,9 @@ function checkStatus() {
     socket.emit("client","check",room, (cb) => {
         let res = cb.serverIsOnline;
         if (res === 'true') {
-            $('#popup').modal('hide');
             _consoleLog('Server side online!');
-            setOnline();
             _fileform.reset();
+            setOnline();
             return true;
         } else if(res === 'false') {
             _consoleLog(`Server side offline!`);
@@ -265,14 +271,14 @@ function checkStatus() {
         } else if(res === 'error') {
             _status.textContent = 'Incorrect room details.';
             _fileform.reset();
-            $('#popup').modal('show');
-            window.room = '';
+            room = '';
+            setOffline();
             _consoleLog(`Incorrect room details.`);
             return false;
         } else {
             _status.textContent = 'An error occurred. Will proceed with force refresh.';
-            window.location.reload();
             _consoleLog(`An error occurred.`);
+            window.location.reload();
         }
 
     });
