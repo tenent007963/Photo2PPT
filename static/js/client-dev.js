@@ -16,6 +16,7 @@ let _roomCodeInput = document.getElementById("roomCode");
 let _roomIndicator = document.getElementById("roomindicator");
 let _scanbutton = document.getElementById("startScan");
 let _saveButton = document.getElementById("savefile");
+let _container = document.getElementById("container");
 
 // Join a channel
 let room, lastResult, countResults = 0;
@@ -220,37 +221,6 @@ socket.on("status",function(data){
     }
 });
 
-// Upon socket disconnection
-// 2021/04/19 I honestly don't think this section doing anything, going to comment it and keep observing
-/*
-socket.on('disconnect', reason => {
-    _consoleLog(`Socket disconnected, reason: ${reason}`);
-    socket.open();
-    _consoleLog(`Trying to reconnect socket.`);
-});
-
-socket.on('connect',() => {
-    _consoleLog(`Reconnecting room.`);
-    socket.emit("join",room);
-    setOnline();
-    checkStatus();
-})
-
-socket.on('reconnect_error',function(reason){
-    _consoleLog(`Reconnect error.`);
-    setOffline();
-    _status.textContent = reason;
-    window.location.reload();
-})
-
-socket.on('error',(reason) => {
-    _consoleLog(`An error occured.`);
-    setOffline();
-    _status.textContent = 'An error occured:' + reason;
-    window.location.reload();
-});
-*/
-
 // "check" to instruct server send check msg to PC and revert back
 // "cb" to check callback from server
 function checkStatus() {
@@ -296,4 +266,5 @@ window.onload = () => {
         joinroom(getRoom);
         _consoleLog(`Joining old room, room code: ${getRoom}`)
     }
+    _container.style.display = block;
 }
