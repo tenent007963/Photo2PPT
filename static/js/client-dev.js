@@ -16,7 +16,6 @@ let _roomCodeInput = document.getElementById("roomCode");
 let _roomIndicator = document.getElementById("roomindicator");
 let _scanbutton = document.getElementById("startScan");
 let _saveButton = document.getElementById("savefile");
-let _container = document.getElementById("container");
 
 // Join a channel
 let room, lastResult, countResults = 0;
