@@ -204,7 +204,7 @@ function addSlide(image) {
                 var width = img_width, height= img_height;
             }
             window.slide = pptx.addNewSlide();
-            slide.addImage({ data: rotated_image,w:width, h:height, sizing:{ type:'cover',w:10,h:5.6}});
+            slide.addImage({ data: rotated_image,w:width, h:height, sizing:{type:'cover'}});
         }
         imgmeasures.src = rotated_image;
         triggerthumbnail(rotated_image);
