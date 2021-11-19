@@ -134,7 +134,6 @@ function onScanSuccess(qrCodeMessage) {
     if (qrCodeMessage === lastResult) {
         countResults = 0;
         html5QrcodeScanner.clear();
-        //let thecode = qrCodeMessage.slice(0,11);
         let thecode = qrCodeMessage.trim();
         _consoleLog(`The code: ${thecode}`);
         joinroom(thecode);
@@ -266,5 +265,4 @@ window.onload = () => {
         joinroom(getRoom);
         _consoleLog(`Joining old room, room code: ${getRoom}`)
     }
-    _container.style.display = block;
 }

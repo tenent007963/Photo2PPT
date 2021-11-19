@@ -50,3 +50,4 @@ On Heroku:
 
 # To-Do:
  0. Make the whole damn code async and simplify the heck out of it
+ 1. Host side ping check for server side status

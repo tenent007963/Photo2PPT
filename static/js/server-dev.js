@@ -36,7 +36,6 @@ let latencycount = 0;
 let room;
 let logping = false;
 let logimgdata = false;
-//let gpintFocus = false;
 let highPingErr = false;
 
 //Pre-init elements
@@ -485,7 +484,6 @@ window.addEventListener("keydown", function(event) {
 
 //Sample: https://jsfiddle.net/ourcodeworld/hzvfq82b/
 window.addEventListener('paste', function(e) {
-    e.preventDefault()
     clipboardData = e.clipboardData;
     
     // Get image file
@@ -518,29 +516,15 @@ window.addEventListener('paste', function(e) {
     // Processing text string
     if (pastedString) {
         if(pptxenabled) {
-            _gpint.value = pastedData.trim();
+            e.preventDefault()
+            _gpint.value = pastedString.trim();
         }
         if(instaMode == 'tech') {
-            _gpint1.value = pastedData.trim();
+            e.preventDefault()
+            _gpint1.value = pastedString.trim();
         }
     }
-
-    //alert("Operation not supported!"); //Discarded due to support majority of content types
-
 });
-
-//To fix duplicate entry when direct paste in _gpint(s)
-//2021/11/16 can e.preventDefault fix this?
-/*
-[_gpint,_gpint1].forEach(function(e){
-    e.onfocus = function() {
-        gpintFocus = true;
-    }
-    e.onblur = function() {
-        gpintFocus = false;
-    }
-})
-*/
 
 //Dropzone : Drop the beat
 if (dropZone) {
@@ -703,8 +687,10 @@ function _log(opt) {
 let pingPop = () => {
     if (!highPingErr) {
         highPingErr = true;
+        _latency.style.color = "orange";
     } else {
         highPingErr = false;
+        _latency.style.color = "green";
     }
     return highPingErr;
 }

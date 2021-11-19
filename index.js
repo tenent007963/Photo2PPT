@@ -11,12 +11,25 @@ const dbURL = process.env.DATABASE_URL;
 //Init postgres connection & setup
 const client = new Client({
     connectionString: dbURL,
-    ssl:{rejectUnauthorized: false},
+    ssl: {
+        require : process.env.DATABASE_URL ? true : false,
+        rejectUnauthorized: false
+    }
 });
-client.connect();
+client.connect(err => {
+    if (err) {
+      console.error('Error Connecting: ', err.stack);
+      console.log(`Limited access.`);
+    } else {
+      console.log('connected');
+    }
+});
 client.query('CREATE TABLE IF NOT EXISTS availableroom (room_id CHAR(11) PRIMARY KEY, server CHAR(8), client CHAR(8));', (err, res) => {
-    if (err) console.log(`Operating in headless mode, Postgres error:`,err);
-    console.log(`Result from postgres:`,res.command);
+    if (err) {
+        console.log(`Operating in headless mode, Postgres error:`,err)
+    } else {
+        console.log(`Result from postgres:`,res.command);
+    }
 });
 
 //https://nodejs.org/en/docs/guides/anatomy-of-an-http-transaction/
@@ -112,14 +125,13 @@ io.on("connection", async function(socket) {
     // Register "server" events sent by server ONLY
     socket.on("server", (data, srcroom, callback) => {
         room = strTrimming(srcroom);
-        if (room)
         // check for sent data
         switch (data) {
             case "isOnline":
+                rooms.setServerOnline(room);
                 console.log(`Received "isOnline" packet, updating ${room} record on host side.`);
                 socket.room = room;
                 socket.join(room);
-                rooms.setServerOnline(room);
                 socket.on('disconnect', function (reason) {
                     //This code have bug, sample:
                     // Socket for transport close disconnected, updating transport close record. Reason:transport close
@@ -217,16 +229,6 @@ io.on("connection", async function(socket) {
         // leave the current room
         socket.leave(room);
     });
-
-    //Spare disconnect function to reset room status
-    //Do not use, will cause the status check malfunc due to same transport with server/client
-    /*
-    socket.on("disconnect", function (reason) {
-        room = socket.room;
-        rooms.setServerOffline(room);
-        console.log(`Room ${room} disconnected, reason: ${reason}.`);
-    })
-    */
 
     // Register "recvimage" events, a newer function sent by the client
     socket.on("recvimage", (data, srcroom, callback) => {

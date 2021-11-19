@@ -36,7 +36,7 @@ let latencycount = 0;
 let room;
 let logping = false;
 let logimgdata = false;
-let gpintFocus = false;
+let highPingErr = false;
 
 //Pre-init elements
 let instaMode = '';
@@ -45,6 +45,7 @@ let prefix = '';
 //Enable PPTXGenJS...or not?
 function togglepptx() {
     if (pptxenabled) {
+        window.pptx = null;
         _pptstat.innerHTML = "Off";
         pptxenabled = false;
         _svppt.disabled = true;
@@ -69,7 +70,10 @@ function togglepptx() {
 }
 
 // Get WebSocket
-const socket = io();
+const socket = io({
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 100});
 
 // new "transimage" socket - w/o room param
 socket.on("transimage", function(buffallow) {
@@ -200,7 +204,7 @@ function addSlide(image) {
                 var width = img_width, height= img_height;
             }
             window.slide = pptx.addNewSlide();
-            slide.addImage({ data: rotated_image,w:width, h:height, sizing:{ type:'contain',w:10,h:5.6}});
+            slide.addImage({ data: rotated_image,w:width, h:height, sizing:{ type:'cover',w:10,h:5.6}});
         }
         imgmeasures.src = rotated_image;
         triggerthumbnail(rotated_image);
@@ -511,28 +515,16 @@ window.addEventListener('paste', function(e) {
 
     // Processing text string
     if (pastedString) {
-        if(!gpintFocus && pptxenabled) {
-            _gpint.value = pastedData.trim();
+        if(pptxenabled) {
+            e.preventDefault()
+            _gpint.value = pastedString.trim();
         }
         if(instaMode == 'tech') {
-            _gpint1.value = pastedData.trim();
+            e.preventDefault()
+            _gpint1.value = pastedString.trim();
         }
     }
-
-    //alert("Operation not supported!"); //Discarded due to support majority of content types
-
 });
-
-//To fix duplicate entry when direct paste in _gpint(s)
-[_gpint,_gpint1].forEach(function(e){
-    e.onfocus = function() {
-        gpintFocus = true;
-    }
-    e.onblur = function() {
-        gpintFocus = false;
-    }
-})
-
 
 //Dropzone : Drop the beat
 if (dropZone) {
@@ -605,6 +597,7 @@ function devTool() {
         xyz = 1;
     }
     xyz++;
+    /* //Temporary deactivate passphrase section due to unnecessary
     if(xyz===11){
         const passcode = prompt("Please enter passcode for the development section:", "WritePasswordHere");
         const passphrase = prompt("Please enter passphrase for verification:", "WritePassphraseHere");
@@ -631,6 +624,11 @@ function devTool() {
                 _consoleLog('Unknown Error.')
             }
         }
+    }*/
+    if(xyz===11){ 
+        _bottombar.style.display="block";
+        _consoleLog("Activated.");
+        return true;
     }
 }
 
@@ -684,6 +682,17 @@ function _log(opt) {
         default:
             return false;
     }
+}
+
+let pingPop = () => {
+    if (!highPingErr) {
+        highPingErr = true;
+        _latency.style.color = "orange";
+    } else {
+        highPingErr = false;
+        _latency.style.color = "green";
+    }
+    return highPingErr;
 }
 
 
@@ -778,7 +787,7 @@ socket.on('pong', (ping) => {
         if (latencycount >= 4) {
             _latency.style.color = "red";
         }
-        if (latencycount >= 7) {
+        if (latencycount >= 8 && highPingErr) {
             alert('High latency detected, some functions might not working properly.');
         }
     }
