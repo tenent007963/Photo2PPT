@@ -17,7 +17,7 @@
     "qrcode": "^1.3.2",
     "socket.io": "^2.4.0"
   },
-  "version": "5.0.0",
+  "version": "5.1.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tenent007963/InstaPhoto.git"
