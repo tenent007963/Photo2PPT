@@ -1,9 +1,10 @@
 {
-  "name": "instaphoto",
-  "description": "Phone Snap, PC get.",
+  "name": "photo2ppt",
+  "description": "Take picture on phone, get PPT on PC",
   "scripts": {
     "start": "node index.js",
-    "release": "node preProd.js"
+    "release": "node preProd.js",
+    "build": "node index.js"
   },
   "main": "index.js",
   "license": "ISC",
@@ -20,11 +21,11 @@
   "version": "5.1.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tenent007963/InstaPhoto.git"
+    "url": "git+https://github.com/tenent007963/Photo2PPT.git"
   },
   "author": "Tenent Jason",
   "bugs": {
-    "url": "https://github.com/tenent007963/InstaPhoto/issues"
+    "url": "https://github.com/tenent007963/Photo2PPT/issues"
   },
-  "homepage": "https://github.com/tenent007963/InstaPhoto#readme"
+  "homepage": "https://github.com/tenent007963/Photo2PPT#readme"
 }
