@@ -11,10 +11,14 @@
   "theme_color": "#ffffff",
   "icons": [
     {
-      "src": "./favicon.ico"
+      "src": "./cacat.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "./favicon.ico",
+      "sizes": "48x48",
       "type": "image/x-icon"
     }
   ],
