@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "xyz.svrcd.pic2ppt.twa",
+        "sha256_cert_fingerprints": ["55:CD:68:65:5B:DE:A5:E6:B1:B8:4E:9D:36:FA:26:05:24:21:AE:5E:B6:6B:23:C7:4F:C8:FE:6F:93:4A:08:54"]
+      }
+    }]
