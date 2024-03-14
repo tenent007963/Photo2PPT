@@ -37,7 +37,7 @@ let server=http.createServer(function(req,res){
     let pathname=url.parse(req.url).pathname;
     let fsCallback = function(error, data) {
         if(error) throw error;
-
+        res.contentType(path.basename(pathname));
         res.writeHead(200);
         res.write(data);
         res.end();
