@@ -113,7 +113,8 @@ let server=http.createServer(function(req,res){
             fs.readFile(__dirname + '/static/manifest.json', 'utf8', fsCallback);
         break;
         default:
-            /* doc = */ fs.readFile(__dirname + '/static/index.html', 'utf8', fsCallback);
+            /* doc = */ //fs.readFile(__dirname + '/static/index.html', 'utf8', fsCallback);
+            fs.readFile(__dirname + '/static/' + pathname, 'utf8', fsCallback);
         break;
     }
 	
