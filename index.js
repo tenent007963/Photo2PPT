@@ -103,18 +103,21 @@ let server=http.createServer(function(req,res){
         case '/dev.js':
             fs.readFile(__dirname + '/static/js/dev.js', 'utf8', fsCallback);
         break;
+        case '/manifest.json':
+            fs.readFile(__dirname + '/static/manifest.json', 'utf8', fsCallback);
+        break;
+        case '/cacat.png':
+            fs.readFile(__dirname + '/static/cacat.png', 'utf8', fsCallback);
+        break;
         case '/papertrail':
             collectRequestData(req, result => {
                 console.log(`Response from ${result['room']} with message '${result['msg']}'`);
             });
             fsCallback(null,`Confirmation of receiving, timestamp: ${Math.floor(+new Date() / 1000)}`);
         break;
-        case '/manifest.json':
-            fs.readFile(__dirname + '/static/manifest.json', 'utf8', fsCallback);
-        break;
         default:
-            /* doc = */ //fs.readFile(__dirname + '/static/index.html', 'utf8', fsCallback);
-            fs.readFile(__dirname + '/static/' + pathname, 'utf8', fsCallback);
+            /* doc = */ fs.readFile(__dirname + '/static/index.html', 'utf8', fsCallback);
+            //fs.readFile(__dirname + '/static/' + pathname, 'utf8', fsCallback);
         break;
     }
 	
