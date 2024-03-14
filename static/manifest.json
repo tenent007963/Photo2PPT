@@ -1,13 +1,26 @@
 {
-  "background_color": "#ffffff",
+  "background_color": "#282828",
+  "description": "InstaPhoto - Instant send freshly taken photos from your phone to your computer. Customized platform to create PowerPoint files in a simple way.",
   "dir": "ltr",
-  "display": "standalone",
-  "name": "pic2ppt.vercel",
-  "orientation": "any",
+  "display": "minimal-ui",
+  "name": "Photo2PPT",
+  "orientation": "portrait",
   "scope": "/",
-  "short_name": "pic2ppt.vercel",
+  "short_name": "pic2ppt",
   "start_url": "/",
   "theme_color": "#ffffff",
-  "id": "pic2ppt",
-  "description": "Customized platform to create powerpoint files in a simple way."
+  "icons": [
+    {
+      "src": "./favicon.ico"
+    },
+    {
+      "src": "./favicon.ico",
+      "type": "image/x-icon"
+    }
+  ],
+  "id": "pic2ppt.svrcd",
+  "lang": "en",
+  "categories": [
+    "utilities"
+  ]
 }
