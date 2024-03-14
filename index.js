@@ -36,8 +36,12 @@ client.query('CREATE TABLE IF NOT EXISTS availableroom (room_id CHAR(11) PRIMARY
 let server=http.createServer(function(req,res){
     let pathname=url.parse(req.url).pathname;
     let fsCallback = function(error, data) {
-        if(error) throw error;
-        res.contentType(pathname);
+        if(error) {
+            res.writeHead(404);
+            res.send("Oops! Couldn't find that file.");
+            res.end();
+        }
+        res.type(pathname);
         res.writeHead(200);
         res.write(data);
         res.end();
