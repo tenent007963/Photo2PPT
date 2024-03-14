@@ -35,85 +35,108 @@ client.query('CREATE TABLE IF NOT EXISTS availableroom (room_id CHAR(11) PRIMARY
 //https://nodejs.org/en/docs/guides/anatomy-of-an-http-transaction/
 let server=http.createServer(function(req,res){
     let pathname=url.parse(req.url).pathname;
+    let mime = '';
     let fsCallback = function(error, data) {
         if(error) {
             res.writeHead(404);
             res.send("Oops! Couldn't find that file.");
             res.end();
         }
-        res.writeHead(200);
-        res.type(pathname).send();
+        res.writeHead(200, {'Content-Type': mime});
         res.write(data);
         res.end();
     }
     switch(pathname){
 		case '/server-dev':
+            mime='text/html';
             fs.readFile(__dirname + '/static/server-dev.html', 'utf8', fsCallback);
         break;
 		case '/pc':
+            mime='text/html';
             fs.readFile(__dirname + '/static/server.html', 'utf8', fsCallback);
         break;
 		case '/client-dev':
+            mime='text/html';
             fs.readFile(__dirname + '/static/client-dev.html', 'utf8', fsCallback);
         break;
 		case '/phone':
+            mime='text/html';
             fs.readFile(__dirname + '/static/client.html', 'utf8', fsCallback);
         break;
 		case '/favicon.ico':
+            mime='image/x-icon';
             fs.readFile(__dirname + '/static/favicon.ico', fsCallback);
         break;
 		case '/jquery.js':
+            mime='text/javascript';
             fs.readFile(__dirname + '/static/js/jquery-3.5.1.min.js', 'utf8', fsCallback);
         break;
 		case '/bootstrap.css':
+            mime='text/css';
             fs.readFile(__dirname + '/static/css/bootstrap.min.css', 'utf8', fsCallback);
         break;
 		case '/bootstrap.js':
+            mime='text/javascript';
             fs.readFile(__dirname + '/static/js/bootstrap.min.js', 'utf8', fsCallback);
         break;
 		case '/compressor.js':
+            mime='text/javascript';
 			fs.readFile(__dirname + '/node_modules/compressorjs/dist/compressor.js', 'utf8', fsCallback);
 		break;
         case '/html5-qrcode.min.js':
+            mime='text/javascript';
             fs.readFile(__dirname + '/static/js/html5-qrcode.min.js', 'utf8', fsCallback);
         break;
         case '/keepalive':
+            mime='text/plain';
             fs.readFile(__dirname + '/static/keepalive.txt', 'utf8', fsCallback);
         break;
         case '/server.js':
+            mime='text/javascript';
             fs.readFile(__dirname + '/static/js/server.js', 'utf8', fsCallback);
         break;
         case '/client.js':
+            mime='text/javascript';
             fs.readFile(__dirname + '/static/js/client.js', 'utf8', fsCallback);
         break;
         case '/server-dev.js':
+            mime='text/javascript';
             fs.readFile(__dirname + '/static/js/server-dev.js', 'utf8', fsCallback);
         break;
         case '/client-dev.js':
+            mime='text/javascript';
             fs.readFile(__dirname + '/static/js/client-dev.js', 'utf8', fsCallback);
         break;
         case '/server.css':
+            mime='text/css';
             fs.readFile(__dirname + '/static/css/server.css', 'utf8', fsCallback);
         break;
         case '/client.css':
+            mime='text/css';
             fs.readFile(__dirname + '/static/css/client.css', 'utf8', fsCallback);
         break;
         case '/server-dev.css':
+            mime='text/css';
             fs.readFile(__dirname + '/static/css/server-dev.css', 'utf8', fsCallback);
         break;
         case '/client-dev.css':
+            mime='text/css';
             fs.readFile(__dirname + '/static/css/client-dev.css', 'utf8', fsCallback);
         break;
         case '/dev.js':
+            mime='text/javascript';
             fs.readFile(__dirname + '/static/js/dev.js', 'utf8', fsCallback);
         break;
         case '/manifest.json':
+            mime='application/json';
             fs.readFile(__dirname + '/static/manifest.json', 'utf8', fsCallback);
         break;
         case '/cacat.png':
+            mime='image/png';
             fs.readFile(__dirname + '/static/cacat.png', 'utf8', fsCallback);
         break;
         case '/papertrail':
+            mime='text/plain';
             collectRequestData(req, result => {
                 console.log(`Response from ${result['room']} with message '${result['msg']}'`);
             });
