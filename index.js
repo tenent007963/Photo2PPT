@@ -135,6 +135,10 @@ let server=http.createServer(function(req,res){
             mime='image/png';
             fs.readFile(__dirname + '/static/cacat.png', 'utf8', fsCallback);
         break;
+        case '/.well-known/assetlinks.json':
+            mime='application/json';
+            fs.readFile(__dirname + '/static/assetlinks.json', 'utf8', fsCallback);
+        break;
         case '/papertrail':
             mime='text/plain';
             collectRequestData(req, result => {

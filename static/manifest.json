@@ -11,7 +11,7 @@
   "theme_color": "#ffffff",
   "icons": [
     {
-      "src": "./cacat.png",
+      "src": "https://i.imgur.com/m0sbY28.png",
       "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any"
