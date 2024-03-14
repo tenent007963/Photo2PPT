@@ -41,8 +41,8 @@ let server=http.createServer(function(req,res){
             res.send("Oops! Couldn't find that file.");
             res.end();
         }
-        res.type(pathname);
         res.writeHead(200);
+        res.type(pathname).send();
         res.write(data);
         res.end();
     }
