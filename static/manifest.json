@@ -1,0 +1,13 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "pic2ppt.vercel",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "pic2ppt.vercel",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "id": "pic2ppt",
+  "description": "Customized platform to create powerpoint files in a simple way."
+}

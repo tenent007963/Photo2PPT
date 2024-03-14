@@ -109,6 +109,9 @@ let server=http.createServer(function(req,res){
             });
             fsCallback(null,`Confirmation of receiving, timestamp: ${Math.floor(+new Date() / 1000)}`);
         break;
+        case '/manifest.json':
+            fs.readFile(__dirname + '/static/manifest.json', 'utf8', fsCallback);
+        break;
         default:
             /* doc = */ fs.readFile(__dirname + '/static/index.html', 'utf8', fsCallback);
         break;

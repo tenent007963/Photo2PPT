@@ -3,8 +3,7 @@
   "description": "Take picture on phone, get PPT on PC",
   "scripts": {
     "start": "node index.js",
-    "release": "node preProd.js",
-    "build": "node index.js"
+    "build": "node preProd.js"
   },
   "main": "index.js",
   "license": "ISC",
