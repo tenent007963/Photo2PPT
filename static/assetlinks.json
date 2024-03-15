@@ -1,8 +1,15 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "xyz.svrcd.pic2ppt.twa",
-        "sha256_cert_fingerprints": ["55:CD:68:65:5B:DE:A5:E6:B1:B8:4E:9D:36:FA:26:05:24:21:AE:5E:B6:6B:23:C7:4F:C8:FE:6F:93:4A:08:54"]
-      }
-    }]
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "xyz.svrcd.pic2ppt.twa",
+      "sha256_cert_fingerprints": [
+        "55:CD:68:65:5B:DE:A5:E6:B1:B8:4E:9D:36:FA:26:05:24:21:AE:5E:B6:6B:23:C7:4F:C8:FE:6F:93:4A:08:54",
+        "6B:31:61:1D:07:40:A8:34:A3:32:4D:0E:A4:84:9F:3D:F9:46:4E:8E:23:29:DD:0D:B3:8E:C8:24:18:5D:94:26"
+      ]
+    }
+  }
+]
