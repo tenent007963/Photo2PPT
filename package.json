@@ -9,7 +9,7 @@
   "license": "ISC",
   "dependencies": {
     "compressorjs": "^1.0.6",
-    "express": "^4.17.3",
+    "express": "^4.19.2",
     "image-compressor.js": "^1.1.4",
     "jspdf": "^2.3.1",
     "pg": "^8.3.0",
