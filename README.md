@@ -55,3 +55,4 @@ On Heroku:
  1. Host side ping check for server side status
  2. To use local SQLite file instead of spinning up new database
  3. P2P encryption for security enhancement
+ 4. Implement https://jam.dev/
